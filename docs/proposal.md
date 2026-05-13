@@ -56,21 +56,22 @@ The project will:
 
 The project will be considered successful if, by end of Week 7:
 
-| Criterion | Target |
-|---|---|
-| Deployed application | Publicly accessible at a stable URL |
-| Opportunity database | Minimum 20 seeded opportunities across all 5 types |
-| User roles working | All 3 roles (Student, Organization, Admin) functional end-to-end |
-| Usability testing | Conducted with ≥ 5 students, results documented |
-| Survey response | ≥ 20 student responses collected and analyzed |
-| Documentation | Complete report, UML diagrams, API spec, README |
-| Presentation | Delivered live with working demo |
+| Criterion            | Target                                                           |
+| -------------------- | ---------------------------------------------------------------- |
+| Deployed application | Publicly accessible at a stable URL                              |
+| Opportunity database | Minimum 20 seeded opportunities across all 5 types               |
+| User roles working   | All 3 roles (Student, Organization, Admin) functional end-to-end |
+| Usability testing    | Conducted with ≥ 5 students, results documented                  |
+| Survey response      | ≥ 20 student responses collected and analyzed                    |
+| Documentation        | Complete report, UML diagrams, API spec, README                  |
+| Presentation         | Delivered live with working demo                                 |
 
 ---
 
 ## 3. Scope
 
 ### 3.1 In Scope
+
 - Web-based platform (responsive — works on mobile browsers)
 - 5 opportunity types: internship, job, scholarship, volunteer, competition
 - 3 user roles: Student, Organization, Admin
@@ -80,9 +81,10 @@ The project will be considered successful if, by end of Week 7:
 - Deployment to public cloud platforms
 
 ### 3.2 Out of Scope (for v1)
+
 - Native mobile apps (iOS / Android)
-- Full Khmer-language translation *(schema-ready, UI deferred)*
-- Direct application submission within the platform *(external links only in v1)*
+- Full Khmer-language translation _(schema-ready, UI deferred)_
+- Direct application submission within the platform _(external links only in v1)_
 - Payment processing or paid postings
 - Real-time chat or messaging
 - Advanced recommendation algorithms / AI matching
@@ -101,4 +103,4 @@ This project contributes value at three levels:
 
 ---
 
-*This document is the formal proposal for Week 1 of the Opportunities Hub project. It will be refined as user survey results come in and as design decisions are finalized in Week 2.*
+_This document is the formal proposal for Week 1 of the Opportunities Hub project. It will be refined as user survey results come in and as design decisions are finalized in Week 2._
