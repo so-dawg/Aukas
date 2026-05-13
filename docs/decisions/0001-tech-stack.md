@@ -10,17 +10,16 @@
 
 ## 1. Context
 
-We are building a full-stack web platform — Opportunities Hub — over 7 weeks with a 3-person team. The platform must:
+Opportunities Hub is a 7-week capstone web platform for Cambodian students, built by a 3-person team across the courses Backend Development, Database Administration, Software Engineering, Automata, HCI, and Research Methodology.
 
-- Serve five types of opportunities (internship, job, scholarship, volunteer, competition)
-- Support three user roles with authentication (student, organization, admin)
-- Run a moderation workflow (admin approves postings)
-- Be reachable publicly on a stable URL by end of Week 7
-- Integrate the learning objectives of six courses: Backend Development, Database Administration, Software Engineering, Automata, HCI, and Research Methodology
+The technology stack is specified in the project workflow plan (`docs/opportunities_workflow.pdf`): **React · Node.js · Express · PostgreSQL · Docker**. This ADR records that stack and the reasoning that supports each choice.
 
-The team has prior coursework in JavaScript, SQL, and basic React. None of us has shipped a production app in Django, Spring, or .NET. The time budget is tight (7 weeks, part-time alongside other courses), and the grading rubric explicitly references the technologies in the Backend Dev and DB Admin syllabi.
+### Hard constraints
 
-This document records the technology choices for the project and the reasoning behind each, so future-us (and the graders) can understand the trade-offs we accepted.
+- **No budget.** Every service, library, and tool must be free or open-source.
+- **7-week timeline**, part-time, alongside other coursework.
+- **Public deployment** required by end of Week 7.
+- Stack must align with the syllabi of the six listed courses.
 
 ---
 
@@ -28,12 +27,12 @@ This document records the technology choices for the project and the reasoning b
 
 | Layer    | Choice                                      |
 | -------- | ------------------------------------------- |
-| Frontend | **React** (Vite build tool)                 |
-| Backend  | **Node.js + Express**                       |
-| Database | **PostgreSQL**                              |
-| Auth     | **JWT** (jsonwebtoken) + **bcrypt**         |
-| Local dev | **Docker + Docker Compose**                |
-| Hosting  | **Vercel** (FE) · **Render** (API) · **Railway** (DB) |
+| Frontend | React (Vite)                                |
+| Backend  | Node.js + Express                           |
+| Database | PostgreSQL                                  |
+| Auth     | JWT (`jsonwebtoken`) + `bcrypt`             |
+| Local dev | Docker + Docker Compose                    |
+| Hosting  | Vercel (FE) · Render (API) · Railway (DB)   |
 
 ---
 
@@ -41,127 +40,114 @@ This document records the technology choices for the project and the reasoning b
 
 ### 3.1 Backend — Node.js + Express
 
-**Chosen over:** Django (Python), Spring Boot (Java), Laravel (PHP), .NET, FastAPI.
+**Why this fits the project:**
+- Same language (JavaScript) on frontend and backend reduces context-switching across the stack.
+- Express is the standard minimal web framework for Node — small surface area, well-documented.
+- Aligns with the Backend Development syllabus (middleware, routing, REST patterns).
+- Deploys onto free hosting tiers (Render, Railway, Fly.io).
 
-**Reasons**
-- The team already knows JavaScript; choosing Node means one language across frontend and backend, reducing context-switching cost in a tight 7-week window.
-- Express is the de-facto Node web framework — minimal, well-documented, with abundant tutorials and StackOverflow coverage in case we get stuck.
-- The Backend Development syllabus references Node/Express patterns (middleware, routing, REST).
-- Easy to deploy on free tiers (Render, Railway, Fly.io).
-
-**Trade-offs / risks**
-- JavaScript's looser typing increases the risk of runtime bugs vs. a typed stack like Spring or .NET. **Mitigation:** strict input validation at the API boundary (regex/joi) — this also covers the Automata course requirement.
-- Express is unopinionated, so we own the project structure. **Mitigation:** follow a standard `routes / controllers / models / middleware` layout from day one (see repo layout).
+**Known limitations:**
+- JavaScript is dynamically typed — runtime errors that a typed language would catch at compile time can slip through. Mitigated by strict input validation at the API boundary, which also satisfies the Automata course requirement (regex / formal validation).
+- Express is unopinionated; project structure is on us. Repository already follows a `routes / controllers / models / middleware / db` layout.
 
 ---
 
 ### 3.2 Database — PostgreSQL
 
-**Chosen over:** MongoDB, MySQL, SQLite.
+**Why this fits the project:**
+- The data model is highly relational (users ↔ opportunities ↔ categories ↔ tags ↔ bookmarks ↔ applications) — a relational DB is the natural choice.
+- The Database Administration syllabus covers normalization, foreign keys, indexes, and transactions — first-class concepts in PostgreSQL.
+- Features used directly by this project: enums (`role`, `status`), full-text search (opportunity search), JSONB (future flexible fields).
+- Free under Railway / Supabase / Neon free tiers.
 
-**Reasons**
-- Our data is highly relational: users ↔ opportunities ↔ categories ↔ tags ↔ bookmarks ↔ applications. A relational DB is the natural fit.
-- The Database Administration course explicitly covers normalization, foreign keys, indexes, and transactions — all first-class in PostgreSQL.
-- PostgreSQL has features we will actually use: enums (for `role`, `status`), full-text search (for opportunity search), and JSONB (escape hatch for future flexible fields).
-- Free, open-source, and supported on every cheap hosting platform (Railway, Supabase, Render).
-- MySQL is similar but has weaker enum and full-text-search support; SQLite doesn't fit multi-user web apps; MongoDB would force us into ad-hoc joins in application code, which clashes with the DB Admin syllabus.
-
-**Trade-offs / risks**
-- Slightly steeper learning curve than SQLite for setup. **Mitigation:** Docker Compose makes local Postgres a one-command start.
-- ORM choice (Prisma vs. Knex vs. raw SQL) is a separate decision — see future ADR.
+**Known limitations:**
+- More setup overhead than SQLite. Docker Compose makes local Postgres reproducible with one command.
+- ORM choice deferred — see ADR-0003 (future).
 
 ---
 
-### 3.3 Frontend — React (with Vite)
+### 3.3 Frontend — React (Vite)
 
-**Chosen over:** Vue, Svelte, plain HTML+JS, Next.js.
+**Why this fits the project:**
+- Specified in the workflow plan.
+- Large ecosystem — easiest to find UI components, hooks, and tutorials.
+- Vite is the modern build tool for React (Create React App is no longer maintained).
+- Static SPA output deploys to Vercel free tier.
 
-**Reasons**
-- React has the largest ecosystem and community — easiest to find UI libraries, hooks, and examples.
-- The team has been exposed to React in coursework; learning curve is the shallowest of the realistic options.
-- **Vite** over Create React App because CRA is no longer actively maintained as of 2024. Vite is faster, simpler, and the modern default.
-- We don't need server-side rendering for v1 — a static SPA is enough, so Next.js's extra complexity isn't justified.
-
-**Trade-offs / risks**
-- SPA + separate API means we manage CORS, auth headers, and routing on both sides. **Mitigation:** centralise API calls in one `api.js` module from day one.
+**Known limitations:**
+- SPA + separate API means CORS and auth headers must be handled correctly. A single `api.js` module will centralise API calls.
 
 ---
 
 ### 3.4 Authentication — JWT + bcrypt
 
-**Chosen over:** session cookies, OAuth-only, Auth0/Clerk.
+**Why this fits the project:**
+- Stateless — fits the SPA + separate API architecture without a shared session store.
+- `jsonwebtoken` and `bcrypt` are standard, free Node packages.
+- The Backend Development syllabus expects implementing auth, not delegating it to a managed provider.
 
-**Reasons**
-- JWT is stateless — fits a SPA + separate API cleanly, no shared session store needed.
-- `jsonwebtoken` + `bcrypt` are the standard Node packages, well-documented and easy to teach in the report.
-- Auth0/Clerk would simplify implementation but hide the learning we're meant to demonstrate (the Backend syllabus expects we *understand* auth, not outsource it).
-
-**Trade-offs / risks**
-- JWTs can't be revoked easily before expiry. **Mitigation:** short expiry (7 days) — acceptable for a capstone.
-- Storing JWT in `localStorage` is XSS-prone. **Mitigation:** sanitise all user-generated content rendered in React (React's default escaping handles most cases).
+**Known limitations:**
+- JWTs cannot be revoked before expiry. Acceptable for a capstone; mitigated by short expiry (7 days).
+- Token storage strategy (localStorage vs HttpOnly cookie) is a separate decision — see future ADR.
 
 ---
 
 ### 3.5 Local development — Docker + Docker Compose
 
-**Reasons**
-- One command (`docker compose up`) brings up Postgres + backend + frontend on any team member's machine, regardless of OS.
-- Avoids the "works on my machine" problem early — all three of us are on different setups.
-- Docker is referenced in the Backend Dev syllabus and looks professional in the final report.
+**Why this fits the project:**
+- `docker compose up` brings up Postgres + backend + frontend consistently on any team member's machine.
+- Specified in the workflow plan.
+- Avoids OS-specific setup issues.
 
-**Trade-offs / risks**
-- Adds a layer of abstraction beginners can find confusing. **Mitigation:** keep the `docker-compose.yml` minimal — just three services — and document it in the root README.
+**Known limitations:**
+- Adds a layer of abstraction for anyone new to Docker. The `docker-compose.yml` will be kept to the three services and documented in the root README.
 
 ---
 
 ### 3.6 Hosting
 
-| Service  | Platform          | Why                                                          |
-| -------- | ----------------- | ------------------------------------------------------------ |
-| Frontend | **Vercel**        | Free tier covers SPAs; instant deploys from GitHub; HTTPS by default. |
-| Backend  | **Render**        | Free web-service tier for Node apps; supports env vars; sleeps when idle (acceptable for demo). |
-| Database | **Railway** *(or Supabase)* | Free Postgres instance with public connection string; easy to seed. |
+| Service  | Platform | Notes                                                        |
+| -------- | -------- | ------------------------------------------------------------ |
+| Frontend | Vercel   | Free tier covers static SPAs; HTTPS by default; auto-deploys from GitHub. |
+| Backend  | Render   | Free web-service tier for Node; supports env vars. **Free tier sleeps after ~15 min idle — cold start is ~30s on first request.** |
+| Database | Railway  | Free Postgres instance with public connection string. Storage cap ~1GB on free tier — well above our needs. |
 
-**Trade-offs / risks**
-- Render's free tier cold-starts after 15 min idle — first request after sleep takes ~30 seconds. **Mitigation:** acknowledged in the demo plan; presenter will warm up the API before the live demo.
-- Free-tier databases have small storage caps (~1GB). **Mitigation:** we'll seed ~20–50 opportunities, far under the limit.
+The cold-start limitation must be acknowledged in the live demo plan: warm up the API before presenting.
 
 ---
 
-## 4. What we explicitly rejected
+## 4. Rejected alternatives
 
-| Option                  | Why we rejected it |
-| ----------------------- | ------------------ |
-| Django (Python)         | Team has weaker Python web experience; would slow Week 3–4. |
-| MongoDB                 | Our data is relational; would force joins in app code; clashes with DB Admin syllabus. |
-| Next.js                 | No SSR needs; extra complexity not justified for v1. |
-| Auth0 / Clerk           | Hides the auth concepts the grading rubric expects us to demonstrate. |
-| Heroku                  | No longer has a free tier as of late 2022. |
-| Tailwind CSS *(undecided)* | Open question — see future ADR on styling. |
+| Option       | Why not |
+| ------------ | ------- |
+| MongoDB      | Data is relational; would force joins in application code; doesn't fit the DB Admin syllabus. |
+| Next.js      | No server-side rendering requirement for v1; extra complexity not justified. |
+| Auth0 / Clerk | Hides the auth implementation the Backend syllabus expects us to demonstrate. Free tiers also have rate/user limits. |
+| Heroku       | No free tier since 2022. |
 
 ---
 
 ## 5. Consequences
 
 **Positive**
-- A single-language stack (JS everywhere) cuts cognitive overhead in a tight timeline.
-- Everything we chose has free hosting tiers — total project cost is $0.
-- Every tech choice maps to at least one course in the rubric, giving the report clear talking points.
+- Single language across frontend and backend.
+- Every layer maps to at least one course in the grading rubric.
+- Stack runs entirely on free tiers.
 
 **Negative**
-- We accept JavaScript's weaker typing and the discipline cost that comes with it.
-- Render's cold-start could embarrass us in the live demo if we forget to warm it up.
-- We commit early to JWT auth, meaning we'll have to do password reset / verification flows manually rather than getting them free from an Auth provider.
+- JavaScript's dynamic typing requires disciplined validation at boundaries.
+- Render's cold start can affect the live demo if the API isn't warmed up first.
+- JWT auth means password reset / email verification flows must be implemented manually.
 
 ---
 
-## 6. Open questions (future ADRs)
+## 6. Follow-up ADRs
 
-- **ADR-0002** — UUID vs SERIAL primary keys
-- **ADR-0003** — ORM choice (Prisma vs Knex vs raw SQL)
-- **ADR-0004** — Styling approach (Tailwind vs CSS modules vs vanilla CSS)
-- **ADR-0005** — File upload strategy (avatars, logos, CVs) — local disk vs S3-compatible
+- ADR-0002 — UUID vs SERIAL primary keys
+- ADR-0003 — ORM choice (Prisma / Knex / raw SQL)
+- ADR-0004 — Styling approach
+- ADR-0005 — File upload strategy (avatars, logos, CVs)
 
 ---
 
-*This ADR is the foundational decision document for the Aukas project. Subsequent design choices in Weeks 2–7 will be recorded as ADR-0002 onward, and any decision that supersedes this one must reference it explicitly.*
+*Stack derived from `docs/opportunities_workflow.pdf`. Future decisions that change any layer here must be recorded as a new ADR that supersedes this one.*
