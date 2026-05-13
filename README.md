@@ -1,73 +1,71 @@
-# Opportunities Hub
+# Aukas — Opportunities Hub
 
-A web platform where Cambodian students discover **internships, jobs, scholarships, volunteer work, and competitions** in one place.
+A Cambodia-first web platform where students discover **internships, jobs, scholarships, volunteer work, and competitions** in one place.
 
-> Capstone project — IDT, Computer Science Gen 11, Year 2 Term 3, Group 3 (7 weeks)
+> Capstone project — IDT · Computer Science Gen 11 · Year 2 Term 3 · Group 3 · 7-week build
 
-## Tech Stack
+---
 
-| Layer    | Technology                  |
-| -------- | --------------------------- |
-| Frontend | React                       |
-| Backend  | Node.js + Express           |
-| Database | PostgreSQL                  |
-| DevOps   | Docker, Docker Compose      |
-| Hosting  | Vercel (FE) · Render (BE) · Railway (DB) |
+## Status
 
-## Repository Layout
+Week 1 of 7 — *Discovery: Research & Planning*. Track progress on the [Issues](https://github.com/so-dawg/Aukas/issues) board, grouped by weekly milestones.
+
+## Tech stack
+
+| Layer    | Technology                                 |
+| -------- | ------------------------------------------ |
+| Frontend | React (Vite)                               |
+| Backend  | Node.js · Express                          |
+| Database | PostgreSQL                                 |
+| DevOps   | Docker · Docker Compose                    |
+| Hosting  | Vercel (frontend) · Render (API) · Railway (DB) |
+
+## Repository layout
 
 ```
 .
 ├── backend/        Node + Express API
-│   ├── src/        Routes, controllers, models, middleware, db
-│   ├── migrations/ Versioned SQL migrations
+│   ├── src/        routes · controllers · models · middleware · db
+│   ├── migrations/ versioned SQL migrations
 │   └── tests/
 ├── frontend/       React app
 ├── db/             schema.sql + seed.sql
-├── docs/           Workflow plan, UML diagrams, API spec, requirements
-├── .env.example    Copy to .env and fill in
-└── docker-compose.yml  (added Week 1)
+├── docs/           workflow plan, research, UML diagrams, API spec
+├── .env.example    copy to .env and fill in
+└── LICENSE
 ```
 
-Each subfolder has its own README describing what belongs there.
-
-## Getting Started
-
-> Full setup is in progress — Week 1 deliverable.
+## Getting started
 
 ```bash
-# 1. Clone
-git clone <repo-url> && cd Aukas
-
-# 2. Copy env template and fill in values
-cp .env.example .env
-
-# 3. (Week 1+) Start the stack with Docker
-docker compose up
+git clone https://github.com/so-dawg/Aukas.git
+cd Aukas
+cp .env.example .env        # then edit values (generate a real JWT_SECRET)
 ```
+
+Local dev workflow lands in **Week 3 (Foundation)**, when the database, Express server, and React skeleton are wired up.
 
 ## Team
 
-| Member   | Role                    |
-| -------- | ----------------------- |
-| Member 1 | Backend & Database      |
-| Member 2 | Frontend & UX           |
-| Member 3 | Research & Documentation |
+| Member | Role                     |
+| ------ | ------------------------ |
+| M1     | Backend & Database       |
+| M2     | Frontend & UX            |
+| M3     | Research & Documentation |
 
-## Course Coverage
+## Course coverage
 
-This project is graded across multiple courses:
-
-- Backend Development
-- Database Administration
-- Software Engineering (UML, Software Process)
-- Automata
-- Human-Computer Interaction
-- Research Methodology
+Backend Development · Database Administration · Software Engineering · Automata · Human-Computer Interaction · Research Methodology
 
 ## Documentation
 
-See [`docs/`](./docs) for the full 7-week workflow plan, UML diagrams, API spec, and research notes.
+- [`docs/opportunities_workflow.pdf`](./docs/opportunities_workflow.pdf) — full 7-week workflow plan
+- [`docs/research/competitor-analysis.md`](./docs/research/competitor-analysis.md) — competitor landscape (Week 1)
+- [`docs/`](./docs) — UML diagrams, API spec, and further notes as they land
+
+## Workflow
+
+All work is tracked as **GitHub Issues** under weekly milestones (Week 1 → Week 7). Before starting a task, check or open an issue, then reference it in commits (`fix: validate email (#7)`) and close it via the PR (`Closes #7`).
 
 ## License
 
