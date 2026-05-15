@@ -6,10 +6,6 @@ A Cambodia-first web platform where students discover **internships, jobs, schol
 
 ---
 
-## Status
-
-Week 1 of 7 — *Discovery: Research & Planning*. Track progress on the [Issues](https://github.com/so-dawg/Aukas/issues) board, grouped by weekly milestones.
-
 ## Tech stack
 
 | Layer    | Technology                                 |
@@ -24,14 +20,18 @@ Week 1 of 7 — *Discovery: Research & Planning*. Track progress on the [Issues]
 
 ```
 .
-├── backend/        Node + Express API
-│   ├── src/        routes · controllers · models · middleware · db
-│   ├── migrations/ versioned SQL migrations
+├── backend/        Node + Express 5 API
+│   ├── src/
+│   │   ├── index.js         server entry (helmet · cors · morgan · express.json)
+│   │   ├── db/index.js      pg Pool — DATABASE_URL
+│   │   └── routes/health.js GET /api/health
+│   ├── migrations/          versioned SQL migrations (Week 3+)
 │   └── tests/
-├── frontend/       React app
-├── db/             schema.sql + seed.sql
-├── docs/           workflow plan, research, UML diagrams, API spec
+├── frontend/       React 19 + Vite SPA
+├── db/             schema.sql + seed.sql (Week 3+)
+├── docs/           proposal, ADRs, data model, research, workflow plan
 ├── .env.example    copy to .env and fill in
+├── AGENTS.md       project context for AI coding agents
 └── LICENSE
 ```
 
@@ -43,7 +43,24 @@ cd Aukas
 cp .env.example .env        # then edit values (generate a real JWT_SECRET)
 ```
 
-Local dev workflow lands in **Week 3 (Foundation)**, when the database, Express server, and React skeleton are wired up.
+Backend (Express 5):
+
+```bash
+cd backend
+npm install
+npm run dev                 # http://localhost:3000
+# GET /api/health → { status: 'ok', db: 'connected' }
+```
+
+Frontend (React 19 + Vite):
+
+```bash
+cd frontend
+npm install
+npm run dev                 # http://localhost:5173
+```
+
+Database schema, seed data, and Docker Compose orchestration land in **Week 3 (Foundation)**.
 
 ## Team
 
@@ -59,8 +76,11 @@ Backend Development · Database Administration · Software Engineering · Automa
 
 ## Documentation
 
+- [`docs/proposal.md`](./docs/proposal.md) — project proposal (problem, objectives, scope, success criteria)
+- [`docs/decisions/0001-tech-stack.md`](./docs/decisions/0001-tech-stack.md) — ADR for the React · Node · PostgreSQL stack
+- [`docs/data-model/entities.md`](./docs/data-model/entities.md) — 10 entities, status state machine
+- [`docs/research/competitor-analysis.md`](./docs/research/competitor-analysis.md) — Cambodian opportunity-platform landscape
 - [`docs/opportunities_workflow.pdf`](./docs/opportunities_workflow.pdf) — full 7-week workflow plan
-- [`docs/research/competitor-analysis.md`](./docs/research/competitor-analysis.md) — competitor landscape (Week 1)
 - [`docs/`](./docs) — UML diagrams, API spec, and further notes as they land
 
 ## Workflow

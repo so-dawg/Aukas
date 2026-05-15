@@ -4,6 +4,20 @@
 - React + Node + PostgreSQL + Docker
 - See `docs/opportunities_workflow.pdf` for the full 7-week plan
 
+## Codebase state
+
+**Backend** (`backend/`) — Express 5 scaffolded:
+- `src/index.js` — `helmet`, `cors`, `morgan('dev')`, `express.json()`; mounts `/api`
+- `src/db/index.js` — `pg.Pool` over `DATABASE_URL`; exports `query` and `pool`
+- `src/routes/health.js` — `GET /api/health` pings the DB
+- `npm run dev` (uses `node --watch`) on `PORT` (default 3000)
+- CommonJS (`"type": "commonjs"`)
+- `migrations/` and `tests/` are empty placeholders (Week 3+)
+
+**Frontend** (`frontend/`) — Vite 8 + React 19 from the default Vite template; no project-specific pages yet.
+
+**Database** — schema not created; `db/` at repo root is an empty placeholder. `.env.example` documents the expected `DATABASE_URL`.
+
 ## Work tracking — GitHub Issues
 
 All work on this repo is tracked in **GitHub Issues** on `so-dawg/Aukas`, organised by weekly **milestones** (Week 1 → Week 7).
