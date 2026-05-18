@@ -4,6 +4,10 @@
 - React + Node + PostgreSQL + Docker
 - See `docs/opportunities_workflow.pdf` for the full 7-week plan
 
+## Required reading
+
+Before starting any work on this repo, read **every file under `docs/`** (including `docs/api/`, `docs/data-model/`, `docs/decisions/`, `docs/research/`, plus `docs/proposal.md` and `docs/README.md`). The PDF `docs/opportunities_workflow.pdf` is also required context. These documents are the source of truth for scope, schema, API contracts, and architectural decisions — do not infer them from code alone.
+
 ## Codebase state
 
 **Backend** (`backend/`) — Express 5 scaffolded:
