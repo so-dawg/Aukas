@@ -8,12 +8,12 @@ A Cambodia-first web platform where students discover **internships, jobs, schol
 
 ## Tech stack
 
-| Layer    | Technology                                 |
-| -------- | ------------------------------------------ |
-| Frontend | React (Vite)                               |
-| Backend  | Node.js · Express                          |
-| Database | PostgreSQL                                 |
-| DevOps   | Docker · Docker Compose                    |
+| Layer    | Technology                                      |
+| -------- | ----------------------------------------------- |
+| Frontend | React (Vite)                                    |
+| Backend  | Node.js · Express                               |
+| Database | PostgreSQL                                      |
+| DevOps   | Docker · Docker Compose                         |
 | Hosting  | Vercel (frontend) · Render (API) · Railway (DB) |
 
 ## Repository layout
