@@ -38,6 +38,8 @@ The JWT payload is:
   "exp": 1716604800
 }
 ```
+**Planned for v1.5:** Refresh token flow with short-lived access tokens (15 min) 
+and long-lived refresh tokens (30 days), enabling silent re-authentication.
 
 ### 1.4 Roles and authorization
 
