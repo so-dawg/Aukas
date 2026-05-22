@@ -1,0 +1,848 @@
+openapi: 3.0.3
+info:
+  title: Opportunities Hub (Aukas) API
+  version: "1.0.0"
+  description: |
+    Machine-readable specification for the Aukas REST API.
+
+    The authoritative narrative reference is
+    [`rest-spec.md`](./rest-spec.md); this YAML is generated from it for
+    use in Swagger UI, Postman, and client SDK generators. If the two
+    disagree, the markdown is the source of truth — update this file to
+    match.
+
+    **Issue:** https://github.com/so-dawg/Aukas/issues/18
+  contact:
+    name: M1 (Backend & Database)
+servers:
+  - url: http://localhost:3000/api
+    description: Local development
+  - url: https://aukas-api.onrender.com/api
+    description: Production (set in Week 7)
+
+tags:
+  - name: Auth
+    description: Registration, login, current user
+  - name: Users
+    description: Self-service profile management
+  - name: Opportunities
+    description: Browse, post, edit, moderate postings
+  - name: Categories
+    description: Lookup of opportunity types
+  - name: Bookmarks
+    description: Student saved items
+  - name: Applications
+    description: "Click-apply" tracking
+  - name: Admin
+    description: Moderation endpoints (admin role only)
+  - name: System
+    description: Health and liveness
+
+security:
+  - bearerAuth: []
+
+paths:
+  # ───────── Auth ─────────
+  /auth/register:
+    post:
+      tags: [Auth]
+      summary: Create a student or organization account
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: Account created; JWT issued
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400': { $ref: '#/components/responses/ValidationFailed' }
+        '409': { $ref: '#/components/responses/Conflict' }
+
+  /auth/login:
+    post:
+      tags: [Auth]
+      summary: Exchange email + password for a JWT
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400': { $ref: '#/components/responses/ValidationFailed' }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+
+  /auth/me:
+    get:
+      tags: [Auth]
+      summary: Return the current authenticated user
+      responses:
+        '200':
+          description: Current user
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user: { $ref: '#/components/schemas/UserWithProfile' }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+
+  # ───────── Users ─────────
+  /users/{id}:
+    get:
+      tags: [Users]
+      summary: Fetch a user by id (admin only)
+      parameters:
+        - $ref: '#/components/parameters/UserIdPath'
+      responses:
+        '200':
+          description: User
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user: { $ref: '#/components/schemas/UserWithProfile' }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /users/me:
+    patch:
+      tags: [Users]
+      summary: Update own base profile fields
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserUpdate'
+      responses:
+        '200':
+          description: Updated user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400': { $ref: '#/components/responses/ValidationFailed' }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+    delete:
+      tags: [Users]
+      summary: Soft-delete own account
+      responses:
+        '204': { description: Account deactivated }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+
+  /students/me:
+    patch:
+      tags: [Users]
+      summary: Update own student profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StudentProfileUpdate'
+      responses:
+        '200':
+          description: Updated student profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StudentProfile'
+        '400': { $ref: '#/components/responses/ValidationFailed' }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+  /organizations/me:
+    patch:
+      tags: [Users]
+      summary: Update own organization profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrganizationProfileUpdate'
+      responses:
+        '200':
+          description: Updated organization profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationProfile'
+        '400': { $ref: '#/components/responses/ValidationFailed' }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+  /organizations/me/opportunities:
+    get:
+      tags: [Opportunities]
+      summary: List the current organization's opportunities
+      parameters:
+        - in: query
+          name: status
+          schema: { $ref: '#/components/schemas/OpportunityStatus' }
+        - $ref: '#/components/parameters/PageQuery'
+        - $ref: '#/components/parameters/LimitQuery'
+      responses:
+        '200':
+          description: Paginated list (any status)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpportunityListResponse'
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+  # ───────── Opportunities ─────────
+  /opportunities:
+    get:
+      tags: [Opportunities]
+      summary: List approved opportunities with search and filters
+      security: []
+      parameters:
+        - in: query
+          name: q
+          schema: { type: string }
+          description: Full-text search on title and description
+        - in: query
+          name: type
+          schema: { $ref: '#/components/schemas/OpportunityType' }
+        - in: query
+          name: category_id
+          schema: { type: string, format: uuid }
+        - in: query
+          name: location
+          schema: { type: string }
+        - in: query
+          name: deadline_before
+          schema: { type: string, format: date }
+        - in: query
+          name: deadline_after
+          schema: { type: string, format: date }
+        - in: query
+          name: organization_id
+          schema: { type: string, format: uuid }
+        - in: query
+          name: sort
+          schema:
+            type: string
+            enum: [deadline_asc, deadline_desc, newest]
+            default: deadline_asc
+        - $ref: '#/components/parameters/PageQuery'
+        - $ref: '#/components/parameters/LimitQuery'
+      responses:
+        '200':
+          description: Paginated list of approved opportunities
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpportunityListResponse'
+    post:
+      tags: [Opportunities]
+      summary: Create an opportunity (organization role)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OpportunityCreate'
+      responses:
+        '201':
+          description: Created (status starts as draft)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Opportunity'
+        '400': { $ref: '#/components/responses/ValidationFailed' }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+  /opportunities/{id}:
+    get:
+      tags: [Opportunities]
+      summary: Fetch a single opportunity
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/OpportunityIdPath'
+      responses:
+        '200':
+          description: Opportunity detail
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Opportunity'
+        '404': { $ref: '#/components/responses/NotFound' }
+    patch:
+      tags: [Opportunities]
+      summary: Edit an opportunity (owner organization)
+      parameters:
+        - $ref: '#/components/parameters/OpportunityIdPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OpportunityUpdate'
+      responses:
+        '200':
+          description: Updated opportunity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Opportunity'
+        '400': { $ref: '#/components/responses/ValidationFailed' }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+    delete:
+      tags: [Opportunities]
+      summary: Hard delete an opportunity (owner or admin)
+      parameters:
+        - $ref: '#/components/parameters/OpportunityIdPath'
+      responses:
+        '204': { description: Deleted }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /opportunities/{id}/status:
+    patch:
+      tags: [Opportunities]
+      summary: Fire a status transition
+      description: |
+        Valid transitions are defined in the
+        [opportunity state diagram](../data-model/opportunity-state-diagram.md#4-transition-table--δq-σ).
+        Illegal transitions return `409` with code `ILLEGAL_TRANSITION`.
+      parameters:
+        - $ref: '#/components/parameters/OpportunityIdPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OpportunityStatusUpdate'
+      responses:
+        '200':
+          description: Updated opportunity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Opportunity'
+        '400': { $ref: '#/components/responses/ValidationFailed' }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+
+  # ───────── Categories ─────────
+  /categories:
+    get:
+      tags: [Categories]
+      summary: List the five opportunity categories
+      security: []
+      responses:
+        '200':
+          description: Categories
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items: { $ref: '#/components/schemas/Category' }
+
+  # ───────── Bookmarks ─────────
+  /bookmarks:
+    get:
+      tags: [Bookmarks]
+      summary: List the current student's bookmarks
+      parameters:
+        - $ref: '#/components/parameters/PageQuery'
+        - $ref: '#/components/parameters/LimitQuery'
+      responses:
+        '200':
+          description: Paginated bookmarks (with embedded opportunity)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookmarkListResponse'
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+    post:
+      tags: [Bookmarks]
+      summary: Bookmark an opportunity
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [opportunity_id]
+              properties:
+                opportunity_id: { type: string, format: uuid }
+      responses:
+        '201':
+          description: Bookmark created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Bookmark' }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '409': { $ref: '#/components/responses/Conflict' }
+
+  /bookmarks/{opportunity_id}:
+    delete:
+      tags: [Bookmarks]
+      summary: Remove a bookmark (idempotent)
+      parameters:
+        - in: path
+          name: opportunity_id
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '204': { description: Removed (also returned if no bookmark existed) }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+  # ───────── Applications ─────────
+  /applications:
+    post:
+      tags: [Applications]
+      summary: Record a "click apply" event
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [opportunity_id]
+              properties:
+                opportunity_id: { type: string, format: uuid }
+      responses:
+        '201':
+          description: Application record
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Application' }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+  /applications/me:
+    get:
+      tags: [Applications]
+      summary: List the current student's application records
+      parameters:
+        - $ref: '#/components/parameters/PageQuery'
+        - $ref: '#/components/parameters/LimitQuery'
+      responses:
+        '200':
+          description: Paginated applications
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApplicationListResponse'
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+  # ───────── Admin moderation ─────────
+  /admin/opportunities:
+    get:
+      tags: [Admin]
+      summary: List opportunities filtered by status (default pending)
+      parameters:
+        - in: query
+          name: status
+          schema:
+            $ref: '#/components/schemas/OpportunityStatus'
+        - $ref: '#/components/parameters/PageQuery'
+        - $ref: '#/components/parameters/LimitQuery'
+      responses:
+        '200':
+          description: Paginated list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpportunityListResponse'
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+  /admin/users:
+    get:
+      tags: [Admin]
+      summary: List users with role and verified filters
+      parameters:
+        - in: query
+          name: role
+          schema: { $ref: '#/components/schemas/UserRole' }
+        - in: query
+          name: verified
+          schema: { type: boolean }
+          description: Filter on organizations.verified (organizations only)
+        - $ref: '#/components/parameters/PageQuery'
+        - $ref: '#/components/parameters/LimitQuery'
+      responses:
+        '200':
+          description: Paginated users
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items: { $ref: '#/components/schemas/UserWithProfile' }
+                  meta: { $ref: '#/components/schemas/PageMeta' }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+  /admin/organizations/{user_id}/verify:
+    patch:
+      tags: [Admin]
+      summary: Toggle an organization's verified flag
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [verified]
+              properties:
+                verified: { type: boolean }
+      responses:
+        '200':
+          description: Updated organization
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/OrganizationProfile' }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  # ───────── System ─────────
+  /health:
+    get:
+      tags: [System]
+      summary: Liveness and database ping
+      security: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: { type: string, example: ok }
+                  db:     { type: string, example: connected }
+        '503':
+          description: Database ping failed
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    PageQuery:
+      in: query
+      name: page
+      schema: { type: integer, minimum: 1, default: 1 }
+    LimitQuery:
+      in: query
+      name: limit
+      schema: { type: integer, minimum: 1, maximum: 50, default: 20 }
+    UserIdPath:
+      in: path
+      name: id
+      required: true
+      schema: { type: string, format: uuid }
+    OpportunityIdPath:
+      in: path
+      name: id
+      required: true
+      schema: { type: string, format: uuid }
+
+  responses:
+    ValidationFailed:
+      description: Request body or query params failed validation
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    Unauthenticated:
+      description: Missing or invalid token
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    Forbidden:
+      description: Authenticated but wrong role or not the resource owner
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    Conflict:
+      description: Duplicate, illegal status transition, or other conflict
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+
+  schemas:
+    # ── Enums ──
+    UserRole:
+      type: string
+      enum: [student, organization, admin]
+    OpportunityType:
+      type: string
+      enum: [internship, job, scholarship, volunteer, competition]
+    OpportunityStatus:
+      type: string
+      enum: [draft, pending, approved, rejected, expired]
+    ApplicationStatus:
+      type: string
+      enum: [clicked, in_review, accepted, rejected]
+
+    # ── Error / paging ──
+    Error:
+      type: object
+      properties:
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code:
+              type: string
+              enum:
+                - VALIDATION_FAILED
+                - UNAUTHENTICATED
+                - FORBIDDEN
+                - NOT_FOUND
+                - CONFLICT
+                - ILLEGAL_TRANSITION
+                - RATE_LIMITED
+                - INTERNAL
+            message: { type: string }
+            details:
+              type: array
+              items:
+                type: object
+                properties:
+                  field: { type: string }
+                  rule:  { type: string }
+    PageMeta:
+      type: object
+      properties:
+        page:        { type: integer }
+        limit:       { type: integer }
+        total:       { type: integer }
+        total_pages: { type: integer }
+
+    # ── Auth ──
+    RegisterRequest:
+      type: object
+      required: [role, email, password, full_name, profile]
+      properties:
+        role:      { $ref: '#/components/schemas/UserRole' }
+        email:     { type: string, format: email }
+        password:  { type: string, minLength: 8, maxLength: 128 }
+        full_name: { type: string, minLength: 2, maxLength: 150 }
+        profile:
+          description: |
+            For role=student: { university, major, year_of_study }.
+            For role=organization: { org_name, website, description }.
+          oneOf:
+            - $ref: '#/components/schemas/StudentProfileUpdate'
+            - $ref: '#/components/schemas/OrganizationProfileUpdate'
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email:    { type: string, format: email }
+        password: { type: string }
+    AuthResponse:
+      type: object
+      properties:
+        user:  { $ref: '#/components/schemas/User' }
+        token: { type: string, description: JWT bearer token }
+
+    # ── Users ──
+    User:
+      type: object
+      properties:
+        id:         { type: string, format: uuid }
+        email:      { type: string, format: email }
+        full_name:  { type: string }
+        role:       { $ref: '#/components/schemas/UserRole' }
+        created_at: { type: string, format: date-time }
+    UserUpdate:
+      type: object
+      properties:
+        full_name: { type: string }
+        email:     { type: string, format: email }
+        password:  { type: string, minLength: 8, maxLength: 128 }
+    UserWithProfile:
+      allOf:
+        - $ref: '#/components/schemas/User'
+        - type: object
+          properties:
+            profile:
+              nullable: true
+              oneOf:
+                - $ref: '#/components/schemas/StudentProfile'
+                - $ref: '#/components/schemas/OrganizationProfile'
+
+    StudentProfile:
+      type: object
+      properties:
+        university:    { type: string, nullable: true }
+        major:         { type: string, nullable: true }
+        year_of_study: { type: integer, minimum: 1, maximum: 6, nullable: true }
+        resume_url:    { type: string, format: uri, nullable: true }
+    StudentProfileUpdate:
+      type: object
+      properties:
+        university:    { type: string }
+        major:         { type: string }
+        year_of_study: { type: integer, minimum: 1, maximum: 6 }
+        resume_url:    { type: string, format: uri }
+
+    OrganizationProfile:
+      type: object
+      properties:
+        org_name:    { type: string }
+        website:     { type: string, format: uri, nullable: true }
+        description: { type: string, nullable: true }
+        verified:    { type: boolean }
+    OrganizationProfileUpdate:
+      type: object
+      properties:
+        org_name:    { type: string }
+        website:     { type: string, format: uri }
+        description: { type: string }
+
+    # ── Category ──
+    Category:
+      type: object
+      properties:
+        id:   { type: string, format: uuid }
+        name: { type: string }
+        slug: { type: string }
+
+    # ── Opportunity ──
+    OpportunitySummary:
+      type: object
+      properties:
+        id:           { type: string, format: uuid }
+        title:        { type: string }
+        type:         { $ref: '#/components/schemas/OpportunityType' }
+        category:     { $ref: '#/components/schemas/Category' }
+        organization:
+          type: object
+          properties:
+            user_id:  { type: string, format: uuid }
+            org_name: { type: string }
+            verified: { type: boolean }
+        location:   { type: string, nullable: true }
+        deadline:   { type: string, format: date, nullable: true }
+        status:     { $ref: '#/components/schemas/OpportunityStatus' }
+        created_at: { type: string, format: date-time }
+    Opportunity:
+      allOf:
+        - $ref: '#/components/schemas/OpportunitySummary'
+        - type: object
+          properties:
+            description: { type: string }
+            approved_by: { type: string, format: uuid, nullable: true }
+            updated_at:  { type: string, format: date-time }
+    OpportunityCreate:
+      type: object
+      required: [category_id, title, description]
+      properties:
+        category_id: { type: string, format: uuid }
+        title:       { type: string, maxLength: 255 }
+        description: { type: string }
+        location:    { type: string }
+        deadline:    { type: string, format: date }
+    OpportunityUpdate:
+      type: object
+      properties:
+        title:       { type: string, maxLength: 255 }
+        description: { type: string }
+        category_id: { type: string, format: uuid }
+        location:    { type: string }
+        deadline:    { type: string, format: date }
+    OpportunityStatusUpdate:
+      type: object
+      required: [status]
+      properties:
+        status: { $ref: '#/components/schemas/OpportunityStatus' }
+        reason:
+          type: string
+          description: Required when status=rejected
+
+    OpportunityListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items: { $ref: '#/components/schemas/OpportunitySummary' }
+        meta: { $ref: '#/components/schemas/PageMeta' }
+
+    # ── Bookmarks ──
+    Bookmark:
+      type: object
+      properties:
+        id:             { type: string, format: uuid }
+        opportunity_id: { type: string, format: uuid }
+        saved_at:       { type: string, format: date-time }
+        opportunity:    { $ref: '#/components/schemas/OpportunitySummary' }
+    BookmarkListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items: { $ref: '#/components/schemas/Bookmark' }
+        meta: { $ref: '#/components/schemas/PageMeta' }
+
+    # ── Applications ──
+    Application:
+      type: object
+      properties:
+        id:             { type: string, format: uuid }
+        opportunity_id: { type: string, format: uuid }
+        status:         { $ref: '#/components/schemas/ApplicationStatus' }
+        applied_at:     { type: string, format: date-time }
+        opportunity:    { $ref: '#/components/schemas/OpportunitySummary' }
+    ApplicationListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items: { $ref: '#/components/schemas/Application' }
+        meta: { $ref: '#/components/schemas/PageMeta' }

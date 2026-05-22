@@ -282,7 +282,7 @@ Errors: `403` if the caller's role is not `student`.
 ### 4.5 `DELETE /users/me`
 
 **Auth:** Any role
-**Behavior:** Soft delete — mark the user inactive. Their opportunities (if organization) remain visible; their bookmarks and applications are kept for analytics.
+**Behavior:** Soft delete — `UPDATE users SET deleted_at = now() WHERE id = $me`. The row stays in the database; subsequent reads filter on `WHERE deleted_at IS NULL` and treat the account as gone (see [`schema.md` §6.4](../data-model/schema.md#64-soft-delete-convention)). Bookmarks and applications are kept for analytics; an organization's opportunities remain visible until separately unpublished. The partial unique index on `users(email)` frees the address for a new signup.
 
 Response `204 No Content`.
 
@@ -550,7 +550,7 @@ Most are listed in the [proposal §3.2](../proposal.md#32-out-of-scope-for-v1).
 ## 13. Open questions for Week 4
 
 1. **Should `GET /opportunities` allow `status=expired` as a public filter?** Probably yes — students may want to see what they missed. Defaulting to `status=approved` keeps the homepage clean.
-2. **Should `DELETE /opportunities/:id` be soft delete?** Currently hard delete; the Week 1 `entities.md` proposed `status = 'expired'` as the soft-delete pathway, which the state diagram already supports. Hard delete remains for outright spam.
+2. **Should `DELETE /opportunities/:id` be soft delete?** Resolved — yes. `opportunities.deleted_at` was added in [`schema.md` §6.4](../data-model/schema.md#64-soft-delete-convention); the endpoint sets it instead of removing the row. `status = 'expired'` remains the FSM-driven path for end-of-deadline opportunities. Hard `DELETE` remains for outright spam (admin only).
 3. **Where do admin moderation actions get logged?** v1 stores only `approved_by`. If the report needs a full audit, the `opportunity_status_log` table from `entities.md` would need to come back.
 
 ---

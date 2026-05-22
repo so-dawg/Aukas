@@ -42,11 +42,12 @@ The authentication table. Every account is a row here; role-specific data lives 
 | Attribute | Type | Constraints |
 |---|---|---|
 | `id` | uuid | PK |
-| `email` | string (255) | UNIQUE, NOT NULL |
+| `email` | string (255) | NOT NULL, UNIQUE among active rows (partial index on `deleted_at IS NULL`) |
 | `password_hash` | string (255) | NOT NULL |
 | `full_name` | string (150) | NOT NULL |
 | `role` | enum | NOT NULL — `'student'` · `'organization'` · `'admin'` |
 | `created_at` | timestamp | DEFAULT NOW() |
+| `deleted_at` | timestamp | NULLABLE — soft-delete marker (see [`schema.md` §6.4](./schema.md#64-soft-delete-convention)) |
 
 ### 3.2 `students`
 
@@ -100,6 +101,7 @@ Seed: `Internship` · `Job` · `Scholarship` · `Volunteer` · `Competition`.
 | `status` | enum | DEFAULT `'pending'` — `'draft'` · `'pending'` · `'approved'` · `'rejected'` · `'expired'` |
 | `created_at` | timestamp | DEFAULT NOW() |
 | `updated_at` | timestamp | DEFAULT NOW() |
+| `deleted_at` | timestamp | NULLABLE — soft-delete marker (see [`schema.md` §6.4](./schema.md#64-soft-delete-convention)) |
 
 **Note on `type` vs `category_id`** — both fields encode the same concept. `category_id` is the relational source of truth; `type` is the denormalized enum value used in API filters where joining `categories` would be wasteful. This duplication is intentional and is justified in the [normalization doc](./normalization.md#5-controlled-denormalization).
 
@@ -192,9 +194,13 @@ In the PNG, lines connecting entities use these endpoints to indicate cardinalit
 
 **Uniqueness**
 
-- `users.email` — UNIQUE
+- `users.email` — UNIQUE among rows where `deleted_at IS NULL` (partial unique index)
 - `categories.name`, `categories.slug` — UNIQUE
 - `bookmarks(student_id, opportunity_id)` — composite UNIQUE
+
+**Soft delete**
+
+- `users.deleted_at`, `opportunities.deleted_at` — `NULL` means active, timestamp means deleted. Normal "delete" operations are `UPDATE deleted_at = now()`; the FK CASCADE rules above only fire on true `DELETE` statements. See [`schema.md` §6.4](./schema.md#64-soft-delete-convention).
 
 **Check constraints (planned, Week 3 migration)**
 

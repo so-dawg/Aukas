@@ -35,13 +35,14 @@ For each table: list the functional dependencies (FDs), then verify each normal 
 ### 3.1 `users`
 
 ```
-id → email, password_hash, full_name, role, created_at
-email → id   (UNIQUE constraint makes email a candidate key)
+id → email, password_hash, full_name, role, created_at, deleted_at
+email → id   (candidate key — only among active rows; enforced by partial unique index)
 ```
 
 - **1NF** ✓ all attributes atomic, `id` is unique.
 - **2NF** ✓ PK is single-column (`id`), so partial dependencies are impossible.
 - **3NF** ✓ every non-key attribute depends directly on `id`. No attribute is derived from another non-key column.
+- The `email → id` FD is conditional on `deleted_at IS NULL`: a soft-deleted row may share an email with a new active row. This is intentional and documented in [`schema.md` §6.4](./schema.md#64-soft-delete-convention) — it does not violate 3NF because `id` remains the sole primary key.
 
 ### 3.2 `students`
 
@@ -75,7 +76,7 @@ slug → id      (UNIQUE)
 
 ```
 id → organization_id, category_id, approved_by, title, description,
-     type, location, deadline, status, created_at, updated_at
+     type, location, deadline, status, created_at, updated_at, deleted_at
 category_id → type    (potential transitive dependency — see §5)
 ```
 
