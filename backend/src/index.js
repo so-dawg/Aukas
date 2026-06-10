@@ -6,6 +6,8 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 
 const healthRouter = require('./routes/health');
+const opportunitiesRouter = require('./routes/opportunities');
+const errorHandler = require('./middleware/error');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -16,6 +18,9 @@ app.use(morgan('dev'));
 app.use(express.json());
 
 app.use('/api', healthRouter);
+app.use('/api', opportunitiesRouter);
+
+app.use(errorHandler);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
