@@ -112,5 +112,71 @@ async function list(filters) {
   };
 }
 
-module.exports = { list, mapRow, OPPORTUNITY_TYPES, SORTS };
+// Fetch a single (non-soft-deleted) opportunity of any status.
+// Returns the detail-shaped object, or null if no such row exists.
+async function findById(id) {
+  const sql = `
+    SELECT ${SELECT_COLUMNS}
+    ${FROM_JOINS}
+    WHERE o.id = $1 AND o.deleted_at IS NULL
+  `;
+  const { rows } = await db.query(sql, [id]);
+  if (rows.length === 0) return null;
+  return mapRow(rows[0], { detail: true });
+}
 
+async function create({
+  organization_id,
+  category_id,
+  title,
+  description,
+  location,
+  deadline,
+}) {
+  //from the category slog , so we don't insert it
+  const { rows } = await db.query(
+    `INSERT INTO opportunities (organization_id, category_id, title, description, location, deadline, status) VALUES ($1, $2, $3, $4, $5, $6, 'draft') RETURNING id`,
+    [
+      organization_id,
+      category_id,
+      title,
+      description,
+      location ?? null,
+      deadline ?? null,
+    ],
+  );
+  return findById(rows[0].id); //re-fetch so the response is the joined detail shape
+}
+
+const UPDATABLE = [
+  "title",
+  "description",
+  "category_id",
+  "location",
+  "deadline",
+  "status",
+];
+
+async function update(id, fields) {
+  const cols = Object.keys(fields).filter((c) => UPDATABLE.includes(c));
+  if (cols.length === 0) return findById(id);
+
+  const set = colls.map((c, i) => `${c} = $${i + 1}`);
+  const params = col.map((c) => fields[c]);
+  params.push(id);
+
+  await db.query(
+    `UPDATE opportunities SET ${set.join(", ")} WHERE id = $${params.length} AND deleted_at IS NULL`,
+    params,
+  );
+  return findById(id);
+}
+module.exports = {
+  list,
+  findById,
+  mapRow,
+  create,
+  update,
+  OPPORTUNITY_TYPES,
+  SORTS,
+};
