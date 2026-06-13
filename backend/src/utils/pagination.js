@@ -2,7 +2,7 @@ const DEFAULT_LIMIT = 20;
 const MAX_LIMIT = 50;
 
 function parsePagination(query) {
-  let page = parsInt(query.page, 10);
+  let page = parseInt(query.page, 10);
   if (!Number.isInteger(page) || page < 1) page = 1;
 
   let limit = parseInt(query.limit, 10);
@@ -22,4 +22,4 @@ function buildMeta(page, limit, total) {
   };
 }
 
-module.export = { parsePagination, buildMeta };
+module.exports = { parsePagination, buildMeta };
