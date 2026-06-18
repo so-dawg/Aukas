@@ -13,7 +13,7 @@ A Cambodia-first web platform where students discover **internships, jobs, schol
 | Frontend | React (Vite)                                    |
 | Backend  | Node.js · Express                               |
 | Database | PostgreSQL                                      |
-| DevOps   | Docker · Docker Compose                         |
+| DevOps   | PostgreSQL (local)                              |
 | Hosting  | Vercel (frontend) · Render (API) · Railway (DB) |
 
 ## Repository layout
@@ -60,7 +60,7 @@ npm install
 npm run dev                 # http://localhost:5173
 ```
 
-Database schema, seed data, and Docker Compose orchestration land in **Week 3 (Foundation)**.
+Database schema and seed data land in **Week 3 (Foundation)**.
 
 ## Team
 

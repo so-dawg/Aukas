@@ -12,7 +12,7 @@
 
 Opportunities Hub is a 7-week capstone web platform for Cambodian students, built by a 3-person team across the courses Backend Development, Database Administration, Software Engineering, Automata, HCI, and Research Methodology.
 
-The technology stack is specified in the project workflow plan (`docs/opportunities_workflow.pdf`): **React · Node.js · Express · PostgreSQL · Docker**. This ADR records that stack and the reasoning that supports each choice.
+The technology stack is specified in the project workflow plan (`docs/opportunities_workflow.pdf`): **React · Node.js · Express · PostgreSQL**. This ADR records that stack and the reasoning that supports each choice.
 
 ### Hard constraints
 
@@ -31,7 +31,7 @@ The technology stack is specified in the project workflow plan (`docs/opportunit
 | Backend  | Node.js + Express                           |
 | Database | PostgreSQL                                  |
 | Auth     | JWT (`jsonwebtoken`) + `bcrypt`             |
-| Local dev | Docker + Docker Compose                    |
+| Local dev | PostgreSQL (local install)                 |
 | Hosting  | Vercel (FE) · Render (API) · Railway (DB)   |
 
 ---
@@ -61,7 +61,7 @@ The technology stack is specified in the project workflow plan (`docs/opportunit
 - Free under Railway / Supabase / Neon free tiers.
 
 **Known limitations:**
-- More setup overhead than SQLite. Docker Compose makes local Postgres reproducible with one command.
+- More setup overhead than SQLite. PostgreSQL runs natively, started via systemctl.
 - ORM choice deferred — see ADR-0003 (future).
 
 ---
@@ -92,15 +92,17 @@ The technology stack is specified in the project workflow plan (`docs/opportunit
 
 ---
 
-### 3.5 Local development — Docker + Docker Compose
+### 3.5 Local development — PostgreSQL
+
+PostgreSQL runs as a native systemd service. Initialize the cluster once, then `sudo systemctl start postgresql` to begin. See project README for setup steps.
 
 **Why this fits the project:**
-- `docker compose up` brings up Postgres + backend + frontend consistently on any team member's machine.
-- Specified in the workflow plan.
-- Avoids OS-specific setup issues.
+- PostgreSQL 18 is already installed on the dev machine.
+- No additional containerization layer — simpler to debug, fewer moving parts.
+- Standard tooling: `psql`, `pg_dump`, `pg_restore` available directly.
 
 **Known limitations:**
-- Adds a layer of abstraction for anyone new to Docker. The `docker-compose.yml` will be kept to the three services and documented in the root README.
+- Setup is Linux-native; team members on macOS/Windows would need their own Postgres install or WSL.
 
 ---
 

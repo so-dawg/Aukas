@@ -1,7 +1,7 @@
 # Opportunities Hub Project
 
 - 7-week project for CS Gen 11 Group 3
-- React + Node + PostgreSQL + Docker
+- React + Node + PostgreSQL
 - See `docs/opportunities_workflow.pdf` for the full 7-week plan
 
 ## Required reading

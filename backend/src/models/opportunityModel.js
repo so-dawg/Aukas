@@ -161,8 +161,8 @@ async function update(id, fields) {
    const cols = Object.keys(fields).filter((c) => UPDATABLE.includes(c));
    if (cols.length === 0) return findById(id);
 
-   const set = colls.map((c, i) => `${c} = $${i + 1}`);
-   const params = col.map((c) => fields[c]);
+   const set = cols.map((c, i) => `${c} = $${i + 1}`);
+   const params = cols.map((c) => fields[c]);
    params.push(id);
 
    await db.query(
