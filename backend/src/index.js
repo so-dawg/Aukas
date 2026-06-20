@@ -21,9 +21,10 @@ app.use(express.json());
 app.use("/api", healthRouter);
 app.use("/api", authRouter);
 app.use("/api", opportunitiesRouter);
+app.use("/api", bookmarksRouter);
 
 app.use(errorHandler);
 
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+   console.log(`Server running on port ${PORT}`);
 });
