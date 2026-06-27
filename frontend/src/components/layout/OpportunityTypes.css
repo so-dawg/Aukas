@@ -1,0 +1,135 @@
+.opt {
+  background: #f8fafc;
+  padding: 60px 24px;
+}
+
+.opt__inner {
+  max-width: 1140px;
+  margin: 0 auto;
+}
+
+.opt__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 40px;
+}
+
+.opt__eyebrow {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #94a3b8;
+  letter-spacing: 0.08em;
+  margin: 0 0 8px;
+}
+
+.opt__title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0;
+}
+
+.opt__see-all {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #1f4ddb;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.opt__see-all:hover {
+  text-decoration: underline;
+}
+
+.opt__grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 16px;
+}
+
+.opt__card {
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 24px 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 200px;
+  cursor: pointer;
+  text-align: left;
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+
+.opt__card:hover {
+  border-color: #1f4ddb;
+  box-shadow: 0 4px 20px rgba(31, 77, 219, 0.1);
+}
+
+.opt__icon {
+  background: #eef2ff;
+  color: #1f4ddb;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.opt__card-bottom {
+  margin-top: auto;
+}
+
+.opt__card-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 4px;
+}
+
+.opt__card-desc {
+  font-size: 0.8rem;
+  color: #64748b;
+  margin: 0 0 12px;
+}
+
+.opt__card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.opt__count {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: #1f4ddb;
+}
+
+.opt__arrow {
+  font-size: 1rem;
+  color: #94a3b8;
+}
+
+@media (max-width: 900px) {
+  .opt__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .opt__title {
+    font-size: 2rem;
+  }
+
+  .opt__header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+}
+
+@media (max-width: 500px) {
+  .opt__grid {
+    grid-template-columns: 1fr;
+  }
+}

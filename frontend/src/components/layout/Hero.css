@@ -1,0 +1,147 @@
+.hero {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 60px 48px;
+    gap: 40px;
+}
+
+.hero__left {
+    max-width: 520px;
+    text-align: left;
+}
+
+.hero__badge {
+    display: inline-block;
+    background: #eef0f8;
+    color: #1e3a8a;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 6px 14px;
+    border-radius: 999px;
+    margin-bottom: 24px;
+}
+
+.hero__title {
+    font-size: 52px;
+    font-weight: 800;
+    color: #0d1b5e;
+    line-height: 1.15;
+    margin-bottom: 20px;
+}
+
+.hero__title--blue {
+    color: #3b82f6;
+}
+
+.hero__desc {
+    font-size: 15px;
+    color: #444;
+    line-height: 1.7;
+    margin-bottom: 32px;
+}
+
+.hero__buttons {
+    display: flex;
+    justify-content: flex-start;
+    gap: 12px;
+    align-items: center;
+}
+
+.btn-primary {
+    background: #1e3a8a;
+    color: white;
+    border: none;
+    border-radius: 999px;
+    padding: 14px 28px;
+    font-weight: 600;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+.btn-ghost {
+    background: transparent;
+    color: #111;
+    border: 1px solid #ccc;
+    border-radius: 999px;
+    padding: 14px 28px;
+    font-weight: 600;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+/* Dark card */
+.hero__card {
+    background: #0f172a;
+    border-radius: 20px;
+    padding: 36px;
+    min-width: 420px;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero__card-blob {
+    position: absolute;
+    top: -40px;
+    right: -40px;
+    width: 180px;
+    height: 180px;
+    background: #1e3a8a;
+    border-radius: 50%;
+}
+
+.hero__card-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    color: #94a3b8;
+    margin-bottom: 24px;
+    position: relative;
+}
+
+.hero__stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 28px;
+    margin-bottom: 32px;
+    position: relative;
+}
+
+.hero__stat-value {
+    font-size: 36px;
+    font-weight: 800;
+    color: white;
+    margin-bottom: 4px;
+}
+
+.hero__stat-desc {
+    font-size: 13px;
+    color: #94a3b8;
+}
+
+.hero__card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid #1e293b;
+    padding-top: 20px;
+    position: relative;
+}
+
+.hero__avatars {
+    display: flex;
+    gap: -6px;
+}
+
+.avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 2px solid #0f172a;
+    margin-right: -8px;
+}
+
+.hero__card-note {
+    font-size: 13px;
+    color: #94a3b8;
+}

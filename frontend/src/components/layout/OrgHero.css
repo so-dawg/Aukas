@@ -1,0 +1,160 @@
+/* ── Config ────────────────────────────────── */
+/* Change these to theme the whole component    */
+/* ────────────────────────────────────────────── */
+
+.org-section {
+    --bg: #dbeafe;
+    --radius: 32px;
+
+    --accent: #1e3a8a;
+    --accent-hover: #152c6b;
+    --text-dark: #0f172a;
+    --text-mid: #475569;
+    --text-light: #94a3b8;
+
+    --card-bg: #ffffff;
+    --card-border: #e2e8f0;
+
+    --btn-secondary-bg: #f8fbff;
+    --btn-secondary-border: #dbe4f5;
+    --btn-secondary-hover: #eef4ff;
+
+    width: 100%;
+    padding: 30px 24px;
+    box-sizing: border-box;
+}
+
+/* ── Card ──────────────────────────────────── */
+
+.org-card {
+    display: flex;
+    align-items: center;
+    gap: 80px;
+    max-width: 1140px;
+    margin: 0 auto;
+    padding: 28px 56px;
+    background: var(--bg);
+    border-radius: var(--radius);
+}
+
+/* ── Text side ─────────────────────────────── */
+
+.org-text {
+    flex: 1;
+    text-align: center;
+}
+
+.org-eyebrow {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 0.08em;
+    margin-bottom: 12px;
+}
+
+.org-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--text-dark);
+    line-height: 1.1;
+    margin: 0 0 16px;
+}
+
+.org-desc {
+    font-size: 1rem;
+    color: var(--text-mid);
+    max-width: 520px;
+    margin: 0 auto 24px;
+    line-height: 1.6;
+}
+
+.org-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+.org-btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 12px 28px;
+    border-radius: 999px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: background 0.2s;
+}
+
+.org-btn--primary {
+    background: var(--accent);
+    color: #fff;
+}
+
+.org-btn--primary:hover {
+    background: var(--accent-hover);
+}
+
+.org-btn--secondary {
+    background: var(--btn-secondary-bg);
+    color: var(--text-dark);
+    border: 1px solid var(--btn-secondary-border);
+}
+
+.org-btn--secondary:hover {
+    background: var(--btn-secondary-hover);
+}
+
+/* ── Stats grid ────────────────────────────── */
+
+.org-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    flex-shrink: 0;
+}
+
+.org-stat {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
+    padding: 20px;
+    text-align: center;
+    min-width: 130px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.org-stat__label {
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: var(--text-light);
+    letter-spacing: 0.05em;
+}
+
+.org-stat__value {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: var(--text-dark);
+}
+
+/* ── Mobile ────────────────────────────────── */
+
+@media (max-width: 900px) {
+    .org-card {
+        flex-direction: column;
+        text-align: center;
+        padding: 36px 24px;
+        gap: 32px;
+    }
+
+    .org-title {
+        font-size: 2rem;
+    }
+
+    .org-desc {
+        max-width: 100%;
+    }
+}

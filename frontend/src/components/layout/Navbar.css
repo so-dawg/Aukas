@@ -1,0 +1,249 @@
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: #0f172a;
+  font-family: var(--heading, "Nunito Sans", sans-serif);
+}
+
+.navbar-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+}
+
+.navbar-logo {
+  text-decoration: none;
+}
+
+.navbar-logo-text {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: -0.02em;
+}
+
+.navbar-links {
+  display: flex;
+  justify-content: center;
+  list-style: none;
+  gap: 0.25rem;
+  margin: 0;
+  padding: 0;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.navbar-link {
+  text-decoration: none;
+  color: #cbd5e1;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+  transition: background 0.2s, color 0.2s;
+}
+
+.navbar-link:hover {
+  background: #1e293b;
+  color: #fff;
+}
+
+.navbar-link.active {
+  color: #fff;
+  background: #1e293b;
+}
+
+.navbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-left: auto;
+}
+
+.navbar-button {
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 600;
+  padding: 0.5rem 1.25rem;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+}
+
+.navbar-button.secondary {
+  background: transparent;
+  color: #cbd5e1;
+  border: 1px solid #334155;
+}
+
+.navbar-button.secondary:hover {
+  background: #1e293b;
+  border-color: #475569;
+}
+
+.navbar-button.primary {
+  background: #1e3a8a;
+  color: #fff;
+  box-shadow: 0 1px 3px rgba(30, 58, 138, 0.3);
+}
+
+.navbar-button.primary:hover {
+  background: #152c6b;
+  box-shadow: 0 2px 6px rgba(30, 58, 138, 0.4);
+}
+
+.profile-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.375rem 0.75rem;
+  border: 1px solid #334155;
+  border-radius: 999px;
+  background: transparent;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.875rem;
+  color: #cbd5e1;
+}
+
+.profile-button:hover {
+  background: #1e293b;
+}
+
+.profile-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #1e3a8a;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.75rem;
+}
+
+.navbar-menu-button {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+}
+
+.menu-icon,
+.menu-icon::before,
+.menu-icon::after {
+  display: block;
+  width: 24px;
+  height: 2px;
+  background: #cbd5e1;
+  border-radius: 2px;
+  transition: transform 0.2s;
+}
+
+.menu-icon {
+  position: relative;
+}
+
+.menu-icon::before,
+.menu-icon::after {
+  content: "";
+  position: absolute;
+  left: 0;
+}
+
+.menu-icon::before {
+  top: -6px;
+}
+
+.menu-icon::after {
+  top: 6px;
+}
+
+.navbar-menu-button.open .menu-icon {
+  background: transparent;
+}
+
+.navbar-menu-button.open .menu-icon::before {
+  top: 0;
+  transform: rotate(45deg);
+}
+
+.navbar-menu-button.open .menu-icon::after {
+  top: 0;
+  transform: rotate(-45deg);
+}
+
+.navbar-mobile {
+  display: none;
+  background: #0f172a;
+  border-top: 1px solid #1e293b;
+  padding: 1rem 1.5rem;
+}
+
+.navbar-mobile.open {
+  display: block;
+}
+
+.navbar-mobile-links {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.navbar-mobile-link {
+  display: block;
+  text-decoration: none;
+  color: #cbd5e1;
+  font-size: 1rem;
+  font-weight: 500;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #1e293b;
+}
+
+.navbar-mobile-link:hover {
+  color: #fff;
+}
+
+.navbar-mobile-link.active {
+  color: #fff;
+}
+
+.navbar-mobile-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.navbar-mobile-actions .navbar-button {
+  text-align: center;
+}
+
+@media (max-width: 768px) {
+  .navbar-links {
+    display: none;
+  }
+
+  .navbar-button.secondary,
+  .navbar-button.primary {
+    display: none;
+  }
+
+  .navbar-menu-button {
+    display: block;
+  }
+
+  .navbar-mobile-actions .navbar-button {
+    display: block;
+  }
+}

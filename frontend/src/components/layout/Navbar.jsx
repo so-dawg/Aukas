@@ -1,10 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 
-const useAuth = () => {
-  return { user: null };
-};
-
 const navLinks = [
   { label: "Home", to: "/" },
   { label: "Opportunities", to: "/opportunities" },
@@ -13,7 +9,7 @@ const navLinks = [
 ];
 
 const Navbar = () => {
-  const { user } = useAuth();
+  const user = null;
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
@@ -55,7 +51,7 @@ const Navbar = () => {
               aria-expanded={profileOpen}
             >
               <span className="profile-avatar">
-                {user.avatar ? <img src={user.avatar} alt={user.name} /> : (user.name?.[0] || "U").toUpperCase()}
+                {(user.name?.[0] || "U").toUpperCase()}
               </span>
               <span>{user.name || "Account"}</span>
             </button>
