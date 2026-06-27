@@ -1,7 +1,11 @@
 const db = require("../db");
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 const UPDATABLE = ["org_name", "website", "description"];
+=======
+const UPDATABLE = ["org_name", "website", "description", "verified"];
+>>>>>>> Stashed changes
 =======
 const UPDATABLE = ["org_name", "website", "description", "verified"];
 >>>>>>> Stashed changes
@@ -16,6 +20,7 @@ async function findByUserId(userId) {
 
 async function update(userId, fields) {
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
    const cols = Object.keys(fields).filter((col) => UPDATABLE.includes(col));
    if (cols.length === 0) return findByUserId(userId);
    const set = cols.map((c, i) => `${c} = $${i + 1}`);
@@ -27,6 +32,8 @@ async function update(userId, fields) {
    );
    return findByUserId(userId);
 =======
+=======
+>>>>>>> Stashed changes
   const cols = Object.keys(fields).filter((col) => UPDATABLE.includes(col));
   if (cols.length === 0) return findByUserId(userId);
   const set = cols.map((c, i) => `${c} = $${i + 1}`);
@@ -37,6 +44,9 @@ async function update(userId, fields) {
     params,
   );
   return findByUserId(userId);
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 }
 
