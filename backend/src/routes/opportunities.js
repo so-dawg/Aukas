@@ -19,5 +19,16 @@ router.patch(
   requireRole("organization"),
   opportunityController.update,
 );
+router.patch(
+  "/opportunities/:id/status",
+  authenticate,
+  opportunityController.updateStatus,
+);
+router.delete(
+  "/opportunities/:id",
+  authenticate,
+  requireRole("organization", "admin"),
+  opportunityController.remove,
+);
 
 module.exports = router;

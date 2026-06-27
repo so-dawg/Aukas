@@ -10,6 +10,14 @@ const authRouter = require("./routes/auth");
 const opportunitiesRouter = require("./routes/opportunities");
 const errorHandler = require("./middleware/error");
 const organizationsRouter = require("./routes/organizations");
+<<<<<<< Updated upstream
+=======
+const bookmarksRouter = require("./routes/bookmarks");
+const adminRouter = require("./routes/admin");
+const userRouter = require("./routes/users");
+const applicationsRouter = require("./routes/applications");
+const categoriesRouter = require("./routes/categories");
+>>>>>>> Stashed changes
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -22,8 +30,17 @@ app.use(express.json());
 app.use("/api", healthRouter);
 app.use("/api", authRouter);
 app.use("/api", opportunitiesRouter);
+<<<<<<< Updated upstream
 app.use("/api", bookmarksRouter);
 app.use("/api", organizationsRouter);
+=======
+app.use("/api/", bookmarksRouter);
+app.use("/api", organizationsRouter);
+app.use("/api", adminRouter);
+app.use("/api", userRouter);
+app.use("/api", applicationsRouter);
+app.use("/api", categoriesRouter);
+>>>>>>> Stashed changes
 
 app.use(errorHandler);
 

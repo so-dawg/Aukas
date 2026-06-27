@@ -181,7 +181,9 @@ async function update(req, res) {
 
   // approved/expired postings are frozen — edit means "create a new one"
   if (["approved", "expired"].includes(existing.status))
-    throw ApiError.conflict("Approved or expired opportunities cannot be edited.");
+    throw ApiError.conflict(
+      "Approved or expired opportunities cannot be edited.",
+    );
 
   const fields = {};
   for (const f of EDITABLE_FIELDS) {
@@ -189,10 +191,79 @@ async function update(req, res) {
       fields[f] = f === "title" ? req.body[f].trim() : req.body[f];
   }
   // editing a pending/rejected posting sends it back to draft (state-diagram "edit")
-  if (["pending", "rejected"].includes(existing.status)) fields.status = "draft";
+  if (["pending", "rejected"].includes(existing.status))
+    fields.status = "draft";
 
   const updated = await opportunityModel.update(id, fields);
   res.json({ data: updated });
 }
 
-module.exports = { list, getById, create, update };
+async function remove(req, res) {
+  const { id } = req.params;
+  if (!UUID_RE.test(id)) throw ApiError.notFound("Opportunity not found.");
+
+  const existing = await opportunityModel.findById(id);
+  if (!existing) throw ApiError.notFound("Opportunity not found.");
+
+  if (
+    req.user.role === "organization" &&
+    existing.organization.user_id !== req.user.id
+  )
+    throw ApiError.forbidden("You do not own this opportunity.");
+
+  await opportunityModel.remove(id);
+  res.status(204).end();
+}
+
+const ORG_TRANSITIONS = {
+  draft: ["pending"], // submit
+  pending: ["draft"], // edit (reverts to draft)
+  rejected: ["draft"], // edit (after rejection)
+};
+
+const ADMIN_TRANSITIONS = {
+  pending: ["approved", "rejected"],
+};
+
+async function updateStatus(req, res) {
+  const { id } = req.params;
+  const { status, reason } = req.body;
+
+  if (!UUID_RE.test(id)) throw ApiError.notFound("Opportunity not found.");
+  if (!status || typeof status !== "string")
+    throw ApiError.validation([{ field: "status", rule: "required" }]);
+
+  const VALID = ["draft", "pending", "approved", "rejected", "expired"];
+  if (!VALID.includes(status))
+    throw ApiError.validation([{ field: "status", rule: "enum" }]);
+
+  const existing = await opportunityModel.findById(id);
+  if (!existing) throw ApiError.notFound("Opportunity not found.");
+
+  const allowed =
+    req.user.role === "admin"
+      ? ADMIN_TRANSITIONS
+      : req.user.role === "organization"
+        ? ORG_TRANSITIONS
+        : null;
+
+  if (!allowed || !allowed[existing.status]?.includes(status))
+    throw ApiError.conflict(
+      `Cannot transition from ${existing.status} to ${status}.`,
+      "ILLEGAL_TRANSITION",
+    );
+
+  if (
+    req.user.role === "organization" &&
+    existing.organization.user_id !== req.user.id
+  )
+    throw ApiError.forbidden("You do not own this opportunity.");
+
+  const fields = { status };
+  if (status === "approved") fields.approved_by = req.user.id;
+
+  const updated = await opportunityModel.update(id, fields);
+  res.json({ data: updated });
+}
+
+module.exports = { list, getById, create, update, remove, updateStatus };
