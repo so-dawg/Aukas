@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import logo from "../../assets/AukasLogo.jpg";
 import "./Footer.css";
 
 const linkColumns = [
@@ -34,8 +35,7 @@ const Footer = () => (
     <div className="footer-inner">
       <div className="footer-brand">
         <div className="footer-logo-row">
-          <span className="footer-logo-mark">a</span>
-          <span className="footer-logo-text">Aukas</span>
+          <img src={logo} alt="Aukas logo" className="footer-logo-image" />
         </div>
         <p className="footer-tagline">
           Opportunities Hub — a Cambodia-first platform

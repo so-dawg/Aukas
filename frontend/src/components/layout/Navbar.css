@@ -19,6 +19,15 @@
 
 .navbar-logo {
   text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.navbar-logo-image {
+  height: 34px;
+  width: auto;
+  display: block;
 }
 
 .navbar-logo-text {

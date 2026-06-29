@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { FiBookmark } from "react-icons/fi";
+import logo from "../../assets/AukasLogo.jpg";
 import { useAuth } from "../../context/AuthContext";
 
 const navLinks = [
@@ -22,7 +23,7 @@ const Navbar = () => {
     <nav className="navbar">
       <div className="navbar-inner">
         <Link to="/" className="navbar-logo">
-          <span className="navbar-logo-text">Aukas</span>
+          <img src={logo} alt="Aukas logo" className="navbar-logo-image" />
         </Link>
 
         <ul className="navbar-links">
