@@ -58,6 +58,8 @@
   min-height: 200px;
   cursor: pointer;
   text-align: left;
+  text-decoration: none;
+  color: inherit;
   transition: box-shadow 0.2s, border-color 0.2s;
 }
 

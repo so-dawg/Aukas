@@ -1,4 +1,4 @@
-const applicationModel = require("../models/applicationModel");
+const applicationModel = require("../models/applicationsModel");
 const opportunityModel = require("../models/opportunityModel");
 const ApiError = require("../utils/ApiError");
 const { parsePagination, buildMeta } = require("../utils/pagination");

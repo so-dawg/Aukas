@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 
 const navLinks = [
   { label: "Home", to: "/" },
@@ -9,7 +10,7 @@ const navLinks = [
 ];
 
 const Navbar = () => {
-  const user = null;
+  const { user } = useAuth();
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
@@ -94,7 +95,11 @@ const Navbar = () => {
 
           {user && (
             <li>
-              <Link to="/whitelist" onClick={() => setMenuOpen(false)} className="navbar-mobile-link">
+              <Link
+                to="/whitelist"
+                onClick={() => setMenuOpen(false)}
+                className="navbar-mobile-link"
+              >
                 Whitelist
               </Link>
             </li>
@@ -104,7 +109,11 @@ const Navbar = () => {
         <div className="navbar-mobile-actions">
           {user ? (
             <>
-              <Link to="/profile" onClick={() => setMenuOpen(false)} className="navbar-button secondary">
+              <Link
+                to="/profile"
+                onClick={() => setMenuOpen(false)}
+                className="navbar-button secondary"
+              >
                 Profile
               </Link>
               <button
@@ -120,10 +129,18 @@ const Navbar = () => {
             </>
           ) : (
             <>
-              <Link to="/login" onClick={() => setMenuOpen(false)} className="navbar-button secondary">
+              <Link
+                to="/login"
+                onClick={() => setMenuOpen(false)}
+                className="navbar-button secondary"
+              >
                 Log In
               </Link>
-              <Link to="/signup" onClick={() => setMenuOpen(false)} className="navbar-button primary">
+              <Link
+                to="/signup"
+                onClick={() => setMenuOpen(false)}
+                className="navbar-button primary"
+              >
                 Sign Up
               </Link>
             </>

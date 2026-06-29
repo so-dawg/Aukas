@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import "./OpportunityTypes.css";
 import {
   Briefcase,
@@ -11,30 +12,35 @@ const types = [
   {
     icon: <Briefcase size={20} />,
     title: "Internship",
+    slug: "internship",
     desc: "Paid + unpaid, hybrid + onsite",
     count: "428",
   },
   {
     icon: <GraduationCap size={20} />,
     title: "Scholarship",
+    slug: "scholarship",
     desc: "Undergrad, postgrad, exchange",
     count: "312",
   },
   {
     icon: <ClipboardList size={20} />,
     title: "Job",
+    slug: "job",
     desc: "Entry & graduate roles",
     count: "286",
   },
   {
     icon: <Heart size={20} />,
     title: "Volunteer",
+    slug: "volunteer",
     desc: "NGOs and community work",
     count: "142",
   },
   {
     icon: <Trophy size={20} />,
     title: "Competition",
+    slug: "competition",
     desc: "Hackathons, business, arts",
     count: "80",
   },
@@ -49,14 +55,14 @@ const OpportunityTypes = () => {
             <p className="opt__eyebrow">FIVE TYPES · ONE PLATFORM</p>
             <h2 className="opt__title">Whatever you're looking for next.</h2>
           </div>
-          <a className="opt__see-all" href="#">
+          <Link className="opt__see-all" to="/opportunities">
             See all open →
-          </a>
+          </Link>
         </div>
 
         <div className="opt__grid">
           {types.map((t) => (
-            <div key={t.title} className="opt__card">
+            <Link key={t.title} to={`/opportunities?type=${t.slug}`} className="opt__card">
               <div className="opt__icon">{t.icon}</div>
               <div className="opt__card-bottom">
                 <h3 className="opt__card-title">{t.title}</h3>
@@ -66,7 +72,7 @@ const OpportunityTypes = () => {
                   <span className="opt__arrow">→</span>
                 </div>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </div>
