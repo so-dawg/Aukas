@@ -1,0 +1,200 @@
+:root {
+  --bg: #f3f4f6;
+  --surface: #ffffff;
+
+  --text: #0f172a;
+  --muted: #64748b;
+  --soft: #94a3b8;
+
+  --border: #e2e8f0;
+
+  --primary: #2563eb;
+  --primary-dark: #1d4ed8;
+
+  --accent: #e8edfb;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Nunito Sans", sans-serif;
+}
+
+body {
+  background: var(--bg);
+}
+
+.page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 16px;
+}
+
+.card {
+  width: 100%;
+  max-width: 460px;
+  background: var(--surface);
+  border-radius: 16px;
+  padding: 40px;
+  box-shadow: 0 2px 24px rgba(0, 0, 0, 0.07);
+}
+
+/* Typography */
+.title {
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+
+.title span {
+  color: var(--primary);
+}
+
+.subtitle {
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 26px;
+}
+
+/* Field */
+.field {
+  margin-bottom: 14px;
+}
+
+.label {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+  margin-bottom: 5px;
+}
+
+/* Input */
+.inputWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.inputIcon {
+  position: absolute;
+  left: 12px;
+  color: var(--soft);
+  display: flex;
+  align-items: center;
+  pointer-events: none;
+}
+
+.input {
+  width: 100%;
+  padding: 11px 13px;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  font-size: 13px;
+  color: var(--text);
+  background: var(--surface);
+  transition: border-color 0.15s;
+}
+
+.input::placeholder {
+  color: var(--soft);
+}
+
+.input:focus {
+  border-color: var(--primary);
+  outline: none;
+}
+
+.inputWithIcon {
+  padding-left: 36px;
+}
+
+.inputPaddingRight {
+  padding-right: 40px;
+}
+
+/* Toggle password */
+.toggleBtn {
+  position: absolute;
+  right: 10px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: var(--soft);
+  display: flex;
+  align-items: center;
+  padding: 0;
+  transition: color 0.15s;
+}
+
+.toggleBtn:hover {
+  color: var(--text);
+}
+
+/* Forgot password */
+.forgotRow {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 20px;
+  margin-top: -4px;
+}
+
+.forgotLink {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--primary);
+  text-decoration: none;
+}
+
+.forgotLink:hover {
+  text-decoration: underline;
+}
+
+/* Submit */
+.submitBtn {
+  width: 100%;
+  padding: 13px;
+  border: none;
+  background: var(--primary);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 800;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: background 0.15s, transform 0.1s;
+  letter-spacing: 0.01em;
+}
+
+.submitBtn:hover {
+  background: var(--primary-dark);
+}
+
+.submitBtn:active {
+  transform: scale(0.98);
+}
+
+/* Sign up row */
+.signinRow {
+  text-align: center;
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 20px;
+}
+
+.signinRow a {
+  color: var(--primary);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.signinRow a:hover {
+  text-decoration: underline;
+}

@@ -1,0 +1,82 @@
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import { FiMail, FiLock, FiEye, FiEyeOff, FiArrowRight } from "react-icons/fi";
+import "./Login.css";
+
+function Label({ children }) {
+  return <label className="label">{children}</label>;
+}
+
+function PasswordField({ id, label, value, onChange }) {
+  const [show, setShow] = useState(false);
+
+  return (
+    <div className="field">
+      <Label>{label}</Label>
+      <div className="inputWrapper">
+        <span className="inputIcon"><FiLock size={15} /></span>
+        <input
+          id={id}
+          type={show ? "text" : "password"}
+          placeholder="Enter your password"
+          value={value}
+          onChange={onChange}
+          className="input inputWithIcon inputPaddingRight"
+        />
+        <button type="button" onClick={() => setShow(!show)} className="toggleBtn">
+          {show ? <FiEyeOff size={15} /> : <FiEye size={15} />}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+export default function Login() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  return (
+    <div className="page">
+      <div className="card">
+        <h1 className="title">
+          Welcome back to <span>Aukas</span>
+        </h1>
+        <p className="subtitle">Login to continue to your existing account.</p>
+
+        <div className="field">
+          <Label>Email address</Label>
+          <div className="inputWrapper">
+            <span className="inputIcon"><FiMail size={15} /></span>
+            <input
+              id="email"
+              type="email"
+              placeholder="sokunkanha@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="input inputWithIcon"
+            />
+          </div>
+        </div>
+
+        <PasswordField
+          id="password"
+          label="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+
+        <div className="forgotRow">
+          <a href="#" className="forgotLink">Forgot password?</a>
+        </div>
+
+        <button className="submitBtn">
+          Login <FiArrowRight size={16} />
+        </button>
+
+        <p className="signinRow">
+          Don't have an account yet? <Link to="/signup">Sign up</Link>
+        </p>
+      </div>
+    </div>
+  );
+}

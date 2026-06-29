@@ -1,4 +1,4 @@
-import { useSearchParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useState } from "react";
 import {
   FiEye,
@@ -308,7 +308,7 @@ export default function AukasSignup() {
         </p>
 
         <p className="signinRow">
-          Already have an account? <a href="#">login</a>
+          Already have an account? <Link to="/login">Login</Link>
         </p>
       </div>
     </div>
