@@ -67,6 +67,25 @@
   margin-left: auto;
 }
 
+.navbar-icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  border: 1px solid #334155;
+  color: #cbd5e1;
+  background: transparent;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+
+.navbar-icon-button:hover {
+  background: #1e293b;
+  color: #fff;
+  border-color: #475569;
+}
+
 .navbar-button {
   text-decoration: none;
   font-size: 0.875rem;

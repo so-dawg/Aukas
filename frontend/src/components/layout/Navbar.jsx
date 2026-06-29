@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { FiBookmark } from "react-icons/fi";
 import { useAuth } from "../../context/AuthContext";
 
 const navLinks = [
@@ -38,6 +39,14 @@ const Navbar = () => {
         </ul>
 
         <div className="navbar-actions">
+          <Link
+            to={user ? "/whitelist" : "/login"}
+            className="navbar-icon-button"
+            aria-label="Saved opportunities"
+          >
+            <FiBookmark size={18} />
+          </Link>
+
           {user && (
             <Link to="/whitelist" className="navbar-button secondary">
               Whitelist
