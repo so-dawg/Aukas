@@ -32,7 +32,6 @@ coverage/
 # Database dumps / local
 *.sqlite
 *.sqlite3
-pgdata/
 
 # Claude local notes
 CLAUDE.local.md
