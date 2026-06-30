@@ -1,5 +1,6 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { useAuth } from "../context/AuthContext";
 import {
   FiEye,
   FiEyeOff,
@@ -236,6 +237,9 @@ function OrgForm({ data, onChange }) {
 }
  
 export default function AukasSignup() {
+  const { register } = useAuth();
+  const navigate = useNavigate();
+  const [error, setError] = useState("");
   const [role, setRole] = useState("student");
  
   const [studentData, setStudentData] = useState({
@@ -263,10 +267,43 @@ export default function AukasSignup() {
   const isStudent = role === "student";
   const updateStudent = (k, v) => setStudentData((p) => ({ ...p, [k]: v }));
   const updateOrg = (k, v) => setOrgData((p) => ({ ...p, [k]: v }));
- 
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    try {
+      if (isStudent) {
+        await register({
+          full_name: `${studentData.firstName} ${studentData.lastName}`.trim(),
+          email: studentData.email,
+          password: studentData.password,
+          role: "student",
+          profile: {
+            university: studentData.university,
+            major: studentData.major,
+          },
+        });
+      } else {
+        await register({
+          full_name: orgData.orgName,
+          email: orgData.email,
+          password: orgData.password,
+          role: "organization",
+          profile: {
+            org_name: orgData.orgName,
+            website: orgData.website || undefined,
+          },
+        });
+      }
+      navigate("/opportunities");
+    } catch (err) {
+      setError(err.response?.data?.error?.message || "Registration failed. Please try again.");
+    }
+  };
+
   return (
     <div className="page">
-      <div className="card">
+      <form className="card" onSubmit={handleSubmit}>
         <h1 className="title">
           Create account on <span>Aukas</span>
         </h1>
@@ -298,7 +335,9 @@ export default function AukasSignup() {
           <OrgForm data={orgData} onChange={updateOrg} />
         )}
  
-        <button className="submitBtn">
+        {error && <p className="errorMsg">{error}</p>}
+
+        <button type="submit" className="submitBtn">
           Create account <FiArrowRight size={16} />
         </button>
 
@@ -310,7 +349,7 @@ export default function AukasSignup() {
         <p className="signinRow">
           Already have an account? <Link to="/login">Login</Link>
         </p>
-      </div>
+      </form>
     </div>
   );
 }

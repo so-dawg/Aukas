@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { FiMail, FiLock, FiEye, FiEyeOff, FiArrowRight } from "react-icons/fi";
+import { useAuth } from "../context/AuthContext";
 import "./Login.css";
 
 function Label({ children }) {
@@ -32,16 +33,32 @@ function PasswordField({ id, label, value, onChange }) {
 }
 
 export default function Login() {
+  const { login } = useAuth();
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    try {
+      await login(email, password);
+      navigate("/opportunities");
+    } catch (err) {
+      setError(err.response?.data?.error?.message || "Login failed. Please try again.");
+    }
+  };
 
   return (
     <div className="page">
-      <div className="card">
+      <form className="card" onSubmit={handleSubmit}>
         <h1 className="title">
           Welcome back to <span>Aukas</span>
         </h1>
         <p className="subtitle">Login to continue to your existing account.</p>
+
+        {error && <p className="errorMsg">{error}</p>}
 
         <div className="field">
           <Label>Email address</Label>
@@ -54,6 +71,7 @@ export default function Login() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="input inputWithIcon"
+              required
             />
           </div>
         </div>
@@ -69,14 +87,14 @@ export default function Login() {
           <a href="#" className="forgotLink">Forgot password?</a>
         </div>
 
-        <button className="submitBtn">
+        <button type="submit" className="submitBtn">
           Login <FiArrowRight size={16} />
         </button>
 
         <p className="signinRow">
           Don't have an account yet? <Link to="/signup">Sign up</Link>
         </p>
-      </div>
+      </form>
     </div>
   );
 }

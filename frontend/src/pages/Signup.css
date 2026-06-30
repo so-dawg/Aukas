@@ -354,3 +354,13 @@ select option:disabled {
 .selectWrapper + .inputWrapper {
   margin-top: 10px;
 }
+
+.errorMsg {
+  background: #fef2f2;
+  color: #dc2626;
+  font-size: 0.85rem;
+  padding: 10px 14px;
+  border-radius: 8px;
+  margin-bottom: 14px;
+  text-align: center;
+}

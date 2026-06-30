@@ -7,11 +7,11 @@ import "../components/layout/Navbar.css";
 import "./OpportunityDetail.css";
 
 const iconMap = {
-  internship: "\uD83C\uDFE2",
-  scholarship: "\uD83C\uDF93",
-  job: "\uD83C\uDFE2",
-  volunteer: "\uD83E\uDD1D",
-  competition: "\uD83C\uDFC6",
+  internship: "🟢",
+  scholarship: "🎓",
+  job: "🟢",
+  volunteer: "🤝",
+  competition: "🏆",
 };
 
 const closingIn = (deadline) => {
@@ -69,7 +69,7 @@ const OpportunityDetail = () => {
     return (
       <>
         <Navbar />
-        <main className="detail-page"><div className="detail-loading">Loading\u2026</div></main>
+        <main className="detail-page"><div className="detail-loading">Loading…</div></main>
       </>
     );
   }
@@ -81,7 +81,7 @@ const OpportunityDetail = () => {
         <main className="detail-page">
           <div className="detail-notfound">
             <h1>Opportunity not found</h1>
-            <Link to="/opportunities" className="detail-back-link">\u2190 Browse all opportunities</Link>
+            <Link to="/opportunities" className="detail-back-link">← Browse all opportunities</Link>
           </div>
         </main>
       </>
@@ -93,7 +93,7 @@ const OpportunityDetail = () => {
       <Navbar />
       <main className="detail-page">
         <div className="detail-inner">
-          <Link to="/opportunities" className="detail-back">\u2190 Back to opportunities</Link>
+          <Link to="/opportunities" className="detail-back">← Back to opportunities</Link>
 
           <div className="detail-header">
             <div className="detail-header-top">
@@ -114,7 +114,7 @@ const OpportunityDetail = () => {
                 </div>
               </div>
               <div className="detail-header-actions">
-                <button className="detail-apply-btn">Apply now \u2192</button>
+                <button className="detail-apply-btn">Apply now →</button>
                 <button
                   className={`detail-save-btn ${saved ? "saved" : ""}`}
                   onClick={toggleBookmark}

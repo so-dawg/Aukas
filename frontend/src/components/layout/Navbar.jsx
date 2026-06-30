@@ -62,9 +62,9 @@ const Navbar = () => {
               aria-expanded={profileOpen}
             >
               <span className="profile-avatar">
-                {(user.name?.[0] || "U").toUpperCase()}
+                {(user.full_name?.[0] || "U").toUpperCase()}
               </span>
-              <span>{user.name || "Account"}</span>
+              <span>{user.full_name || "Account"}</span>
             </button>
           ) : (
             <>
@@ -130,7 +130,7 @@ const Navbar = () => {
                 type="button"
                 onClick={() => {
                   setMenuOpen(false);
-                  console.log("Logout");
+                  logout();
                 }}
                 className="navbar-button secondary"
               >
