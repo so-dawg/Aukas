@@ -279,7 +279,11 @@ export default function AukasSignup() {
           password: studentData.password,
           role: "student",
           profile: {
-            university: studentData.university,
+            dob: studentData.dob,
+            university:
+              studentData.university === "Other"
+                ? studentData.universityOther
+                : studentData.university,
             major: studentData.major,
           },
         });

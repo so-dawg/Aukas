@@ -103,7 +103,7 @@ mockRouter.post("/auth/login", (req, res) => {
 });
 
 mockRouter.post("/auth/register", (req, res) => {
-  const { email, password, full_name, role } = req.body;
+  const { email, password, full_name, role, profile = {} } = req.body;
   if (!email || !password || !full_name || !role) {
     return res.status(400).json({ error: "All fields are required" });
   }
@@ -116,6 +116,7 @@ mockRouter.post("/auth/register", (req, res) => {
     email,
     password,
     role,
+    profile,
     avatar_url: null,
     bio: "",
     created_at: new Date().toISOString(),

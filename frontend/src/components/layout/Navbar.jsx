@@ -52,14 +52,14 @@ const Navbar = () => {
           )}
 
           {user ? (
-            <button
-              type="button"
+            <Link
+              to="/profile"
               className="profile-button"
               aria-label={user.full_name ? `${user.full_name} account` : "Account"}
               title={user.full_name || "Account"}
             >
               <FiUser size={18} />
-            </button>
+            </Link>
           ) : (
             <>
               <Link to="/login" className="navbar-button secondary">

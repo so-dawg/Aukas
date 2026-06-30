@@ -6,6 +6,11 @@
       "email": "student@aukas.org",
       "password": "password123",
       "role": "student",
+      "profile": {
+        "dob": "2002-06-15",
+        "university": "Royal University of Phnom Penh",
+        "major": "Computer Science"
+      },
       "avatar_url": null,
       "bio": "Computer Science student passionate about web development.",
       "created_at": "2025-01-15T08:00:00Z"
@@ -26,6 +31,11 @@
       "email": "student2@aukas.org",
       "password": "password123",
       "role": "student",
+      "profile": {
+        "dob": "2003-03-21",
+        "university": "Paragon International University",
+        "major": "Design"
+      },
       "avatar_url": null,
       "bio": "Design student exploring UX and graphic design.",
       "created_at": "2025-02-01T08:00:00Z"
