@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { FiBookmark } from "react-icons/fi";
+import { FiBookmark, FiUser } from "react-icons/fi";
 import logo from "../../assets/AukasLogo.jpg";
 import { useAuth } from "../../context/AuthContext";
 
@@ -12,12 +12,12 @@ const navLinks = [
 ];
 
 const Navbar = () => {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
-  const [profileOpen, setProfileOpen] = useState(false);
 
   const isActive = (path) => location.pathname === path;
+  const isJobSeeker = user?.role === "student";
 
   return (
     <nav className="navbar">
@@ -40,17 +40,14 @@ const Navbar = () => {
         </ul>
 
         <div className="navbar-actions">
-          <Link
-            to={user ? "/whitelist" : "/login"}
-            className="navbar-icon-button"
-            aria-label="Saved opportunities"
-          >
-            <FiBookmark size={18} />
-          </Link>
-
-          {user && (
-            <Link to="/whitelist" className="navbar-button secondary">
-              Whitelist
+          {isJobSeeker && (
+            <Link
+              to="/whitelist"
+              className="navbar-icon-button"
+              aria-label="Saved opportunities"
+              title="Saved opportunities"
+            >
+              <FiBookmark size={18} />
             </Link>
           )}
 
@@ -58,13 +55,10 @@ const Navbar = () => {
             <button
               type="button"
               className="profile-button"
-              onClick={() => setProfileOpen((prev) => !prev)}
-              aria-expanded={profileOpen}
+              aria-label={user.full_name ? `${user.full_name} account` : "Account"}
+              title={user.full_name || "Account"}
             >
-              <span className="profile-avatar">
-                {(user.full_name?.[0] || "U").toUpperCase()}
-              </span>
-              <span>{user.full_name || "Account"}</span>
+              <FiUser size={18} />
             </button>
           ) : (
             <>
@@ -103,14 +97,14 @@ const Navbar = () => {
             </li>
           ))}
 
-          {user && (
+          {isJobSeeker && (
             <li>
               <Link
                 to="/whitelist"
                 onClick={() => setMenuOpen(false)}
                 className="navbar-mobile-link"
               >
-                Whitelist
+                Saved
               </Link>
             </li>
           )}
