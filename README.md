@@ -11,10 +11,8 @@ A Cambodia-first web platform where students discover **internships, jobs, schol
 | Layer    | Technology                                      |
 | -------- | ----------------------------------------------- |
 | Frontend | React (Vite)                                    |
-| Backend  | Node.js · Express                               |
-| Database | PostgreSQL                                      |
-| DevOps   | PostgreSQL (local)                              |
-| Hosting  | Vercel (frontend) · Render (API) · Railway (DB) |
+| Backend  | Node.js · Express · axios                       |
+| Database | PostgreSQL · sequelize                          |
 
 ## Repository layout
 

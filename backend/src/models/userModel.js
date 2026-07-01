@@ -1,47 +1,46 @@
-const db = require("../db");
+const { QueryTypes } = require("sequelize");
+const sequelize = require("../db");
 
-// Includes password_hash — for login verification only. Never send to clients.
 async function findActiveByEmail(email) {
-  const { rows } = await db.query(
+  const rows = await sequelize.query(
     `SELECT id, email, password_hash, full_name, role, created_at
        FROM users
       WHERE email = $1 AND deleted_at IS NULL`,
-    [email],
+    { bind: [email], type: QueryTypes.SELECT },
   );
   return rows[0] || null;
 }
 
 async function findActiveById(id) {
-  const { rows } = await db.query(
+  const rows = await sequelize.query(
     `SELECT id, email, full_name, role, created_at
        FROM users
       WHERE id = $1 AND deleted_at IS NULL`,
-    [id],
+    { bind: [id], type: QueryTypes.SELECT },
   );
   return rows[0] || null;
 }
 
 async function getProfile(userId, role) {
   if (role === "student") {
-    const { rows } = await db.query(
+    const rows = await sequelize.query(
       `SELECT university, major, year_of_study, resume_url
          FROM students WHERE user_id = $1`,
-      [userId],
+      { bind: [userId], type: QueryTypes.SELECT },
     );
     return rows[0] || null;
   }
   if (role === "organization") {
-    const { rows } = await db.query(
+    const rows = await sequelize.query(
       `SELECT org_name, website, description, verified
          FROM organizations WHERE user_id = $1`,
-      [userId],
+      { bind: [userId], type: QueryTypes.SELECT },
     );
     return rows[0] || null;
   }
-  return null; // admin has no profile row
+  return null;
 }
 
-// Insert the user + their role profile atomically.
 async function createWithProfile({
   email,
   passwordHash,
@@ -49,37 +48,47 @@ async function createWithProfile({
   role,
   profile,
 }) {
-  return db.transaction(async (client) => {
-    const { rows } = await client.query(
+  return sequelize.transaction(async (t) => {
+    const rows = await sequelize.query(
       `INSERT INTO users (email, password_hash, full_name, role)
        VALUES ($1, $2, $3, $4)
        RETURNING id, email, full_name, role, created_at`,
-      [email, passwordHash, full_name, role],
+      {
+        bind: [email, passwordHash, full_name, role],
+        type: QueryTypes.SELECT,
+        transaction: t,
+      },
     );
     const user = rows[0];
 
     if (role === "student") {
-      await client.query(
+      await sequelize.query(
         `INSERT INTO students (user_id, university, major, year_of_study, resume_url)
          VALUES ($1, $2, $3, $4, $5)`,
-        [
-          user.id,
-          profile.university ?? null,
-          profile.major ?? null,
-          profile.year_of_study ?? null,
-          profile.resume_url ?? null,
-        ],
+        {
+          bind: [
+            user.id,
+            profile.university ?? null,
+            profile.major ?? null,
+            profile.year_of_study ?? null,
+            profile.resume_url ?? null,
+          ],
+          transaction: t,
+        },
       );
     } else if (role === "organization") {
-      await client.query(
+      await sequelize.query(
         `INSERT INTO organizations (user_id, org_name, website, description)
          VALUES ($1, $2, $3, $4)`,
-        [
-          user.id,
-          profile.org_name,
-          profile.website ?? null,
-          profile.description ?? null,
-        ],
+        {
+          bind: [
+            user.id,
+            profile.org_name,
+            profile.website ?? null,
+            profile.description ?? null,
+          ],
+          transaction: t,
+        },
       );
     }
 
@@ -91,12 +100,10 @@ async function listUsers(filters) {
   const where = ["u.deleted_at IS NULL"];
   const params = [];
 
-  const add = (value, clause) => {
-    params.push(value);
-    where.push(clause(params.length));
-  };
-
-  if (filters.role) add(filters.role, (n) => `u.role = $${n}`);
+  if (filters.role) {
+    params.push(filters.role);
+    where.push(`u.role = $${params.length}`);
+  }
 
   const { limit, offset } = filters;
 
@@ -110,11 +117,14 @@ async function listUsers(filters) {
   const countSql = `SELECT COUNT(*) AS total FROM users u WHERE ${where.join(" AND ")}`;
 
   const [rowsResult, countResult] = await Promise.all([
-    db.query(rowsSql, [...params, limit, offset]),
-    db.query(countSql, params),
+    sequelize.query(rowsSql, {
+      bind: [...params, limit, offset],
+      type: QueryTypes.SELECT,
+    }),
+    sequelize.query(countSql, { bind: params, type: QueryTypes.SELECT }),
   ]);
 
-  return { rows: rowsResult.rows, total: Number(countResult.rows[0].total) };
+  return { rows: rowsResult, total: Number(countResult[0].total) };
 }
 
 const USER_UPDATABLE = ["full_name", "email", "password_hash"];
@@ -127,18 +137,18 @@ async function update(id, fields) {
   const params = cols.map((c) => fields[c]);
   params.push(id);
 
-  const { rows } = await db.query(
+  const rows = await sequelize.query(
     `UPDATE users SET ${set.join(", ")} WHERE id = $${params.length} AND deleted_at IS NULL
      RETURNING id, email, full_name, role, created_at`,
-    params,
+    { bind: params, type: QueryTypes.SELECT },
   );
   return rows[0] || null;
 }
 
 async function remove(id) {
-  await db.query(
+  await sequelize.query(
     `UPDATE users SET deleted_at = now() WHERE id = $1 AND deleted_at IS NULL`,
-    [id],
+    { bind: [id] },
   );
 }
 

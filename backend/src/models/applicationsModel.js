@@ -1,16 +1,17 @@
-const db = require("../db");
+const { QueryTypes } = require("sequelize");
+const sequelize = require("../db");
 
 async function create(studentId, opportunityId) {
-  const { rows } = await db.query(
+  const rows = await sequelize.query(
     `INSERT INTO applications (student_id, opportunity_id) VALUES ($1, $2)
      RETURNING id, student_id, opportunity_id, status, applied_at`,
-    [studentId, opportunityId],
+    { bind: [studentId, opportunityId], type: QueryTypes.SELECT },
   );
   return rows[0];
 }
 
 async function listByStudent(studentId, { limit, offset }) {
-  const { rows } = await db.query(
+  const rows = await sequelize.query(
     `SELECT a.id, a.student_id, a.opportunity_id, a.status, a.applied_at,
        o.title AS opportunity_title, o.type AS opportunity_type,
        to_char(o.deadline, 'YYYY-MM-DD') AS opportunity_deadline,
@@ -21,13 +22,13 @@ async function listByStudent(studentId, { limit, offset }) {
      WHERE a.student_id = $1
      ORDER BY a.applied_at DESC
      LIMIT $2 OFFSET $3`,
-    [studentId, limit, offset],
+    { bind: [studentId, limit, offset], type: QueryTypes.SELECT },
   );
-  const countResult = await db.query(
+  const count = await sequelize.query(
     `SELECT COUNT(*) AS total FROM applications WHERE student_id = $1`,
-    [studentId],
+    { bind: [studentId], type: QueryTypes.SELECT },
   );
-  return { rows, total: Number(countResult.rows[0].total) };
+  return { rows, total: Number(count[0].total) };
 }
 
 module.exports = { create, listByStudent };

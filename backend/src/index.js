@@ -1,4 +1,4 @@
-require("dotenv").config();
+require("dotenv").config({ path: "../.env" });
 
 const express = require("express");
 const cors = require("cors");
@@ -15,7 +15,6 @@ const adminRouter = require("./routes/admin");
 const userRouter = require("./routes/users");
 const applicationsRouter = require("./routes/applications");
 const categoriesRouter = require("./routes/categories");
-const mockMiddleware = require("./middleware/mock");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -25,19 +24,15 @@ app.use(cors());
 app.use(morgan("dev"));
 app.use(express.json());
 
-if (process.env.USE_MOCK === "true") {
-  app.use("/api", mockMiddleware);
-} else {
-  app.use("/api", healthRouter);
-  app.use("/api", authRouter);
-  app.use("/api", opportunitiesRouter);
-  app.use("/api", bookmarksRouter);
-  app.use("/api", organizationsRouter);
-  app.use("/api", adminRouter);
-  app.use("/api", userRouter);
-  app.use("/api", applicationsRouter);
-  app.use("/api", categoriesRouter);
-}
+app.use("/api", healthRouter);
+app.use("/api", authRouter);
+app.use("/api", opportunitiesRouter);
+app.use("/api", bookmarksRouter);
+app.use("/api", organizationsRouter);
+app.use("/api", adminRouter);
+app.use("/api", userRouter);
+app.use("/api", applicationsRouter);
+app.use("/api", categoriesRouter);
 
 app.use(errorHandler);
 

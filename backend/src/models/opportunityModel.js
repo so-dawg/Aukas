@@ -1,4 +1,5 @@
-const db = require("../db");
+const { QueryTypes } = require("sequelize");
+const sequelize = require("../db");
 
 const OPPORTUNITY_TYPES = [
   "internship",
@@ -67,7 +68,7 @@ function buildWhere(filters) {
     where.push(clause(params.length));
   };
 
-  if (!filter.allStatuses) where.push("o.status = 'approved'");
+  if (!filters.allStatuses) where.push("o.status = 'approved'");
 
   if (filters.q)
     add(
@@ -104,25 +105,29 @@ async function list(filters) {
   const countSql = `SELECT COUNT(*) AS total ${FROM_JOINS} WHERE ${whereSql}`;
 
   const [rowsResult, countResult] = await Promise.all([
-    db.query(rowsSql, [...params, filters.limit, filters.offset]),
-    db.query(countSql, params),
+    sequelize.query(rowsSql, {
+      bind: [...params, filters.limit, filters.offset],
+      type: QueryTypes.SELECT,
+    }),
+    sequelize.query(countSql, { bind: params, type: QueryTypes.SELECT }),
   ]);
 
   return {
-    rows: rowsResult.rows.map((r) => mapRow(r)),
-    total: Number(countResult.rows[0].total),
+    rows: rowsResult.map((r) => mapRow(r)),
+    total: Number(countResult[0].total),
   };
 }
 
-// Fetch a single (non-soft-deleted) opportunity of any status.
-// Returns the detail-shaped object, or null if no such row exists.
 async function findById(id) {
   const sql = `
     SELECT ${SELECT_COLUMNS}
     ${FROM_JOINS}
     WHERE o.id = $1 AND o.deleted_at IS NULL
   `;
-  const { rows } = await db.query(sql, [id]);
+  const rows = await sequelize.query(sql, {
+    bind: [id],
+    type: QueryTypes.SELECT,
+  });
   if (rows.length === 0) return null;
   return mapRow(rows[0], { detail: true });
 }
@@ -135,19 +140,22 @@ async function create({
   location,
   deadline,
 }) {
-  //from the category slog , so we don't insert it
-  const { rows } = await db.query(
-    `INSERT INTO opportunities (organization_id, category_id, title, description, location, deadline, status) VALUES ($1, $2, $3, $4, $5, $6, 'draft') RETURNING id`,
-    [
-      organization_id,
-      category_id,
-      title,
-      description,
-      location ?? null,
-      deadline ?? null,
-    ],
+  const rows = await sequelize.query(
+    `INSERT INTO opportunities (organization_id, category_id, title, description, location, deadline, status)
+     VALUES ($1, $2, $3, $4, $5, $6, 'draft') RETURNING id`,
+    {
+      bind: [
+        organization_id,
+        category_id,
+        title,
+        description,
+        location ?? null,
+        deadline ?? null,
+      ],
+      type: QueryTypes.SELECT,
+    },
   );
-  return findById(rows[0].id); //re-fetch so the response is the joined detail shape
+  return findById(rows[0].id);
 }
 
 const UPDATABLE = [
@@ -168,19 +176,20 @@ async function update(id, fields) {
   const params = cols.map((c) => fields[c]);
   params.push(id);
 
-  await db.query(
+  await sequelize.query(
     `UPDATE opportunities SET ${set.join(", ")} WHERE id = $${params.length} AND deleted_at IS NULL`,
-    params,
+    { bind: params },
   );
   return findById(id);
 }
 
 async function remove(id) {
-  await db.query(
-    "UPDATE opportunities SET deleted_at = now() where id = $1 AND deleted_at IS NULL",
-    [id],
+  await sequelize.query(
+    "UPDATE opportunities SET deleted_at = now() WHERE id = $1 AND deleted_at IS NULL",
+    { bind: [id] },
   );
 }
+
 module.exports = {
   list,
   findById,

@@ -1,11 +1,12 @@
-const db = require("../db");
+const { QueryTypes } = require("sequelize");
+const sequelize = require("../db");
 
 const UPDATABLE = ["university", "major", "year_of_study", "resume_url"];
 
 async function findByUserId(userId) {
-  const { rows } = await db.query(
+  const rows = await sequelize.query(
     `SELECT user_id, university, major, year_of_study, resume_url FROM students WHERE user_id = $1`,
-    [userId],
+    { bind: [userId], type: QueryTypes.SELECT },
   );
   return rows[0] || null;
 }
@@ -18,9 +19,9 @@ async function update(userId, fields) {
   const params = cols.map((c) => fields[c]);
   params.push(userId);
 
-  await db.query(
+  await sequelize.query(
     `UPDATE students SET ${set.join(", ")} WHERE user_id = $${params.length}`,
-    params,
+    { bind: params },
   );
   return findByUserId(userId);
 }

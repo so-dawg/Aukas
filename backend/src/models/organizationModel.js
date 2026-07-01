@@ -1,11 +1,12 @@
-const db = require("../db");
+const { QueryTypes } = require("sequelize");
+const sequelize = require("../db");
 
 const UPDATABLE = ["org_name", "website", "description", "verified"];
 
 async function findByUserId(userId) {
-  const { rows } = await db.query(
-    `SELECT user_id, org_name, website, description, verified FROM organizations WHERE user_id= $1`,
-    [userId],
+  const rows = await sequelize.query(
+    `SELECT user_id, org_name, website, description, verified FROM organizations WHERE user_id = $1`,
+    { bind: [userId], type: QueryTypes.SELECT },
   );
   return rows[0] || null;
 }
@@ -16,9 +17,9 @@ async function update(userId, fields) {
   const set = cols.map((c, i) => `${c} = $${i + 1}`);
   const params = cols.map((c) => fields[c]);
   params.push(userId);
-  await db.query(
+  await sequelize.query(
     `UPDATE organizations SET ${set.join(", ")} WHERE user_id = $${params.length}`,
-    params,
+    { bind: params },
   );
   return findByUserId(userId);
 }

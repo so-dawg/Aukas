@@ -1,37 +1,35 @@
-const db = require("../db");
+const { QueryTypes } = require("sequelize");
+const sequelize = require("../db");
 const { SELECT_COLUMNS, mapRow } = require("./opportunityModel");
 
 async function listByStudent(userId, { limit, offset }) {
-  const { rows } = await db.query(
+  const rows = await sequelize.query(
     `SELECT b.saved_at, ${SELECT_COLUMNS}
        FROM bookmarks b
        JOIN opportunities o ON o.id = b.opportunity_id
        JOIN categories c ON c.id = o.category_id
-       JOIN organizations org on org.user_id = o.organization_id
+       JOIN organizations org ON org.user_id = o.organization_id
       WHERE b.student_id = $1 AND o.deleted_at IS NULL
       ORDER BY b.saved_at DESC
       LIMIT $2 OFFSET $3`,
-    [userId, limit, offset],
+    { bind: [userId, limit, offset], type: QueryTypes.SELECT },
   );
-  const mapped = rows.map((r) => ({
-    saved_at: r.saved_at,
-    ...mapRow(r),
-  }));
+  const mapped = rows.map((r) => ({ saved_at: r.saved_at, ...mapRow(r) }));
   return { rows: mapped };
 }
 
 async function create(studentId, opportunityId) {
-  const { rows } = await db.query(
+  const rows = await sequelize.query(
     `INSERT INTO bookmarks (student_id, opportunity_id) VALUES ($1, $2) RETURNING *`,
-    [studentId, opportunityId],
+    { bind: [studentId, opportunityId], type: QueryTypes.SELECT },
   );
   return rows[0];
 }
 
 async function remove(studentId, opportunityId) {
-  await db.query(
+  await sequelize.query(
     `DELETE FROM bookmarks WHERE student_id = $1 AND opportunity_id = $2`,
-    [studentId, opportunityId],
+    { bind: [studentId, opportunityId] },
   );
 }
 

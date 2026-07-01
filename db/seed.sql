@@ -1,4 +1,3 @@
-and seed sql -- Aukas — sample seed data
 -- Apply against a database that already has the schema:
 --   docker exec -i aukas-db psql -U opportunities -d opportunities_hub < db/seed.sql
 --
@@ -55,7 +54,7 @@ INSERT INTO opportunities (organization_id, category_id, approved_by, title, des
     'Backend Engineering Intern',
     'Three-month paid internship building Node.js and PostgreSQL APIs. Open to 3rd and 4th year IT students.',
     'Phnom Penh', '2026-06-30', 'approved' ),
-[6/30/2026 9:12 PM] Sokunnita Ly: ( (SELECT user_id FROM organizations WHERE org_name = 'Mekong Tech Co.'),
+  ( (SELECT user_id FROM organizations WHERE org_name = 'Mekong Tech Co.'),
     (SELECT id      FROM categories    WHERE slug = 'job'),
     (SELECT id      FROM users         WHERE email = 'admin@aukas.test'),
     'Junior DevOps Engineer',
@@ -125,7 +124,7 @@ INSERT INTO opportunities (organization_id, category_id, approved_by, title, des
     'Product Manager',
     'Lead product strategy for the driver app. Draft, not yet submitted by the organization.',
     'Phnom Penh', '2026-09-01', 'draft' ),
-[6/30/2026 9:12 PM] Sokunnita Ly: ( (SELECT user_id FROM organizations WHERE org_name = 'Tonle Sap Conservation'),
+  ( (SELECT user_id FROM organizations WHERE org_name = 'Tonle Sap Conservation'),
     (SELECT id      FROM categories    WHERE slug = 'competition'),
     (SELECT id      FROM users         WHERE email = 'admin@aukas.test'),
     'Eco Innovation Challenge',

@@ -125,7 +125,7 @@ CREATE INDEX idx_opportunities_org
 
 CREATE INDEX idx_opportunities_search
   ON opportunities
-  USING GIN (to_tsvector('simple', title  ' '  description));
+  USING GIN (to_tsvector('simple', title || ' ' || description));
 
 CREATE INDEX idx_applications_student
   ON applications (student_id, applied_at DESC);
