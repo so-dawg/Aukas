@@ -10,35 +10,61 @@ A Cambodia-first web platform where students discover **internships, jobs, schol
 
 | Layer    | Technology                                      |
 | -------- | ----------------------------------------------- |
-| Frontend | React (Vite)                                    |
-| Backend  | Node.js · Express · axios                       |
-| Database | PostgreSQL · sequelize                          |
+| Frontend | React (Vite) · axios · lucide-react             |
+| Backend  | Node.js · Express · sequelize · jsonwebtoken    |
+| Database | PostgreSQL 15+                                  |
 
 ## Repository layout
+
 
 ```
 .
 ├── backend/        Node + Express 5 API
 │   ├── src/
-│   │   ├── index.js         server entry (helmet · cors · morgan · express.json)
-│   │   ├── db/index.js      pg Pool — DATABASE_URL
-│   │   └── routes/health.js GET /api/health
-│   ├── migrations/          versioned SQL migrations (Week 3+)
+│   │   ├── index.js             server entry (helmet · cors · morgan · express.json)
+│   │   ├── db/index.js          Sequelize instance — DATABASE_URL
+│   │   ├── routes/              health, auth, opportunities, bookmarks, orgs, admin, etc.
+│   │   ├── controllers/         route handlers (validation, business logic)
+│   │   ├── models/              data-access layer (raw SQL via Sequelize)
+│   │   ├── middleware/          auth JWT, error handler
+│   │   └── utils/               JWT helpers, password hashing, pagination, regex patterns
+│   ├── scripts/                 standalone utilities (e.g. expire-opportunities)
 │   └── tests/
 ├── frontend/       React 19 + Vite SPA
-├── db/             schema.sql + seed.sql (Week 3+)
+│   └── src/
+│       ├── api/client.js        Axios client — baseURL /api, auto-attaches JWT
+│       ├── context/AuthContext   Login, register, logout state
+│       ├── pages/               Home, Opportunities, OpportunityDetail, Login, Signup, etc.
+│       └── components/          Navbar, Footer, Hero, cards
+├── db/             Sequelize CLI scaffold
+│   ├── config/config.json       PostgreSQL connection config
+│   ├── migrations/              versioned schema migrations
+│   ├── seeders/                 sample data seeders
+│   ├── models/                  Sequelize model definitions (User, Opportunity, etc.)
+│   ├── schema.sql               reference SQL schema (source of truth)
+│   └── seed.sql                 reference SQL seed data
 ├── docs/           proposal, ADRs, data model, research, workflow plan
+├── .sequelizerc    Sequelize CLI config paths
 ├── .env.example    copy to .env and fill in
 ├── AGENTS.md       project context for AI coding agents
+├── README.md       you are here
 └── LICENSE
 ```
 
 ## Getting started
 
+### Prerequisites
+
+- **Node.js** 20+
+- **PostgreSQL** 15+
+- **npm**
+
+### 1. Clone and install
+
 ```bash
 git clone https://github.com/so-dawg/Aukas.git
 cd Aukas
-cp .env.example .env        # then edit values (generate a real JWT_SECRET)
+cp .env.example .env   # then edit values
 ```
 
 Backend (Express 5):
@@ -58,15 +84,26 @@ npm install
 npm run dev                 # http://localhost:5173
 ```
 
-Database schema and seed data land in **Week 3 (Foundation)**.
+Database schema and seed data land in 
+# Arch Linux
 
+```bash
+sudo pacman -S postgresql
+sudo -u postgres initdb -D /var/lib/postgres/data
+sudo systemctl start postgresql
+sudo systemctl enable postgresql
+
+# Create database and user
+sudo -u postgres createuser opportunities -P   # password: changeme
+sudo -u postgres createdb opportunities_hub -O opportunities
+```
 ## Team
 
 | Member | Role                     |
 | ------ | ------------------------ |
-| M1     | Backend & Database       |
+| M1     | Backend & Fullstack      |
 | M2     | Frontend & UX            |
-| M3     | Research & Documentation |
+| M3     | Database                 |
 
 ## Course coverage
 
