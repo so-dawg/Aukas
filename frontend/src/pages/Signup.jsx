@@ -272,8 +272,9 @@ export default function AukasSignup() {
     e.preventDefault();
     setError("");
     try {
+      let user;
       if (isStudent) {
-        await register({
+        user = await register({
           full_name: `${studentData.firstName} ${studentData.lastName}`.trim(),
           email: studentData.email,
           password: studentData.password,
@@ -288,7 +289,7 @@ export default function AukasSignup() {
           },
         });
       } else {
-        await register({
+        user = await register({
           full_name: orgData.orgName,
           email: orgData.email,
           password: orgData.password,
@@ -299,7 +300,7 @@ export default function AukasSignup() {
           },
         });
       }
-      navigate("/opportunities");
+      navigate(user?.role === "organization" ? "/profile" : "/opportunities");
     } catch (err) {
       setError(err.response?.data?.error?.message || "Registration failed. Please try again.");
     }

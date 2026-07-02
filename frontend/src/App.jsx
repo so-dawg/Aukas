@@ -10,21 +10,25 @@ import Contact from "./pages/Contact";
 import Opportunities from "./pages/Opportunities";
 import OpportunityDetail from "./pages/OpportunityDetail";
 import ProfileJobSeeker from "./pages/ProfileJobSeeker";
+import ProfileOrg from "./pages/ProfileOrg";
 import Footer from "./components/layout/Footer";
 import Navbar from "./components/layout/Navbar";
 import "./components/layout/Navbar.css";
 
-function JobSeekerProfileRoute() {
+function ProfileRoute() {
   const { user, loading } = useAuth();
 
   if (loading) return null;
   if (!user) return <Navigate to="/login" replace />;
-  if (user.role !== "student") return <Navigate to="/opportunities" replace />;
+
+  const isStudent = user.role === "student";
+  const isOrganization = user.role === "organization";
+  if (!isStudent && !isOrganization) return <Navigate to="/opportunities" replace />;
 
   return (
     <>
       <Navbar />
-      <ProfileJobSeeker />
+      {isStudent ? <ProfileJobSeeker /> : <ProfileOrg />}
       <Footer />
     </>
   );
@@ -85,7 +89,7 @@ function App() {
             />
             <Route
               path="/profile"
-              element={<JobSeekerProfileRoute />}
+              element={<ProfileRoute />}
             />
           </Routes>
         </BrowserRouter>

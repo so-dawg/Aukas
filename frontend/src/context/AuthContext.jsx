@@ -21,12 +21,14 @@ export const AuthProvider = ({ children }) => {
     const { data } = await client.post("/auth/login", { email, password });
     localStorage.setItem("token", data.token);
     setUser(data.user);
+    return data.user;
   };
 
   const register = async (payload) => {
     const { data } = await client.post("/auth/register", payload);
     localStorage.setItem("token", data.token);
     setUser(data.user);
+    return data.user;
   };
 
   const logout = () => {

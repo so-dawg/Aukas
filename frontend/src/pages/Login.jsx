@@ -43,8 +43,8 @@ export default function Login() {
     e.preventDefault();
     setError("");
     try {
-      await login(email, password);
-      navigate("/opportunities");
+      const user = await login(email, password);
+      navigate(user?.role === "organization" ? "/profile" : "/opportunities");
     } catch (err) {
       setError(err.response?.data?.error?.message || "Login failed. Please try again.");
     }
