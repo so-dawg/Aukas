@@ -22,25 +22,24 @@ A Cambodia-first web platform where students discover **internships, jobs, schol
 ├── backend/        Node + Express 5 API
 │   ├── src/
 │   │   ├── index.js             server entry (helmet · cors · morgan · express.json)
+│   │   ├── api/client.js        Axios client — baseURL /api, auto-attaches JWT
+│   │   ├── config/config.json       PostgreSQL connection config
 │   │   ├── db/index.js          Sequelize instance — DATABASE_URL
+│   │   ├── migrations/              versioned schema migrations
 │   │   ├── routes/              health, auth, opportunities, bookmarks, orgs, admin, etc.
 │   │   ├── controllers/         route handlers (validation, business logic)
 │   │   ├── models/              data-access layer (raw SQL via Sequelize)
+│   │   ├── seeders/                 sample data seeders
 │   │   ├── middleware/          auth JWT, error handler
 │   │   └── utils/               JWT helpers, password hashing, pagination, regex patterns
 │   ├── scripts/                 standalone utilities (e.g. expire-opportunities)
 │   └── tests/
 ├── frontend/       React 19 + Vite SPA
 │   └── src/
-│       ├── api/client.js        Axios client — baseURL /api, auto-attaches JWT
 │       ├── context/AuthContext   Login, register, logout state
 │       ├── pages/               Home, Opportunities, OpportunityDetail, Login, Signup, etc.
 │       └── components/          Navbar, Footer, Hero, cards
 ├── db/             Sequelize CLI scaffold
-│   ├── config/config.json       PostgreSQL connection config
-│   ├── migrations/              versioned schema migrations
-│   ├── seeders/                 sample data seeders
-│   ├── models/                  Sequelize model definitions (User, Opportunity, etc.)
 │   ├── schema.sql               reference SQL schema (source of truth)
 │   └── seed.sql                 reference SQL seed data
 ├── docs/           proposal, ADRs, data model, research, workflow plan
