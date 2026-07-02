@@ -16,6 +16,19 @@ const userRouter = require("./routes/users");
 const applicationsRouter = require("./routes/applications");
 const categoriesRouter = require("./routes/categories");
 
+setInterval(
+  async () => {
+    const { QueryTypes } = require("sequelize");
+    const sequelize = require("./db");
+    await sequelize.query(
+      `UPDATE opportunities SET status = 'expired'
+     WHERE status = 'approved' AND deadline < CURRENT_DATE AND deleted_at IS NULL`,
+      { type: QueryTypes.SELECT },
+    );
+  },
+  60 * 60 * 1000,
+); // every hour
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
