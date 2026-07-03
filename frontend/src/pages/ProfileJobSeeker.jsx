@@ -9,6 +9,7 @@ import {
   FiX,
 } from "react-icons/fi";
 import { useAuth } from "../context/AuthContext";
+import client from "../api/client";
 import "./ProfileJobSeeker.css";
 
 const splitName = (fullName = "") => {
@@ -22,23 +23,21 @@ const splitName = (fullName = "") => {
 const fullNameFrom = ({ firstName, lastName }) =>
   [firstName, lastName].filter(Boolean).join(" ").trim() || "Student";
 
-const yearFromDob = (dob) => {
-  if (!dob) return "";
-  const birthYear = new Date(dob).getFullYear();
-  if (!Number.isFinite(birthYear)) return "";
-  return `Year ${new Date().getFullYear() - birthYear - 17}`;
-};
-
 export default function ProfileJobSeeker() {
   const { user } = useAuth();
   const profile = user?.student_profile || user?.profile || {};
-  const initialName = useMemo(() => splitName(user?.full_name), [user?.full_name]);
+  const initialName = useMemo(
+    () => splitName(user?.full_name),
+    [user?.full_name],
+  );
 
   const [isEditing, setIsEditing] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState(null);
   const [profileData, setProfileData] = useState({
     firstName: initialName.firstName,
     lastName: initialName.lastName,
-    dob: profile.date_of_birth || profile.dob || "",
+    yearOfStudy: profile.year_of_study || "",
     university: profile.university || "",
     major: profile.major || "",
     email: user?.email || "",
@@ -53,30 +52,55 @@ export default function ProfileJobSeeker() {
     .join("")
     .slice(0, 2)
     .toUpperCase();
-  const yearLabel = yearFromDob(profileData.dob);
-  const bio =
-    profileData.bio ||
-    "Computer Science student interested in product engineering and design.";
 
   const metaItems = [
-    yearLabel && { icon: <FiUser size={12} />, label: yearLabel },
-    profileData.major && { icon: <FiBookOpen size={12} />, label: profileData.major },
-    profileData.university && { icon: <FiBookOpen size={12} />, label: profileData.university },
-    profileData.email && { icon: <FiMail size={12} />, label: profileData.email },
+    profileData.yearOfStudy && {
+      icon: <FiUser size={12} />,
+      label: `Year ${profileData.yearOfStudy}`,
+    },
+    profileData.email && {
+      icon: <FiMail size={12} />,
+      label: profileData.email,
+    },
   ].filter(Boolean);
 
   const updateDraft = (key, value) => {
     setDraft((current) => ({ ...current, [key]: value }));
   };
 
-  const saveProfile = () => {
-    setProfileData(draft);
-    setIsEditing(false);
+  const saveProfile = async () => {
+    setSaving(true);
+    setError(null);
+    try {
+      const newFullName = fullNameFrom(draft);
+      const userPayload = {};
+      if (newFullName !== user?.full_name) userPayload.full_name = newFullName;
+      if (draft.email !== user?.email) userPayload.email = draft.email;
+      if (Object.keys(userPayload).length > 0)
+        await client.patch("/users/me", userPayload);
+
+      const studentPayload = {};
+      if (draft.university !== profile.university)
+        studentPayload.university = draft.university;
+      if (draft.major !== profile.major) studentPayload.major = draft.major;
+      if (draft.yearOfStudy !== (profile.year_of_study?.toString() || ""))
+        studentPayload.year_of_study = parseInt(draft.yearOfStudy, 10);
+      if (Object.keys(studentPayload).length > 0)
+        await client.patch("/students/me", studentPayload);
+
+      setProfileData(draft);
+      setIsEditing(false);
+    } catch (err) {
+      setError(err.response?.data?.error?.message || "Failed to save profile");
+    } finally {
+      setSaving(false);
+    }
   };
 
   const cancelEdit = () => {
     setDraft(profileData);
     setIsEditing(false);
+    setError(null);
   };
 
   return (
@@ -110,36 +134,52 @@ export default function ProfileJobSeeker() {
                   First name
                   <input
                     value={draft.firstName}
-                    onChange={(event) => updateDraft("firstName", event.target.value)}
+                    onChange={(event) =>
+                      updateDraft("firstName", event.target.value)
+                    }
                   />
                 </label>
                 <label>
                   Last name
                   <input
                     value={draft.lastName}
-                    onChange={(event) => updateDraft("lastName", event.target.value)}
+                    onChange={(event) =>
+                      updateDraft("lastName", event.target.value)
+                    }
                   />
                 </label>
                 <label>
-                  Date of birth
-                  <input
-                    type="date"
-                    value={draft.dob}
-                    onChange={(event) => updateDraft("dob", event.target.value)}
-                  />
+                  Year of study
+                  <select
+                    value={draft.yearOfStudy}
+                    onChange={(event) =>
+                      updateDraft("yearOfStudy", event.target.value)
+                    }
+                  >
+                    <option value="">Select year</option>
+                    {[1, 2, 3, 4, 5, 6].map((y) => (
+                      <option key={y} value={y}>
+                        Year {y}
+                      </option>
+                    ))}
+                  </select>
                 </label>
                 <label>
                   University
                   <input
                     value={draft.university}
-                    onChange={(event) => updateDraft("university", event.target.value)}
+                    onChange={(event) =>
+                      updateDraft("university", event.target.value)
+                    }
                   />
                 </label>
                 <label>
                   Major
                   <input
                     value={draft.major}
-                    onChange={(event) => updateDraft("major", event.target.value)}
+                    onChange={(event) =>
+                      updateDraft("major", event.target.value)
+                    }
                   />
                 </label>
                 <label>
@@ -147,28 +187,31 @@ export default function ProfileJobSeeker() {
                   <input
                     type="email"
                     value={draft.email}
-                    onChange={(event) => updateDraft("email", event.target.value)}
+                    onChange={(event) =>
+                      updateDraft("email", event.target.value)
+                    }
                   />
                 </label>
               </div>
 
-              <label className="profile-bio-field">
-                Bio
-                <textarea
-                  value={draft.bio}
-                  onChange={(event) => updateDraft("bio", event.target.value)}
-                  placeholder="Write a short profile summary."
-                />
-              </label>
-
               <div className="profile-form-actions">
-                <button type="button" className="profile-action-btn" onClick={cancelEdit}>
+                <button
+                  type="button"
+                  className="profile-action-btn"
+                  onClick={cancelEdit}
+                  disabled={saving}
+                >
                   <FiX size={12} />
                   Cancel
                 </button>
-                <button type="button" className="profile-action-btn primary" onClick={saveProfile}>
+                <button
+                  type="button"
+                  className="profile-action-btn primary"
+                  onClick={saveProfile}
+                  disabled={saving}
+                >
                   <FiCheck size={12} />
-                  Save
+                  {saving ? "Saving..." : "Save"}
                 </button>
               </div>
             </div>
@@ -183,7 +226,6 @@ export default function ProfileJobSeeker() {
                   </span>
                 ))}
               </div>
-              <p>{bio}</p>
             </>
           )}
         </div>

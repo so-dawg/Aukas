@@ -1,3 +1,4 @@
+// Student model — lookup and update student-specific profile fields.
 const { QueryTypes } = require("sequelize");
 const sequelize = require("../db");
 

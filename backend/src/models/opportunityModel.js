@@ -1,3 +1,4 @@
+// Opportunity model — full-text search with filters, paginated listing, CRUD, soft-delete.
 const { QueryTypes } = require("sequelize");
 const sequelize = require("../db");
 

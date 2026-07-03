@@ -1,3 +1,4 @@
+// Organization routes — update profile and manage own opportunities.
 const { Router } = require("express");
 const { authenticate, requireRole } = require("../middleware/auth");
 const organizationController = require("../controllers/organizationController");

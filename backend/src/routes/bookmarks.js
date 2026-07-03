@@ -1,3 +1,4 @@
+// Bookmark routes — students can save/favourite opportunities for later.
 const { Router } = require("express");
 const { authenticate, requireRole } = require("../middleware/auth");
 const bookmarksController = require("../controllers/bookmarksController");

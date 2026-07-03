@@ -2,6 +2,7 @@ const ApiError = require("../utils/ApiError");
 const jwt = require("../utils/jwt");
 
 // Reads "Authorization: Bearer <token>", verifies it, attaches req.user.
+// Call before requireRole() — it populates req.user with { id, role }.
 function authenticate(req, _res, next) {
   const header = req.headers.authorization || "";
   const [scheme, token] = header.split(" ");
@@ -19,7 +20,8 @@ function authenticate(req, _res, next) {
   next();
 }
 
-// Guard for one or more roles. Use AFTER authenticate.
+// Factory that returns middleware — only allows access if req.user.role
+// matches one of the given roles. Must come after authenticate().
 function requireRole(...roles) {
   return (req, _res, next) => {
     if (!req.user) throw ApiError.unauthenticated();

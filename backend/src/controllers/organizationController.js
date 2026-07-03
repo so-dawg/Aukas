@@ -1,3 +1,4 @@
+// Organization controller — update org profile and list own opportunities.
 const PATTERNS = require("../utils/patterns");
 const ApiError = require("../utils/ApiError");
 const organizationModel = require("../models/organizationModel");

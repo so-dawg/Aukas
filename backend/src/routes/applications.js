@@ -1,3 +1,4 @@
+// Application routes — students apply to opportunities and view their applications.
 const { Router } = require("express");
 const { authenticate, requireRole } = require("../middleware/auth");
 const applicationController = require("../controllers/applicationController");

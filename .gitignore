@@ -36,3 +36,6 @@ coverage/
 # Claude local notes
 CLAUDE.local.md
 backend/.zed/settings.json
+
+# Backend database backups
+backups/

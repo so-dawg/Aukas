@@ -1,3 +1,4 @@
+// Health-check endpoint — used by Render/UptimeRobot to verify the server + DB are alive.
 const { Router } = require("express");
 const db = require("../db");
 

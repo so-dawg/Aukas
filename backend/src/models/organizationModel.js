@@ -1,3 +1,4 @@
+// Organization model — lookup and update profile/verification status.
 const { QueryTypes } = require("sequelize");
 const sequelize = require("../db");
 

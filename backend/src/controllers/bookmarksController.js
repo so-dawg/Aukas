@@ -1,3 +1,4 @@
+// Bookmarks controller — students save/bookmark opportunities for later reference.
 const bookmarkModel = require("../models/bookmarkModel");
 const opportunityModel = require("../models/opportunityModel");
 const ApiError = require("../utils/ApiError");

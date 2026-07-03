@@ -1,3 +1,4 @@
+// Applications model — student applies to an opportunity, lists their submitted applications.
 const { QueryTypes } = require("sequelize");
 const sequelize = require("../db");
 

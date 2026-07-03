@@ -1,3 +1,4 @@
+// Public endpoint listing all opportunity categories (e.g. Tech, Health, Education).
 const { Router } = require("express");
 const sequelize = require("../db");
 

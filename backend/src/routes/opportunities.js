@@ -1,3 +1,4 @@
+// Opportunity CRUD — public listing/detail, org create/update/status, admin+org delete.
 const { Router } = require("express");
 const opportunityController = require("../controllers/opportunityController");
 const { authenticate, requireRole } = require("../middleware/auth");

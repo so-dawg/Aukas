@@ -1,3 +1,4 @@
+// User routes — self-service (update/delete own profile) and admin user lookup.
 const { Router } = require("express");
 const { authenticate, requireRole } = require("../middleware/auth");
 const userController = require("../controllers/userController");

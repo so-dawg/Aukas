@@ -2,16 +2,16 @@ const fs = require("fs");
 const path = require("path");
 
 const rootEnvPath = path.resolve(__dirname, "..", "..", ".env");
-const backendEnvPath = path.resolve(__dirname, "..", ".env");
-const envPath = fs.existsSync(rootEnvPath) ? rootEnvPath : backendEnvPath;
-require("dotenv").config({ path: envPath });
+require("dotenv").config({ path: rootEnvPath });
 
 const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
 const morgan = require("morgan");
+const rateLimit = require("express-rate-limit");
 
 const healthRouter = require("./routes/health");
+const contactRouter = require("./routes/contact");
 const authRouter = require("./routes/auth");
 const opportunitiesRouter = require("./routes/opportunities");
 const errorHandler = require("./middleware/error");
@@ -36,22 +36,36 @@ setInterval(
 ); // every hour
 
 const app = express();
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  message: { error: { message: "Too many requests, please try again later." } },
+});
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  message: { error: { message: "Too many requests, please try again later." } },
+});
 const PORT = process.env.PORT || 3000;
 
 app.use(helmet());
-app.use(cors());
+app.use(cors({ origin: process.env.CORS_ORIGIN || "*" }));
 app.use(morgan("dev"));
 app.use(express.json());
+
+app.use("/api/auth", authLimiter);
+app.use("/api", apiLimiter);
 
 app.use("/api", healthRouter);
 app.use("/api", authRouter);
 app.use("/api", opportunitiesRouter);
 app.use("/api", bookmarksRouter);
 app.use("/api", organizationsRouter);
-app.use("/api", adminRouter);
+app.use("/api/admin", adminRouter);
 app.use("/api", userRouter);
 app.use("/api", applicationsRouter);
 app.use("/api", categoriesRouter);
+app.use("/api", contactRouter);
 
 app.use(errorHandler);
 

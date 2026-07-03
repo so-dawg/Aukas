@@ -1,3 +1,4 @@
+// User controller — self-service profile updates, account deletion, admin user lookup.
 const PATTERNS = require("../utils/patterns");
 const ApiError = require("../utils/ApiError");
 const password = require("../utils/password");

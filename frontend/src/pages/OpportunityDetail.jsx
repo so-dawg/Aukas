@@ -14,10 +14,14 @@ const iconMap = {
   competition: "🏆",
 };
 
+const handleApply = async () => {
+  await client.post("/applications", { opportunity_id: id });
+};
+
 const closingIn = (deadline) => {
   if (!deadline) return null;
   const days = Math.ceil(
-    (new Date(deadline) - new Date()) / (1000 * 60 * 60 * 24)
+    (new Date(deadline) - new Date()) / (1000 * 60 * 60 * 24),
   );
   if (days <= 0) return "Closed";
   if (days === 1) return "Closes in 1 day";
@@ -48,7 +52,8 @@ const OpportunityDetail = () => {
       client
         .get("/bookmarks")
         .then((res) => {
-          if (res.data.data.some((b) => b.opportunity_id === id)) setSaved(true);
+          if (res.data.data.some((b) => b.opportunity_id === id))
+            setSaved(true);
         })
         .catch(() => {});
     }
@@ -69,7 +74,9 @@ const OpportunityDetail = () => {
     return (
       <>
         <Navbar />
-        <main className="detail-page"><div className="detail-loading">Loading…</div></main>
+        <main className="detail-page">
+          <div className="detail-loading">Loading…</div>
+        </main>
       </>
     );
   }
@@ -81,7 +88,9 @@ const OpportunityDetail = () => {
         <main className="detail-page">
           <div className="detail-notfound">
             <h1>Opportunity not found</h1>
-            <Link to="/opportunities" className="detail-back-link">← Browse all opportunities</Link>
+            <Link to="/opportunities" className="detail-back-link">
+              ← Browse all opportunities
+            </Link>
           </div>
         </main>
       </>
@@ -93,33 +102,55 @@ const OpportunityDetail = () => {
       <Navbar />
       <main className="detail-page">
         <div className="detail-inner">
-          <Link to="/opportunities" className="detail-back">← Back to opportunities</Link>
+          <Link to="/opportunities" className="detail-back">
+            ← Back to opportunities
+          </Link>
 
           <div className="detail-header">
             <div className="detail-header-top">
               <div className="detail-type-badge">
-                {iconMap[opp.type]} {opp.type?.charAt(0).toUpperCase() + opp.type?.slice(1)}
+                {iconMap[opp.type]}{" "}
+                {opp.type?.charAt(0).toUpperCase() + opp.type?.slice(1)}
               </div>
               {opp.deadline && (
-                <span className="detail-deadline">{closingIn(opp.deadline)}</span>
+                <span className="detail-deadline">
+                  {closingIn(opp.deadline)}
+                </span>
               )}
             </div>
             <h1 className="detail-title">{opp.title}</h1>
             <div className="detail-meta">
               <div className="detail-org">
-                <div className="detail-org-avatar">{opp.organization?.org_name?.[0]?.toUpperCase() || "?"}</div>
+                <div className="detail-org-avatar">
+                  {opp.organization?.org_name?.[0]?.toUpperCase() || "?"}
+                </div>
                 <div>
-                  <p className="detail-org-name">{opp.organization?.org_name}</p>
-                  <p className="detail-org-location">{opp.location || "Remote"}</p>
+                  <p className="detail-org-name">
+                    {opp.organization?.org_name}
+                  </p>
+                  <p className="detail-org-location">
+                    {opp.location || "Remote"}
+                  </p>
                 </div>
               </div>
               <div className="detail-header-actions">
-                <button className="detail-apply-btn">Apply now →</button>
+                <button className="detail-apply-btn" onClick={handleApply}>
+                  Apply now →
+                </button>
                 <button
                   className={`detail-save-btn ${saved ? "saved" : ""}`}
                   onClick={toggleBookmark}
                 >
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill={saved ? "#2563eb" : "none"} stroke={saved ? "#2563eb" : "#94a3b8"} strokeWidth="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill={saved ? "#2563eb" : "none"}
+                    stroke={saved ? "#2563eb" : "#94a3b8"}
+                    strokeWidth="2"
+                  >
+                    <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+                  </svg>
                   {saved ? "Saved" : "Save"}
                 </button>
               </div>

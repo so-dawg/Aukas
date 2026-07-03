@@ -1,3 +1,4 @@
+// User model — lookup, create (with student/org profile), update, soft-delete, admin list.
 const { QueryTypes } = require("sequelize");
 const sequelize = require("../db");
 

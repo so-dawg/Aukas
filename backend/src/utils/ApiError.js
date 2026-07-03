@@ -1,6 +1,7 @@
+// Custom error class that carries HTTP status + error code.
+// Throw anywhere — the global error handler catches it and sends a JSON response.
+// Use static methods for common cases: validation(), notFound(), forbidden(), etc.
 class ApiError extends Error {
-  // why objects bcuz u can throw it anywhere
-  // Constructor for Api error
   constructor(status, code, message, details) {
     super(message);
     this.name = "ApiError";
@@ -9,6 +10,7 @@ class ApiError extends Error {
     if (details) this.details = details;
   }
 
+  // Convert to the shape the frontend expects: { error: { code, message, details? } }
   toResponse() {
     const error = { code: this.code, message: this.message };
     if (this.details) error.details = this.details;

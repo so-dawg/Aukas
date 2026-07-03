@@ -1,12 +1,28 @@
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import Navbar from "../components/layout/Navbar";
+import client from "../api/client";
 import "../components/layout/Navbar.css";
 import "./Contact.css";
 
 const Contact = () => {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [subject, setSubject] = useState("");
+  const [message, setMessage] = useState("");
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    await client.post("/contact", { name, email, subject, message });
+    alert("Message sent!");
+    setName("");
+    setEmail("");
+    setSubject("");
+    setMessage("");
+  };
 
   return (
     <>
@@ -36,14 +52,40 @@ const Contact = () => {
             </div>
           </div>
 
-          <form className="contact-form" onSubmit={(e) => e.preventDefault()}>
+          <form className="contact-form" onSubmit={handleSubmit}>
             <div className="contact-form-row">
-              <input type="text" placeholder="Your name" className="contact-input" />
-              <input type="email" placeholder="Your email" className="contact-input" />
+              <input
+                type="text"
+                placeholder="Your name"
+                className="contact-input"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
+              <input
+                type="email"
+                placeholder="Your email"
+                className="contact-input"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
             </div>
-            <input type="text" placeholder="Subject" className="contact-input" />
-            <textarea placeholder="Message" className="contact-textarea" rows={5} />
-            <button type="submit" className="contact-btn">Send Message</button>
+            <input
+              type="text"
+              placeholder="Subject"
+              className="contact-input"
+              value={subject}
+              onChange={(e) => setSubject(e.target.value)}
+            />
+            <textarea
+              placeholder="Message"
+              className="contact-textarea"
+              rows={5}
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+            />
+            <button type="submit" className="contact-btn">
+              Send Message
+            </button>
           </form>
         </section>
       </main>

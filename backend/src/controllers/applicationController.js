@@ -1,3 +1,4 @@
+// Application controller — students apply to opportunities and view their sent applications.
 const applicationModel = require("../models/applicationsModel");
 const opportunityModel = require("../models/opportunityModel");
 const ApiError = require("../utils/ApiError");
