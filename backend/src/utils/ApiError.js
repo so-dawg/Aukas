@@ -10,10 +10,10 @@ class ApiError extends Error {
     if (details) this.details = details;
   }
 
-  // Convert to the shape the frontend expects: { error: { code, message, details? } }
-  toResponse() {
+  toResponse(requestId) {
     const error = { code: this.code, message: this.message };
     if (this.details) error.details = this.details;
+    if (requestId) error.requestId = requestId;
     return { error };
   }
 

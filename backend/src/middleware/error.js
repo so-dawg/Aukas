@@ -1,21 +1,57 @@
-const ApiError = require("../utils/ApiError.js");
+const ApiError = require("../utils/ApiError");
 
-// Global Express error handler — catches ApiError (thrown by controllers/middleware)
-// and unexpected errors. Must be the last middleware in the chain.
-function errorHandler(err, _req, res, _next) {
+// Maps PostgreSQL error codes to HTTP responses
+const PG_ERRORS = {
+  "22P02": {
+    code: "BAD_REQUEST",
+    status: 400,
+    message: "Invalid input syntax.",
+  },
+  23503: {
+    code: "CONFLICT",
+    status: 409,
+    message: "Referenced resource does not exist.",
+  },
+  23505: { code: "CONFLICT", status: 409, message: "Resource already exists." },
+  23514: {
+    code: "BAD_REQUEST",
+    status: 400,
+    message: "Check constraint violation.",
+  },
+};
+
+function errorHandler(err, req, res, _next) {
+  const requestId = req.requestId || null;
+
+  // Known application errors
   if (err instanceof ApiError) {
-    return res.status(err.status).json(err.toResponse());
+    return res.status(err.status).json(err.toResponse(requestId));
   }
-  // PostgreSQL unique violation (e.g. duplicate email/slug)
-  if (err && err.code === "23505") {
-    return res.status(409).json({
-      error: { code: "CONFLICT", message: "Resource already exists." },
+
+  // PostgreSQL driver errors
+  if (err && err.code && PG_ERRORS[err.code]) {
+    const pg = PG_ERRORS[err.code];
+    return res.status(pg.status).json({
+      error: { code: pg.code, message: pg.message, requestId },
     });
   }
-  console.error(err);
-  return res
-    .status(500)
-    .json({ error: { code: "INTERNAL", message: "Internal server error." } });
+
+  // Unexpected — log everything
+  console.error(
+    JSON.stringify({
+      level: "error",
+      requestId,
+      method: req.method,
+      path: req.path,
+      message: err.message,
+      stack: err.stack,
+      timestamp: new Date().toISOString(),
+    }),
+  );
+
+  return res.status(500).json({
+    error: { code: "INTERNAL", message: "Internal server error.", requestId },
+  });
 }
 
 module.exports = errorHandler;

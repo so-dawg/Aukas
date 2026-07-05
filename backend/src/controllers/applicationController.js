@@ -1,12 +1,12 @@
 // Application controller — students apply to opportunities and view their sent applications.
 const { Application, Opportunity, Organization } = require("../models");
 const ApiError = require("../utils/ApiError");
-const crypto = require("crypto");
+const PATTERNS = require("../utils/patterns");
 const { parsePagination, buildMeta } = require("../utils/pagination");
 
 async function create(req, res) {
   const { opportunity_id } = req.body;
-  if (!opportunity_id || !crypto.validateUUID(opportunity_id))
+  if (!opportunity_id || !PATTERNS.uuid.test(opportunity_id))
     throw ApiError.validation([{ field: "opportunity_id", rule: "format" }]);
 
   const opp = await Opportunity.findOne({

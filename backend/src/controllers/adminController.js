@@ -9,7 +9,7 @@ const {
 } = require("../models");
 const ApiError = require("../utils/ApiError");
 const { parsePagination, buildMeta } = require("../utils/pagination");
-const crypto = require("crypto");
+const PATTERNS = require("../utils/patterns");
 
 async function listOpportunities(req, res) {
   const { page, limit, offset } = parsePagination(req.query);
@@ -63,7 +63,7 @@ async function verifyOrganization(req, res) {
   const { user_id } = req.params;
   const { verified } = req.body;
 
-  if (!crypto.validateUUID(user_id))
+  if (!PATTERNS.uuid.test(user_id))
     throw ApiError.validation([{ field: "user_id", rule: "format" }]);
   if (typeof verified !== "boolean")
     throw ApiError.validation([{ field: "verified", rule: "required" }]);

@@ -1,7 +1,7 @@
 const { Op } = require("sequelize");
 const sequelize = require("../db");
 const { Opportunity, Category, Organization } = require("../models");
-const crypto = require("crypto");
+const PATTERNS = require("../utils/patterns");
 const ApiError = require("../utils/ApiError");
 const { parsePagination, buildMeta } = require("../utils/pagination");
 
@@ -30,9 +30,9 @@ function validateQuery(query) {
     details.push({ field: "type", rule: "enum" });
   if (query.sort && !Object.keys(SORT_MAP).includes(query.sort))
     details.push({ field: "sort", rule: "enum" });
-  if (query.category_id && !crypto.validateUUID(query.category_id))
+  if (query.category_id && !PATTERNS.uuid.test(query.category_id))
     details.push({ field: "category_id", rule: "format" });
-  if (query.organization_id && !crypto.validateUUID(query.organization_id))
+  if (query.organization_id && !PATTERNS.uuid.test(query.organization_id))
     details.push({ field: "organization_id", rule: "format" });
   if (query.deadline_before && !DATE_RE.test(query.deadline_before))
     details.push({ field: "deadline_before", rule: "format" });
@@ -96,7 +96,7 @@ async function getById(req, res) {
 
   // A malformed id can't exist; 404 (not 400) avoids leaking what a valid id
   // would look like, and keeps Postgres from erroring on the uuid cast.
-  if (!crypto.validateUUID(id))
+  if (!PATTERNS.uuid.test(id))
     throw ApiError.notFound("Opportunity not found.");
 
   const opportunity = await Opportunity.findOne({
@@ -117,7 +117,7 @@ function validateCreate(body) {
   const b = body || {};
   const details = [];
 
-  if (!b.category_id || !crypto.validateUUID(b.category_id))
+  if (!b.category_id || !PATTERNS.uuid.test(b.category_id))
     details.push({ field: "category_id", rule: "format" });
   if (
     typeof b.title !== "string" ||
@@ -183,7 +183,7 @@ function validateUpdate(body) {
     );
 
   const details = [];
-  if (b.category_id !== undefined && !crypto.validateUUID(b.category_id))
+  if (b.category_id !== undefined && !PATTERNS.uuid.test(b.category_id))
     details.push({ field: "category_id", rule: "format" });
   if (
     b.title !== undefined &&
@@ -217,7 +217,7 @@ async function update(req, res) {
   validateUpdate(req.body);
 
   const { id } = req.params;
-  if (!crypto.validateUUID(id))
+  if (!PATTERNS.uuid.test(id))
     throw ApiError.notFound("Opportunity not found.");
 
   const existing = await Opportunity.findOne({
@@ -254,7 +254,7 @@ async function update(req, res) {
 
 async function remove(req, res) {
   const { id } = req.params;
-  if (!crypto.validateUUID(id))
+  if (!PATTERNS.uuid.test(id))
     throw ApiError.notFound("Opportunity not found.");
 
   const existing = await Opportunity.findOne({
@@ -290,7 +290,7 @@ async function updateStatus(req, res) {
   const { id } = req.params;
   const { status, reason } = req.body;
 
-  if (!crypto.validateUUID(id))
+  if (!PATTERNS.uuid.test(id))
     throw ApiError.notFound("Opportunity not found.");
   if (!status || typeof status !== "string")
     throw ApiError.validation([{ field: "status", rule: "required" }]);

@@ -1,8 +1,11 @@
 const fs = require("fs");
 const path = require("path");
+const crypto = require("crypto");
 
 const rootEnvPath = path.resolve(__dirname, "..", "..", ".env");
-require("dotenv").config({ path: rootEnvPath });
+if (process.env.NODE_ENV !== "production") {
+  require("dotenv").config({ path: rootEnvPath });
+}
 
 const { Op } = require("sequelize");
 const { Opportunity } = require("./models");
@@ -43,7 +46,7 @@ setInterval(
     );
   },
   60 * 60 * 1000,
-); // every hour
+);
 
 const app = express();
 const authLimiter = rateLimit({
@@ -60,8 +63,14 @@ const PORT = process.env.PORT || 3000;
 
 app.use(helmet());
 app.use(cors({ origin: process.env.CORS_ORIGIN || "*" }));
-app.use(morgan("dev"));
+app.use(morgan("short"));
 app.use(express.json());
+
+app.use((req, _res, next) => {
+  req.requestId = crypto.randomUUID();
+  next();
+});
+
 app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.use("/api/auth", authLimiter);
