@@ -11,6 +11,8 @@ const cors = require("cors");
 const helmet = require("helmet");
 const morgan = require("morgan");
 const rateLimit = require("express-rate-limit");
+const swaggerUi = require("swagger-ui-express");
+const yamljs = require("yamljs");
 
 const healthRouter = require("./routes/health");
 const contactRouter = require("./routes/contact");
@@ -23,6 +25,9 @@ const adminRouter = require("./routes/admin");
 const userRouter = require("./routes/users");
 const applicationsRouter = require("./routes/applications");
 const categoriesRouter = require("./routes/categories");
+const swaggerDocument = yamljs.load(
+  path.resolve(__dirname, "..", "..", "docs", "api", "openapi.yaml"),
+);
 
 setInterval(
   async () => {
@@ -57,6 +62,7 @@ app.use(helmet());
 app.use(cors({ origin: process.env.CORS_ORIGIN || "*" }));
 app.use(morgan("dev"));
 app.use(express.json());
+app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.use("/api/auth", authLimiter);
 app.use("/api", apiLimiter);

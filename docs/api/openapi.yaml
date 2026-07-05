@@ -32,7 +32,7 @@ tags:
   - name: Bookmarks
     description: Student saved items
   - name: Applications
-    description: "Click-apply" tracking
+    description: Click-apply tracking
   - name: Admin
     description: Moderation endpoints (admin role only)
   - name: System
@@ -53,16 +53,16 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/RegisterRequest'
+              $ref: "#/components/schemas/RegisterRequest"
       responses:
-        '201':
+        "201":
           description: Account created; JWT issued
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AuthResponse'
-        '400': { $ref: '#/components/responses/ValidationFailed' }
-        '409': { $ref: '#/components/responses/Conflict' }
+                $ref: "#/components/schemas/AuthResponse"
+        "400": { $ref: "#/components/responses/ValidationFailed" }
+        "409": { $ref: "#/components/responses/Conflict" }
 
   /auth/login:
     post:
@@ -74,31 +74,31 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/LoginRequest'
+              $ref: "#/components/schemas/LoginRequest"
       responses:
-        '200':
+        "200":
           description: Login successful
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AuthResponse'
-        '400': { $ref: '#/components/responses/ValidationFailed' }
-        '401': { $ref: '#/components/responses/Unauthenticated' }
+                $ref: "#/components/schemas/AuthResponse"
+        "400": { $ref: "#/components/responses/ValidationFailed" }
+        "401": { $ref: "#/components/responses/Unauthenticated" }
 
   /auth/me:
     get:
       tags: [Auth]
       summary: Return the current authenticated user
       responses:
-        '200':
+        "200":
           description: Current user
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  user: { $ref: '#/components/schemas/UserWithProfile' }
-        '401': { $ref: '#/components/responses/Unauthenticated' }
+                  user: { $ref: "#/components/schemas/UserWithProfile" }
+        "401": { $ref: "#/components/responses/Unauthenticated" }
 
   # ───────── Users ─────────
   /users/{id}:
@@ -106,19 +106,19 @@ paths:
       tags: [Users]
       summary: Fetch a user by id (admin only)
       parameters:
-        - $ref: '#/components/parameters/UserIdPath'
+        - $ref: "#/components/parameters/UserIdPath"
       responses:
-        '200':
+        "200":
           description: User
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  user: { $ref: '#/components/schemas/UserWithProfile' }
-        '401': { $ref: '#/components/responses/Unauthenticated' }
-        '403': { $ref: '#/components/responses/Forbidden' }
-        '404': { $ref: '#/components/responses/NotFound' }
+                  user: { $ref: "#/components/schemas/UserWithProfile" }
+        "401": { $ref: "#/components/responses/Unauthenticated" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
 
   /users/me:
     patch:
@@ -129,22 +129,22 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserUpdate'
+              $ref: "#/components/schemas/UserUpdate"
       responses:
-        '200':
+        "200":
           description: Updated user
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
-        '400': { $ref: '#/components/responses/ValidationFailed' }
-        '401': { $ref: '#/components/responses/Unauthenticated' }
+                $ref: "#/components/schemas/User"
+        "400": { $ref: "#/components/responses/ValidationFailed" }
+        "401": { $ref: "#/components/responses/Unauthenticated" }
     delete:
       tags: [Users]
       summary: Soft-delete own account
       responses:
-        '204': { description: Account deactivated }
-        '401': { $ref: '#/components/responses/Unauthenticated' }
+        "204": { description: Account deactivated }
+        "401": { $ref: "#/components/responses/Unauthenticated" }
 
   /students/me:
     patch:
@@ -155,17 +155,17 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/StudentProfileUpdate'
+              $ref: "#/components/schemas/StudentProfileUpdate"
       responses:
-        '200':
+        "200":
           description: Updated student profile
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/StudentProfile'
-        '400': { $ref: '#/components/responses/ValidationFailed' }
-        '401': { $ref: '#/components/responses/Unauthenticated' }
-        '403': { $ref: '#/components/responses/Forbidden' }
+                $ref: "#/components/schemas/StudentProfile"
+        "400": { $ref: "#/components/responses/ValidationFailed" }
+        "401": { $ref: "#/components/responses/Unauthenticated" }
+        "403": { $ref: "#/components/responses/Forbidden" }
 
   /organizations/me:
     patch:
@@ -176,17 +176,17 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/OrganizationProfileUpdate'
+              $ref: "#/components/schemas/OrganizationProfileUpdate"
       responses:
-        '200':
+        "200":
           description: Updated organization profile
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/OrganizationProfile'
-        '400': { $ref: '#/components/responses/ValidationFailed' }
-        '401': { $ref: '#/components/responses/Unauthenticated' }
-        '403': { $ref: '#/components/responses/Forbidden' }
+                $ref: "#/components/schemas/OrganizationProfile"
+        "400": { $ref: "#/components/responses/ValidationFailed" }
+        "401": { $ref: "#/components/responses/Unauthenticated" }
+        "403": { $ref: "#/components/responses/Forbidden" }
 
   /organizations/me/opportunities:
     get:
@@ -195,18 +195,18 @@ paths:
       parameters:
         - in: query
           name: status
-          schema: { $ref: '#/components/schemas/OpportunityStatus' }
-        - $ref: '#/components/parameters/PageQuery'
-        - $ref: '#/components/parameters/LimitQuery'
+          schema: { $ref: "#/components/schemas/OpportunityStatus" }
+        - $ref: "#/components/parameters/PageQuery"
+        - $ref: "#/components/parameters/LimitQuery"
       responses:
-        '200':
+        "200":
           description: Paginated list (any status)
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/OpportunityListResponse'
-        '401': { $ref: '#/components/responses/Unauthenticated' }
-        '403': { $ref: '#/components/responses/Forbidden' }
+                $ref: "#/components/schemas/OpportunityListResponse"
+        "401": { $ref: "#/components/responses/Unauthenticated" }
+        "403": { $ref: "#/components/responses/Forbidden" }
 
   # ───────── Opportunities ─────────
   /opportunities:
@@ -221,7 +221,7 @@ paths:
           description: Full-text search on title and description
         - in: query
           name: type
-          schema: { $ref: '#/components/schemas/OpportunityType' }
+          schema: { $ref: "#/components/schemas/OpportunityType" }
         - in: query
           name: category_id
           schema: { type: string, format: uuid }
@@ -243,15 +243,15 @@ paths:
             type: string
             enum: [deadline_asc, deadline_desc, newest]
             default: deadline_asc
-        - $ref: '#/components/parameters/PageQuery'
-        - $ref: '#/components/parameters/LimitQuery'
+        - $ref: "#/components/parameters/PageQuery"
+        - $ref: "#/components/parameters/LimitQuery"
       responses:
-        '200':
+        "200":
           description: Paginated list of approved opportunities
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/OpportunityListResponse'
+                $ref: "#/components/schemas/OpportunityListResponse"
     post:
       tags: [Opportunities]
       summary: Create an opportunity (organization role)
@@ -260,17 +260,17 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/OpportunityCreate'
+              $ref: "#/components/schemas/OpportunityCreate"
       responses:
-        '201':
+        "201":
           description: Created (status starts as draft)
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Opportunity'
-        '400': { $ref: '#/components/responses/ValidationFailed' }
-        '401': { $ref: '#/components/responses/Unauthenticated' }
-        '403': { $ref: '#/components/responses/Forbidden' }
+                $ref: "#/components/schemas/Opportunity"
+        "400": { $ref: "#/components/responses/ValidationFailed" }
+        "401": { $ref: "#/components/responses/Unauthenticated" }
+        "403": { $ref: "#/components/responses/Forbidden" }
 
   /opportunities/{id}:
     get:
@@ -278,48 +278,48 @@ paths:
       summary: Fetch a single opportunity
       security: []
       parameters:
-        - $ref: '#/components/parameters/OpportunityIdPath'
+        - $ref: "#/components/parameters/OpportunityIdPath"
       responses:
-        '200':
+        "200":
           description: Opportunity detail
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Opportunity'
-        '404': { $ref: '#/components/responses/NotFound' }
+                $ref: "#/components/schemas/Opportunity"
+        "404": { $ref: "#/components/responses/NotFound" }
     patch:
       tags: [Opportunities]
       summary: Edit an opportunity (owner organization)
       parameters:
-        - $ref: '#/components/parameters/OpportunityIdPath'
+        - $ref: "#/components/parameters/OpportunityIdPath"
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/OpportunityUpdate'
+              $ref: "#/components/schemas/OpportunityUpdate"
       responses:
-        '200':
+        "200":
           description: Updated opportunity
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Opportunity'
-        '400': { $ref: '#/components/responses/ValidationFailed' }
-        '401': { $ref: '#/components/responses/Unauthenticated' }
-        '403': { $ref: '#/components/responses/Forbidden' }
-        '404': { $ref: '#/components/responses/NotFound' }
-        '409': { $ref: '#/components/responses/Conflict' }
+                $ref: "#/components/schemas/Opportunity"
+        "400": { $ref: "#/components/responses/ValidationFailed" }
+        "401": { $ref: "#/components/responses/Unauthenticated" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/Conflict" }
     delete:
       tags: [Opportunities]
       summary: Hard delete an opportunity (owner or admin)
       parameters:
-        - $ref: '#/components/parameters/OpportunityIdPath'
+        - $ref: "#/components/parameters/OpportunityIdPath"
       responses:
-        '204': { description: Deleted }
-        '401': { $ref: '#/components/responses/Unauthenticated' }
-        '403': { $ref: '#/components/responses/Forbidden' }
-        '404': { $ref: '#/components/responses/NotFound' }
+        "204": { description: Deleted }
+        "401": { $ref: "#/components/responses/Unauthenticated" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
 
   /opportunities/{id}/status:
     patch:
@@ -330,25 +330,25 @@ paths:
         [opportunity state diagram](../data-model/opportunity-state-diagram.md#4-transition-table--δq-σ).
         Illegal transitions return `409` with code `ILLEGAL_TRANSITION`.
       parameters:
-        - $ref: '#/components/parameters/OpportunityIdPath'
+        - $ref: "#/components/parameters/OpportunityIdPath"
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/OpportunityStatusUpdate'
+              $ref: "#/components/schemas/OpportunityStatusUpdate"
       responses:
-        '200':
+        "200":
           description: Updated opportunity
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Opportunity'
-        '400': { $ref: '#/components/responses/ValidationFailed' }
-        '401': { $ref: '#/components/responses/Unauthenticated' }
-        '403': { $ref: '#/components/responses/Forbidden' }
-        '404': { $ref: '#/components/responses/NotFound' }
-        '409': { $ref: '#/components/responses/Conflict' }
+                $ref: "#/components/schemas/Opportunity"
+        "400": { $ref: "#/components/responses/ValidationFailed" }
+        "401": { $ref: "#/components/responses/Unauthenticated" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/Conflict" }
 
   # ───────── Categories ─────────
   /categories:
@@ -357,7 +357,7 @@ paths:
       summary: List the five opportunity categories
       security: []
       responses:
-        '200':
+        "200":
           description: Categories
           content:
             application/json:
@@ -366,7 +366,7 @@ paths:
                 properties:
                   data:
                     type: array
-                    items: { $ref: '#/components/schemas/Category' }
+                    items: { $ref: "#/components/schemas/Category" }
 
   # ───────── Bookmarks ─────────
   /bookmarks:
@@ -374,17 +374,17 @@ paths:
       tags: [Bookmarks]
       summary: List the current student's bookmarks
       parameters:
-        - $ref: '#/components/parameters/PageQuery'
-        - $ref: '#/components/parameters/LimitQuery'
+        - $ref: "#/components/parameters/PageQuery"
+        - $ref: "#/components/parameters/LimitQuery"
       responses:
-        '200':
+        "200":
           description: Paginated bookmarks (with embedded opportunity)
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BookmarkListResponse'
-        '401': { $ref: '#/components/responses/Unauthenticated' }
-        '403': { $ref: '#/components/responses/Forbidden' }
+                $ref: "#/components/schemas/BookmarkListResponse"
+        "401": { $ref: "#/components/responses/Unauthenticated" }
+        "403": { $ref: "#/components/responses/Forbidden" }
     post:
       tags: [Bookmarks]
       summary: Bookmark an opportunity
@@ -398,14 +398,14 @@ paths:
               properties:
                 opportunity_id: { type: string, format: uuid }
       responses:
-        '201':
+        "201":
           description: Bookmark created
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/Bookmark' }
-        '401': { $ref: '#/components/responses/Unauthenticated' }
-        '403': { $ref: '#/components/responses/Forbidden' }
-        '409': { $ref: '#/components/responses/Conflict' }
+              schema: { $ref: "#/components/schemas/Bookmark" }
+        "401": { $ref: "#/components/responses/Unauthenticated" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "409": { $ref: "#/components/responses/Conflict" }
 
   /bookmarks/{opportunity_id}:
     delete:
@@ -417,9 +417,9 @@ paths:
           required: true
           schema: { type: string, format: uuid }
       responses:
-        '204': { description: Removed (also returned if no bookmark existed) }
-        '401': { $ref: '#/components/responses/Unauthenticated' }
-        '403': { $ref: '#/components/responses/Forbidden' }
+        "204": { description: Removed (also returned if no bookmark existed) }
+        "401": { $ref: "#/components/responses/Unauthenticated" }
+        "403": { $ref: "#/components/responses/Forbidden" }
 
   # ───────── Applications ─────────
   /applications:
@@ -436,30 +436,30 @@ paths:
               properties:
                 opportunity_id: { type: string, format: uuid }
       responses:
-        '201':
+        "201":
           description: Application record
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/Application' }
-        '401': { $ref: '#/components/responses/Unauthenticated' }
-        '403': { $ref: '#/components/responses/Forbidden' }
+              schema: { $ref: "#/components/schemas/Application" }
+        "401": { $ref: "#/components/responses/Unauthenticated" }
+        "403": { $ref: "#/components/responses/Forbidden" }
 
   /applications/me:
     get:
       tags: [Applications]
       summary: List the current student's application records
       parameters:
-        - $ref: '#/components/parameters/PageQuery'
-        - $ref: '#/components/parameters/LimitQuery'
+        - $ref: "#/components/parameters/PageQuery"
+        - $ref: "#/components/parameters/LimitQuery"
       responses:
-        '200':
+        "200":
           description: Paginated applications
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApplicationListResponse'
-        '401': { $ref: '#/components/responses/Unauthenticated' }
-        '403': { $ref: '#/components/responses/Forbidden' }
+                $ref: "#/components/schemas/ApplicationListResponse"
+        "401": { $ref: "#/components/responses/Unauthenticated" }
+        "403": { $ref: "#/components/responses/Forbidden" }
 
   # ───────── Admin moderation ─────────
   /admin/opportunities:
@@ -470,18 +470,18 @@ paths:
         - in: query
           name: status
           schema:
-            $ref: '#/components/schemas/OpportunityStatus'
-        - $ref: '#/components/parameters/PageQuery'
-        - $ref: '#/components/parameters/LimitQuery'
+            $ref: "#/components/schemas/OpportunityStatus"
+        - $ref: "#/components/parameters/PageQuery"
+        - $ref: "#/components/parameters/LimitQuery"
       responses:
-        '200':
+        "200":
           description: Paginated list
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/OpportunityListResponse'
-        '401': { $ref: '#/components/responses/Unauthenticated' }
-        '403': { $ref: '#/components/responses/Forbidden' }
+                $ref: "#/components/schemas/OpportunityListResponse"
+        "401": { $ref: "#/components/responses/Unauthenticated" }
+        "403": { $ref: "#/components/responses/Forbidden" }
 
   /admin/users:
     get:
@@ -490,15 +490,15 @@ paths:
       parameters:
         - in: query
           name: role
-          schema: { $ref: '#/components/schemas/UserRole' }
+          schema: { $ref: "#/components/schemas/UserRole" }
         - in: query
           name: verified
           schema: { type: boolean }
           description: Filter on organizations.verified (organizations only)
-        - $ref: '#/components/parameters/PageQuery'
-        - $ref: '#/components/parameters/LimitQuery'
+        - $ref: "#/components/parameters/PageQuery"
+        - $ref: "#/components/parameters/LimitQuery"
       responses:
-        '200':
+        "200":
           description: Paginated users
           content:
             application/json:
@@ -507,10 +507,10 @@ paths:
                 properties:
                   data:
                     type: array
-                    items: { $ref: '#/components/schemas/UserWithProfile' }
-                  meta: { $ref: '#/components/schemas/PageMeta' }
-        '401': { $ref: '#/components/responses/Unauthenticated' }
-        '403': { $ref: '#/components/responses/Forbidden' }
+                    items: { $ref: "#/components/schemas/UserWithProfile" }
+                  meta: { $ref: "#/components/schemas/PageMeta" }
+        "401": { $ref: "#/components/responses/Unauthenticated" }
+        "403": { $ref: "#/components/responses/Forbidden" }
 
   /admin/organizations/{user_id}/verify:
     patch:
@@ -531,14 +531,14 @@ paths:
               properties:
                 verified: { type: boolean }
       responses:
-        '200':
+        "200":
           description: Updated organization
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/OrganizationProfile' }
-        '401': { $ref: '#/components/responses/Unauthenticated' }
-        '403': { $ref: '#/components/responses/Forbidden' }
-        '404': { $ref: '#/components/responses/NotFound' }
+              schema: { $ref: "#/components/schemas/OrganizationProfile" }
+        "401": { $ref: "#/components/responses/Unauthenticated" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
 
   # ───────── System ─────────
   /health:
@@ -547,7 +547,7 @@ paths:
       summary: Liveness and database ping
       security: []
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
@@ -555,8 +555,8 @@ paths:
                 type: object
                 properties:
                   status: { type: string, example: ok }
-                  db:     { type: string, example: connected }
-        '503':
+                  db: { type: string, example: connected }
+        "503":
           description: Database ping failed
 
 components:
@@ -591,27 +591,27 @@ components:
       description: Request body or query params failed validation
       content:
         application/json:
-          schema: { $ref: '#/components/schemas/Error' }
+          schema: { $ref: "#/components/schemas/Error" }
     Unauthenticated:
       description: Missing or invalid token
       content:
         application/json:
-          schema: { $ref: '#/components/schemas/Error' }
+          schema: { $ref: "#/components/schemas/Error" }
     Forbidden:
       description: Authenticated but wrong role or not the resource owner
       content:
         application/json:
-          schema: { $ref: '#/components/schemas/Error' }
+          schema: { $ref: "#/components/schemas/Error" }
     NotFound:
       description: Resource not found
       content:
         application/json:
-          schema: { $ref: '#/components/schemas/Error' }
+          schema: { $ref: "#/components/schemas/Error" }
     Conflict:
       description: Duplicate, illegal status transition, or other conflict
       content:
         application/json:
-          schema: { $ref: '#/components/schemas/Error' }
+          schema: { $ref: "#/components/schemas/Error" }
 
   schemas:
     # ── Enums ──
@@ -654,13 +654,13 @@ components:
                 type: object
                 properties:
                   field: { type: string }
-                  rule:  { type: string }
+                  rule: { type: string }
     PageMeta:
       type: object
       properties:
-        page:        { type: integer }
-        limit:       { type: integer }
-        total:       { type: integer }
+        page: { type: integer }
+        limit: { type: integer }
+        total: { type: integer }
         total_pages: { type: integer }
 
     # ── Auth ──
@@ -668,89 +668,89 @@ components:
       type: object
       required: [role, email, password, full_name, profile]
       properties:
-        role:      { $ref: '#/components/schemas/UserRole' }
-        email:     { type: string, format: email }
-        password:  { type: string, minLength: 8, maxLength: 128 }
+        role: { $ref: "#/components/schemas/UserRole" }
+        email: { type: string, format: email }
+        password: { type: string, minLength: 8, maxLength: 128 }
         full_name: { type: string, minLength: 2, maxLength: 150 }
         profile:
           description: |
             For role=student: { university, major, year_of_study }.
             For role=organization: { org_name, website, description }.
           oneOf:
-            - $ref: '#/components/schemas/StudentProfileUpdate'
-            - $ref: '#/components/schemas/OrganizationProfileUpdate'
+            - $ref: "#/components/schemas/StudentProfileUpdate"
+            - $ref: "#/components/schemas/OrganizationProfileUpdate"
     LoginRequest:
       type: object
       required: [email, password]
       properties:
-        email:    { type: string, format: email }
+        email: { type: string, format: email }
         password: { type: string }
     AuthResponse:
       type: object
       properties:
-        user:  { $ref: '#/components/schemas/User' }
+        user: { $ref: "#/components/schemas/User" }
         token: { type: string, description: JWT bearer token }
 
     # ── Users ──
     User:
       type: object
       properties:
-        id:         { type: string, format: uuid }
-        email:      { type: string, format: email }
-        full_name:  { type: string }
-        role:       { $ref: '#/components/schemas/UserRole' }
+        id: { type: string, format: uuid }
+        email: { type: string, format: email }
+        full_name: { type: string }
+        role: { $ref: "#/components/schemas/UserRole" }
         created_at: { type: string, format: date-time }
     UserUpdate:
       type: object
       properties:
         full_name: { type: string }
-        email:     { type: string, format: email }
-        password:  { type: string, minLength: 8, maxLength: 128 }
+        email: { type: string, format: email }
+        password: { type: string, minLength: 8, maxLength: 128 }
     UserWithProfile:
       allOf:
-        - $ref: '#/components/schemas/User'
+        - $ref: "#/components/schemas/User"
         - type: object
           properties:
             profile:
               nullable: true
               oneOf:
-                - $ref: '#/components/schemas/StudentProfile'
-                - $ref: '#/components/schemas/OrganizationProfile'
+                - $ref: "#/components/schemas/StudentProfile"
+                - $ref: "#/components/schemas/OrganizationProfile"
 
     StudentProfile:
       type: object
       properties:
-        university:    { type: string, nullable: true }
-        major:         { type: string, nullable: true }
+        university: { type: string, nullable: true }
+        major: { type: string, nullable: true }
         year_of_study: { type: integer, minimum: 1, maximum: 6, nullable: true }
-        resume_url:    { type: string, format: uri, nullable: true }
+        resume_url: { type: string, format: uri, nullable: true }
     StudentProfileUpdate:
       type: object
       properties:
-        university:    { type: string }
-        major:         { type: string }
+        university: { type: string }
+        major: { type: string }
         year_of_study: { type: integer, minimum: 1, maximum: 6 }
-        resume_url:    { type: string, format: uri }
+        resume_url: { type: string, format: uri }
 
     OrganizationProfile:
       type: object
       properties:
-        org_name:    { type: string }
-        website:     { type: string, format: uri, nullable: true }
+        org_name: { type: string }
+        website: { type: string, format: uri, nullable: true }
         description: { type: string, nullable: true }
-        verified:    { type: boolean }
+        verified: { type: boolean }
     OrganizationProfileUpdate:
       type: object
       properties:
-        org_name:    { type: string }
-        website:     { type: string, format: uri }
+        org_name: { type: string }
+        website: { type: string, format: uri }
         description: { type: string }
 
     # ── Category ──
     Category:
       type: object
       properties:
-        id:   { type: string, format: uuid }
+        id: { type: string, format: uuid }
         name: { type: string }
         slug: { type: string }
 
@@ -758,50 +758,50 @@ components:
     OpportunitySummary:
       type: object
       properties:
-        id:           { type: string, format: uuid }
-        title:        { type: string }
-        type:         { $ref: '#/components/schemas/OpportunityType' }
-        category:     { $ref: '#/components/schemas/Category' }
+        id: { type: string, format: uuid }
+        title: { type: string }
+        type: { $ref: "#/components/schemas/OpportunityType" }
+        category: { $ref: "#/components/schemas/Category" }
         organization:
           type: object
           properties:
-            user_id:  { type: string, format: uuid }
+            user_id: { type: string, format: uuid }
             org_name: { type: string }
             verified: { type: boolean }
-        location:   { type: string, nullable: true }
-        deadline:   { type: string, format: date, nullable: true }
-        status:     { $ref: '#/components/schemas/OpportunityStatus' }
+        location: { type: string, nullable: true }
+        deadline: { type: string, format: date, nullable: true }
+        status: { $ref: "#/components/schemas/OpportunityStatus" }
         created_at: { type: string, format: date-time }
     Opportunity:
       allOf:
-        - $ref: '#/components/schemas/OpportunitySummary'
+        - $ref: "#/components/schemas/OpportunitySummary"
         - type: object
           properties:
             description: { type: string }
             approved_by: { type: string, format: uuid, nullable: true }
-            updated_at:  { type: string, format: date-time }
+            updated_at: { type: string, format: date-time }
     OpportunityCreate:
       type: object
       required: [category_id, title, description]
       properties:
         category_id: { type: string, format: uuid }
-        title:       { type: string, maxLength: 255 }
+        title: { type: string, maxLength: 255 }
         description: { type: string }
-        location:    { type: string }
-        deadline:    { type: string, format: date }
+        location: { type: string }
+        deadline: { type: string, format: date }
     OpportunityUpdate:
       type: object
       properties:
-        title:       { type: string, maxLength: 255 }
+        title: { type: string, maxLength: 255 }
         description: { type: string }
         category_id: { type: string, format: uuid }
-        location:    { type: string }
-        deadline:    { type: string, format: date }
+        location: { type: string }
+        deadline: { type: string, format: date }
     OpportunityStatusUpdate:
       type: object
       required: [status]
       properties:
-        status: { $ref: '#/components/schemas/OpportunityStatus' }
+        status: { $ref: "#/components/schemas/OpportunityStatus" }
         reason:
           type: string
           description: Required when status=rejected
@@ -811,38 +811,38 @@ components:
       properties:
         data:
           type: array
-          items: { $ref: '#/components/schemas/OpportunitySummary' }
-        meta: { $ref: '#/components/schemas/PageMeta' }
+          items: { $ref: "#/components/schemas/OpportunitySummary" }
+        meta: { $ref: "#/components/schemas/PageMeta" }
 
     # ── Bookmarks ──
     Bookmark:
       type: object
       properties:
-        id:             { type: string, format: uuid }
+        id: { type: string, format: uuid }
         opportunity_id: { type: string, format: uuid }
-        saved_at:       { type: string, format: date-time }
-        opportunity:    { $ref: '#/components/schemas/OpportunitySummary' }
+        saved_at: { type: string, format: date-time }
+        opportunity: { $ref: "#/components/schemas/OpportunitySummary" }
     BookmarkListResponse:
       type: object
       properties:
         data:
           type: array
-          items: { $ref: '#/components/schemas/Bookmark' }
-        meta: { $ref: '#/components/schemas/PageMeta' }
+          items: { $ref: "#/components/schemas/Bookmark" }
+        meta: { $ref: "#/components/schemas/PageMeta" }
 
     # ── Applications ──
     Application:
       type: object
       properties:
-        id:             { type: string, format: uuid }
+        id: { type: string, format: uuid }
         opportunity_id: { type: string, format: uuid }
-        status:         { $ref: '#/components/schemas/ApplicationStatus' }
-        applied_at:     { type: string, format: date-time }
-        opportunity:    { $ref: '#/components/schemas/OpportunitySummary' }
+        status: { $ref: "#/components/schemas/ApplicationStatus" }
+        applied_at: { type: string, format: date-time }
+        opportunity: { $ref: "#/components/schemas/OpportunitySummary" }
     ApplicationListResponse:
       type: object
       properties:
         data:
           type: array
-          items: { $ref: '#/components/schemas/Application' }
-        meta: { $ref: '#/components/schemas/PageMeta' }
+          items: { $ref: "#/components/schemas/Application" }
+        meta: { $ref: "#/components/schemas/PageMeta" }
