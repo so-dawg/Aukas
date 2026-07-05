@@ -2,8 +2,7 @@
 const PATTERNS = require("../utils/patterns");
 const ApiError = require("../utils/ApiError");
 const password = require("../utils/password");
-const userModel = require("../models/userModel");
-const studentModel = require("../models/studentModel");
+const { User, Student, Organization } = require("../models");
 
 function publicUser(u) {
   return {
@@ -34,7 +33,9 @@ async function updateMe(req, res) {
   if (b.email) {
     const newEmail = b.email.toLowerCase().trim();
     if (newEmail !== req.user.email) {
-      const existing = await userModel.findActiveByEmail(newEmail);
+      const existing = await User.findOne({
+        where: { email: newEmail, deleted_at: null },
+      });
       if (existing) throw ApiError.conflict("Email is already in use.");
     }
     fields.email = newEmail;
@@ -47,12 +48,18 @@ async function updateMe(req, res) {
       "No editable fields provided.",
     );
 
-  const updated = await userModel.update(req.user.id, fields);
+  await User.update(fields, { where: { id: req.user.id, deleted_at: null } });
+  const updated = await User.findOne({
+    where: { id: req.user.id, deleted_at: null },
+  });
   res.json({ data: publicUser(updated) });
 }
 
 async function deleteMe(req, res) {
-  await userModel.remove(req.user.id);
+  await User.update(
+    { deleted_at: new Date() },
+    { where: { id: req.user.id, deleted_at: null } },
+  );
   res.status(204).end();
 }
 
@@ -60,10 +67,15 @@ async function getUser(req, res) {
   const { id } = req.params;
   if (!PATTERNS.uuid.test(id)) throw ApiError.notFound("User not found.");
 
-  const user = await userModel.findActiveById(id);
+  const user = await User.findOne({ where: { id, deleted_at: null } });
   if (!user) throw ApiError.notFound("User not found.");
 
-  const profile = await userModel.getProfile(user.id, user.role);
+  let profile = null;
+  if (user.role === "student") {
+    profile = await Student.findByPk(user.id);
+  } else if (user.role === "organization") {
+    profile = await Organization.findByPk(user.id);
+  }
   res.json({ data: { ...publicUser(user), profile } });
 }
 
@@ -98,7 +110,8 @@ async function updateStudentProfile(req, res) {
       "No editable fields provided.",
     );
 
-  const updated = await studentModel.update(req.user.id, fields);
+  await Student.update(fields, { where: { user_id: req.user.id } });
+  const updated = await Student.findByPk(req.user.id);
   res.json({ data: updated });
 }
 

@@ -1,8 +1,7 @@
 // Organization controller — update org profile and list own opportunities.
 const PATTERNS = require("../utils/patterns");
+const { Organization, Opportunity, Category } = require("../models");
 const ApiError = require("../utils/ApiError");
-const organizationModel = require("../models/organizationModel");
-const opportunityModel = require("../models/opportunityModel");
 const { parsePagination, buildMeta } = require("../utils/pagination");
 
 const UPDATABLE_FIELDS = ["org_name", "website", "description"];
@@ -43,20 +42,25 @@ async function updateProfile(req, res) {
     if (req.body[f] !== undefined)
       fields[f] = f === "org_name" ? req.body[f].trim() : req.body[f];
   }
-  const org = await organizationModel.update(req.user.id, fields);
+  await Organization.update(fields, { where: { user_id: req.user.id } });
+  const org = await Organization.findByPk(req.user.id);
   res.json({ data: org });
 }
 
 async function listMyOpportunities(req, res) {
   const { page, limit, offset } = parsePagination(req.query);
-  const { rows, total } = await opportunityModel.list({
-    organization_id: req.user.id,
-    allStatuses: true,
-    status: req.query.status,
+  const where = { organization_id: req.user.id };
+  if (req.query.status) where.status = req.query.status;
+
+  const { rows, count } = await Opportunity.findAndCountAll({
+    where,
+    include: [Category],
+    order: [["created_at", "DESC"]],
     limit,
     offset,
+    distinct: true,
   });
-  res.json({ data: rows, meta: buildMeta(page, limit, total) });
+  res.json({ data: rows, meta: buildMeta(page, limit, count) });
 }
 
 module.exports = { updateProfile, listMyOpportunities };

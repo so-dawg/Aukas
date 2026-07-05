@@ -1,11 +1,23 @@
-const opportunityModel = require("../models/opportunityModel");
-const organizationModel = require("../models/organizationModel");
+const { Op } = require("sequelize");
+const sequelize = require("../db");
+const { Opportunity, Category, Organization } = require("../models");
+const crypto = require("crypto");
 const ApiError = require("../utils/ApiError");
 const { parsePagination, buildMeta } = require("../utils/pagination");
 
-const UUID_RE =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+const OPPORTUNITY_TYPES = [
+  "internship",
+  "job",
+  "scholarship",
+  "volunteer",
+  "competition",
+];
+
+const SORT_MAP = {
+  deadline_asc: [["deadline", "ASC"]],
+  deadline_desc: [["deadline", "DESC"]],
+  newest: [["created_at", "DESC"]],
+};
 
 function isValidDate(s) {
   return DATE_RE.test(s) && !Number.isNaN(Date.parse(s));
@@ -14,13 +26,13 @@ function isValidDate(s) {
 function validateQuery(query) {
   const details = [];
 
-  if (query.type && !opportunityModel.OPPORTUNITY_TYPES.includes(query.type))
+  if (query.type && !OPPORTUNITY_TYPES.includes(query.type))
     details.push({ field: "type", rule: "enum" });
-  if (query.sort && !Object.keys(opportunityModel.SORTS).includes(query.sort))
+  if (query.sort && !Object.keys(SORT_MAP).includes(query.sort))
     details.push({ field: "sort", rule: "enum" });
-  if (query.category_id && !UUID_RE.test(query.category_id))
+  if (query.category_id && !crypto.validateUUID(query.category_id))
     details.push({ field: "category_id", rule: "format" });
-  if (query.organization_id && !UUID_RE.test(query.organization_id))
+  if (query.organization_id && !crypto.validateUUID(query.organization_id))
     details.push({ field: "organization_id", rule: "format" });
   if (query.deadline_before && !DATE_RE.test(query.deadline_before))
     details.push({ field: "deadline_before", rule: "format" });
@@ -30,24 +42,50 @@ function validateQuery(query) {
   if (details.length) throw ApiError.validation(details);
 }
 
+function buildWhere(filters) {
+  const where = { deleted_at: null };
+
+  if (!filters.allStatuses) where.status = "approved";
+
+  if (filters.q) {
+    where[Op.and] = sequelize.literal(
+      `to_tsvector('simple', "Opportunity"."title" || ' ' || "Opportunity"."description") @@ plainto_tsquery('simple', ${sequelize.escape(filters.q)})`,
+    );
+  }
+  if (filters.type) where.type = filters.type;
+  if (filters.category_id) where.category_id = filters.category_id;
+  if (filters.organization_id) where.organization_id = filters.organization_id;
+  if (filters.status) where.status = filters.status;
+  if (filters.location) {
+    where.location = { [Op.iLike]: `%${filters.location}%` };
+  }
+  if (filters.deadline_before) {
+    where.deadline = { ...where.deadline, [Op.lte]: filters.deadline_before };
+  }
+  if (filters.deadline_after) {
+    where.deadline = { ...where.deadline, [Op.gte]: filters.deadline_after };
+  }
+
+  return where;
+}
+
 async function list(req, res) {
   validateQuery(req.query);
 
   const { page, limit, offset } = parsePagination(req.query);
-  const { rows, total } = await opportunityModel.list({
-    q: req.query.q,
-    type: req.query.type,
-    category_id: req.query.category_id,
-    location: req.query.location,
-    deadline_before: req.query.deadline_before,
-    deadline_after: req.query.deadline_after,
-    organization_id: req.query.organization_id,
-    sort: req.query.sort,
+  const where = buildWhere(req.query);
+  const order = SORT_MAP[req.query.sort] || SORT_MAP.deadline_asc;
+
+  const { rows, count } = await Opportunity.findAndCountAll({
+    where,
+    include: [Category, Organization],
+    order,
     limit,
     offset,
+    distinct: true,
   });
 
-  res.json({ data: rows, meta: buildMeta(page, limit, total) });
+  res.json({ data: rows, meta: buildMeta(page, limit, count) });
 }
 
 // Statuses any unauthenticated visitor is allowed to see.
@@ -58,15 +96,17 @@ async function getById(req, res) {
 
   // A malformed id can't exist; 404 (not 400) avoids leaking what a valid id
   // would look like, and keeps Postgres from erroring on the uuid cast.
-  if (!UUID_RE.test(id)) throw ApiError.notFound("Opportunity not found.");
+  if (!crypto.validateUUID(id))
+    throw ApiError.notFound("Opportunity not found.");
 
-  const opportunity = await opportunityModel.findById(id);
+  const opportunity = await Opportunity.findOne({
+    where: { id, deleted_at: null },
+    include: [Category, Organization],
+  });
   if (!opportunity) throw ApiError.notFound("Opportunity not found.");
 
   // Public visitors only see approved/expired rows. Draft/pending/rejected
   // are hidden as 404 so their existence isn't leaked.
-  // TODO(auth): once the JWT middleware lands, also allow the owning
-  // organization or an admin to read non-public statuses here.
   if (!PUBLIC_STATUSES.includes(opportunity.status))
     throw ApiError.notFound("Opportunity not found.");
 
@@ -77,7 +117,7 @@ function validateCreate(body) {
   const b = body || {};
   const details = [];
 
-  if (!b.category_id || !UUID_RE.test(b.category_id))
+  if (!b.category_id || !crypto.validateUUID(b.category_id))
     details.push({ field: "category_id", rule: "format" });
   if (
     typeof b.title !== "string" ||
@@ -102,13 +142,13 @@ async function create(req, res) {
   validateCreate(req.body);
 
   // role is already 'organization' (requireRole); verified is data, so check it.
-  const org = await organizationModel.findByUserId(req.user.id);
+  const org = await Organization.findByPk(req.user.id);
   if (!org || !org.verified)
     throw ApiError.forbidden(
       "Only verified organizations can post opportunities.",
     );
 
-  const created = await opportunityModel.create({
+  const created = await Opportunity.create({
     organization_id: req.user.id, // from the token, never the body
     category_id: req.body.category_id,
     title: req.body.title.trim(),
@@ -117,7 +157,13 @@ async function create(req, res) {
     deadline: req.body.deadline ?? null,
   });
 
-  res.status(201).json({ data: created });
+  // Re-fetch with includes to return the full object
+  const withIncludes = await Opportunity.findOne({
+    where: { id: created.id },
+    include: [Category, Organization],
+  });
+
+  res.status(201).json({ data: withIncludes });
 }
 
 const EDITABLE_FIELDS = [
@@ -137,7 +183,7 @@ function validateUpdate(body) {
     );
 
   const details = [];
-  if (b.category_id !== undefined && !UUID_RE.test(b.category_id))
+  if (b.category_id !== undefined && !crypto.validateUUID(b.category_id))
     details.push({ field: "category_id", rule: "format" });
   if (
     b.title !== undefined &&
@@ -171,9 +217,13 @@ async function update(req, res) {
   validateUpdate(req.body);
 
   const { id } = req.params;
-  if (!UUID_RE.test(id)) throw ApiError.notFound("Opportunity not found.");
+  if (!crypto.validateUUID(id))
+    throw ApiError.notFound("Opportunity not found.");
 
-  const existing = await opportunityModel.findById(id);
+  const existing = await Opportunity.findOne({
+    where: { id, deleted_at: null },
+    include: [Organization],
+  });
   if (!existing) throw ApiError.notFound("Opportunity not found.");
 
   if (existing.organization.user_id !== req.user.id)
@@ -194,15 +244,23 @@ async function update(req, res) {
   if (["pending", "rejected"].includes(existing.status))
     fields.status = "draft";
 
-  const updated = await opportunityModel.update(id, fields);
+  await Opportunity.update(fields, { where: { id, deleted_at: null } });
+  const updated = await Opportunity.findOne({
+    where: { id, deleted_at: null },
+    include: [Category, Organization],
+  });
   res.json({ data: updated });
 }
 
 async function remove(req, res) {
   const { id } = req.params;
-  if (!UUID_RE.test(id)) throw ApiError.notFound("Opportunity not found.");
+  if (!crypto.validateUUID(id))
+    throw ApiError.notFound("Opportunity not found.");
 
-  const existing = await opportunityModel.findById(id);
+  const existing = await Opportunity.findOne({
+    where: { id, deleted_at: null },
+    include: [Organization],
+  });
   if (!existing) throw ApiError.notFound("Opportunity not found.");
 
   if (
@@ -211,7 +269,10 @@ async function remove(req, res) {
   )
     throw ApiError.forbidden("You do not own this opportunity.");
 
-  await opportunityModel.remove(id);
+  await Opportunity.update(
+    { deleted_at: new Date() },
+    { where: { id, deleted_at: null } },
+  );
   res.status(204).end();
 }
 
@@ -229,7 +290,8 @@ async function updateStatus(req, res) {
   const { id } = req.params;
   const { status, reason } = req.body;
 
-  if (!UUID_RE.test(id)) throw ApiError.notFound("Opportunity not found.");
+  if (!crypto.validateUUID(id))
+    throw ApiError.notFound("Opportunity not found.");
   if (!status || typeof status !== "string")
     throw ApiError.validation([{ field: "status", rule: "required" }]);
 
@@ -237,7 +299,10 @@ async function updateStatus(req, res) {
   if (!VALID.includes(status))
     throw ApiError.validation([{ field: "status", rule: "enum" }]);
 
-  const existing = await opportunityModel.findById(id);
+  const existing = await Opportunity.findOne({
+    where: { id, deleted_at: null },
+    include: [Organization],
+  });
   if (!existing) throw ApiError.notFound("Opportunity not found.");
 
   const allowed =
@@ -262,7 +327,11 @@ async function updateStatus(req, res) {
   const fields = { status };
   if (status === "approved") fields.approved_by = req.user.id;
 
-  const updated = await opportunityModel.update(id, fields);
+  await Opportunity.update(fields, { where: { id, deleted_at: null } });
+  const updated = await Opportunity.findOne({
+    where: { id, deleted_at: null },
+    include: [Category, Organization],
+  });
   res.json({ data: updated });
 }
 

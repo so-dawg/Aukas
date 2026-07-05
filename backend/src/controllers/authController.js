@@ -2,7 +2,7 @@ const PATTERNS = require("../utils/patterns");
 const ApiError = require("../utils/ApiError");
 const password = require("../utils/password");
 const jwt = require("../utils/jwt");
-const userModel = require("../models/userModel");
+const { User, Student, Organization } = require("../models");
 
 // Client-safe user shape — never includes password_hash.
 function publicUser(u) {
@@ -39,7 +39,11 @@ function validateRegister(body) {
   if (b.role === "student") {
     if (
       p.year_of_study != null &&
-      !(Number.isInteger(p.year_of_study) && p.year_of_study >= 1 && p.year_of_study <= 6)
+      !(
+        Number.isInteger(p.year_of_study) &&
+        p.year_of_study >= 1 &&
+        p.year_of_study <= 6
+      )
     )
       details.push({ field: "profile.year_of_study", rule: "range" });
     if (p.resume_url != null && !PATTERNS.url.test(p.resume_url))
@@ -53,16 +57,44 @@ async function register(req, res) {
   validateRegister(req.body);
   const email = req.body.email.toLowerCase().trim();
 
-  if (await userModel.findActiveByEmail(email))
-    throw ApiError.conflict("Email is already registered.");
+  const existing = await User.findOne({ where: { email, deleted_at: null } });
+  if (existing) throw ApiError.conflict("Email is already registered.");
 
   const passwordHash = await password.hash(req.body.password);
-  const user = await userModel.createWithProfile({
-    email,
-    passwordHash,
-    full_name: req.body.full_name.trim(),
-    role: req.body.role,
-    profile: req.body.profile || {},
+  const full_name = req.body.full_name.trim();
+  const role = req.body.role;
+  const profile = req.body.profile || {};
+
+  const user = await User.sequelize.transaction(async (t) => {
+    const u = await User.create(
+      { email, password_hash: passwordHash, full_name, role },
+      { transaction: t },
+    );
+
+    if (role === "student") {
+      await Student.create(
+        {
+          user_id: u.id,
+          university: profile.university ?? null,
+          major: profile.major ?? null,
+          year_of_study: profile.year_of_study ?? null,
+          resume_url: profile.resume_url ?? null,
+        },
+        { transaction: t },
+      );
+    } else if (role === "organization") {
+      await Organization.create(
+        {
+          user_id: u.id,
+          org_name: profile.org_name,
+          website: profile.website ?? null,
+          description: profile.description ?? null,
+        },
+        { transaction: t },
+      );
+    }
+
+    return u;
   });
 
   res.status(201).json({ user: publicUser(user), token: jwt.sign(user) });
@@ -77,7 +109,9 @@ async function login(req, res) {
     details.push({ field: "password", rule: "required" });
   if (details.length) throw ApiError.validation(details);
 
-  const user = await userModel.findActiveByEmail(b.email.toLowerCase().trim());
+  const user = await User.findOne({
+    where: { email: b.email.toLowerCase().trim(), deleted_at: null },
+  });
   // identical failure for unknown email AND wrong password → no user enumeration
   const ok = user && (await password.compare(b.password, user.password_hash));
   if (!ok) throw ApiError.unauthenticated("Invalid email or password.");
@@ -86,10 +120,17 @@ async function login(req, res) {
 }
 
 async function me(req, res) {
-  const user = await userModel.findActiveById(req.user.id);
+  const user = await User.findOne({
+    where: { id: req.user.id, deleted_at: null },
+  });
   if (!user) throw ApiError.unauthenticated("Account no longer exists.");
 
-  const profile = await userModel.getProfile(user.id, user.role);
+  let profile = null;
+  if (user.role === "student") {
+    profile = await Student.findByPk(user.id);
+  } else if (user.role === "organization") {
+    profile = await Organization.findByPk(user.id);
+  }
   res.json({ user: { ...publicUser(user), profile } });
 }
 

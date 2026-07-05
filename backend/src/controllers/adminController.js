@@ -1,61 +1,78 @@
-const opportunityModel = require("../models/opportunityModel");
-const userModel = require("../models/userModel");
-const organizationModel = require("../models/organizationModel");
+const { Op } = require("sequelize");
+const sequelize = require("../db");
+const {
+  Opportunity,
+  User,
+  Student,
+  Organization,
+  Category,
+} = require("../models");
 const ApiError = require("../utils/ApiError");
 const { parsePagination, buildMeta } = require("../utils/pagination");
-
-const UUID_RE =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const crypto = require("crypto");
 
 async function listOpportunities(req, res) {
   const { page, limit, offset } = parsePagination(req.query);
-  const { rows, total } = await opportunityModel.list({
-    q: req.query.q,
-    type: req.query.type,
-    category_id: req.query.category_id,
-    location: req.query.location,
-    deadline_before: req.query.deadline_before,
-    deadline_after: req.query.deadline_after,
-    organization_id: req.query.organization_id,
-    status: req.query.status, // defaults to pending in buildWhere? No — admin wants all
-    sort: req.query.sort,
-    allStatuses: true,
+  const where = { deleted_at: null };
+
+  if (req.query.status) where.status = req.query.status;
+  if (req.query.type) where.type = req.query.type;
+  if (req.query.category_id) where.category_id = req.query.category_id;
+  if (req.query.organization_id)
+    where.organization_id = req.query.organization_id;
+
+  const { rows, count } = await Opportunity.findAndCountAll({
+    where,
+    include: [Category, Organization],
+    order: [["created_at", "DESC"]],
     limit,
     offset,
+    distinct: true,
   });
-  res.json({ data: rows, meta: buildMeta(page, limit, total) });
+  res.json({ data: rows, meta: buildMeta(page, limit, count) });
 }
 
 async function listUsers(req, res) {
   const { page, limit, offset } = parsePagination(req.query);
-  const { rows, total } = await userModel.listUsers({
-    role: req.query.role,
+  const where = { deleted_at: null };
+
+  if (req.query.role) where.role = req.query.role;
+
+  const { rows, count } = await User.findAndCountAll({
+    where,
+    order: [["created_at", "DESC"]],
     limit,
     offset,
   });
   // fetch profiles for each user
   const data = await Promise.all(
     rows.map(async (u) => {
-      const profile = await userModel.getProfile(u.id, u.role);
-      return { ...u, profile };
+      let profile = null;
+      if (u.role === "student") {
+        profile = await Student.findByPk(u.id);
+      } else if (u.role === "organization") {
+        profile = await Organization.findByPk(u.id);
+      }
+      return { ...u.toJSON(), profile };
     }),
   );
-  res.json({ data, meta: buildMeta(page, limit, total) });
+  res.json({ data, meta: buildMeta(page, limit, count) });
 }
 
 async function verifyOrganization(req, res) {
   const { user_id } = req.params;
   const { verified } = req.body;
 
-  if (!UUID_RE.test(user_id))
+  if (!crypto.validateUUID(user_id))
     throw ApiError.validation([{ field: "user_id", rule: "format" }]);
   if (typeof verified !== "boolean")
     throw ApiError.validation([{ field: "verified", rule: "required" }]);
 
-  const org = await organizationModel.findByUserId(user_id);
+  const org = await Organization.findByPk(user_id);
   if (!org) throw ApiError.notFound("Organization not found.");
 
-  const updated = await organizationModel.update(user_id, { verified });
+  await Organization.update({ verified }, { where: { user_id } });
+  const updated = await Organization.findByPk(user_id);
   res.json({ data: updated });
 }
 

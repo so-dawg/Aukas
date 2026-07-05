@@ -4,6 +4,8 @@ const path = require("path");
 const rootEnvPath = path.resolve(__dirname, "..", "..", ".env");
 require("dotenv").config({ path: rootEnvPath });
 
+const { Op } = require("sequelize");
+const { Opportunity } = require("./models");
 const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
@@ -24,12 +26,15 @@ const categoriesRouter = require("./routes/categories");
 
 setInterval(
   async () => {
-    const { QueryTypes } = require("sequelize");
-    const sequelize = require("./db");
-    await sequelize.query(
-      `UPDATE opportunities SET status = 'expired'
-     WHERE status = 'approved' AND deadline < CURRENT_DATE AND deleted_at IS NULL`,
-      { type: QueryTypes.SELECT },
+    await Opportunity.update(
+      { status: "expired" },
+      {
+        where: {
+          status: "approved",
+          deadline: { [Op.lt]: new Date().toISOString().split("T")[0] },
+          deleted_at: null,
+        },
+      },
     );
   },
   60 * 60 * 1000,
