@@ -5,7 +5,6 @@ import { AuthProvider, useAuth } from "./context/AuthContext";
 import Home from "./pages/Home";
 import Signup from "./pages/Signup";
 import Login from "./pages/Login";
-import About from "./pages/About";
 import Contact from "./pages/Contact";
 import Opportunities from "./pages/Opportunities";
 import OpportunityDetail from "./pages/OpportunityDetail";
@@ -51,15 +50,6 @@ function App() {
             />
             <Route path="/signup" element={<Signup />} />
             <Route path="/login" element={<Login />} />
-            <Route
-              path="/about"
-              element={
-                <>
-                  <About />
-                  <Footer />
-                </>
-              }
-            />
             <Route
               path="/contact"
               element={
