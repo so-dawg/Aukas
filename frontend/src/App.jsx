@@ -7,11 +7,11 @@ import Signup from "./pages/Signup";
 import Login from "./pages/Login";
 import Contact from "./pages/Contact";
 import Opportunities from "./pages/Opportunities";
-import OpportunityDetail from "./pages/OpportunityDetail";
 import ProfileJobSeeker from "./pages/ProfileJobSeeker";
 import ProfileOrg from "./pages/ProfileOrg";
 import Footer from "./components/layout/Footer";
 import Navbar from "./components/layout/Navbar";
+import MyApplications from "./pages/MyApplications";
 import "./components/layout/Navbar.css";
 
 function ProfileRoute() {
@@ -68,11 +68,12 @@ function App() {
                 </>
               }
             />
+            {/* Opportunity detail route removed */}
             <Route
-              path="/opportunities/:id"
+              path="/my-applications"
               element={
                 <>
-                  <OpportunityDetail />
+                  <MyApplications />
                   <Footer />
                 </>
               }

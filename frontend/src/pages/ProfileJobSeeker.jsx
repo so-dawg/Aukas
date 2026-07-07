@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import {
   FiBookOpen,
   FiCalendar,
@@ -124,6 +125,10 @@ export default function ProfileJobSeeker() {
                 <FiEdit2 size={12} />
                 Edit profile
               </button>
+              <Link to="/my-applications" className="profile-action-btn secondary">
+                <FiBookOpen size={12} />
+                My applications
+              </Link>
             </div>
           </div>
 

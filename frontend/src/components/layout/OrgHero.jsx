@@ -34,7 +34,7 @@ const OrgHero = () => {
                 else if (user.role === "organization") navigate("/dashboard");
               }}
             >
-              Post your first role →
+              Post your first role
             </button>
           </div>
         </div>

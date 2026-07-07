@@ -13,7 +13,6 @@ import {
   FiGlobe,
   FiPhone,
   FiInfo,
-  FiArrowRight,
 } from "react-icons/fi";
 import "./Signup.css";
 
@@ -343,7 +342,7 @@ export default function AukasSignup() {
         {error && <p className="errorMsg">{error}</p>}
 
         <button type="submit" className="submitBtn">
-          Create account <FiArrowRight size={16} />
+          Create account
         </button>
 
         <p className="footerText">

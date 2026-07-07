@@ -1,0 +1,218 @@
+﻿.applications-page {
+  min-height: 100vh;
+  background: #f3f4f6;
+  padding: 40px 24px 80px;
+}
+
+.applications-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.applications-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  align-items: flex-end;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.applications-eyebrow {
+  margin: 0 0 10px;
+  color: #64748b;
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.applications-title {
+  margin: 0;
+  font-size: 2.25rem;
+  font-weight: 800;
+  color: #0f172a;
+  line-height: 1.05;
+}
+
+.applications-subtitle {
+  margin: 14px 0 0;
+  color: #475569;
+  max-width: 680px;
+  line-height: 1.75;
+}
+
+.applications-stats {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 18px 24px;
+  color: #0f172a;
+  font-weight: 700;
+  min-width: 180px;
+  text-align: center;
+}
+
+.applications-loading,
+.applications-error,
+.applications-empty {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  padding: 48px 32px;
+  text-align: center;
+  color: #475569;
+}
+
+.applications-error {
+  color: #b91c1c;
+}
+
+.applications-empty h2 {
+  margin: 0 0 12px;
+  color: #0f172a;
+  font-size: 1.75rem;
+}
+
+.applications-empty p {
+  margin: 0 0 20px;
+  color: #64748b;
+}
+
+.applications-empty-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: #2563eb;
+  color: #fff;
+  border-radius: 999px;
+  padding: 12px 24px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.applications-empty-btn:hover {
+  background: #1d4ed8;
+}
+
+.applications-list {
+  display: grid;
+  gap: 18px;
+}
+
+.applications-card {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+}
+
+.applications-card-main {
+  flex: 1;
+}
+
+.applications-card-top {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.applications-status,
+.applications-type {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 8px 12px;
+  border-radius: 999px;
+}
+
+.status-clicked {
+  color: #2563eb;
+  background: #eef2ff;
+}
+
+.status-review {
+  color: #7c3aed;
+  background: #f3e8ff;
+}
+
+.status-accepted {
+  color: #15803d;
+  background: #dcfce7;
+}
+
+.status-rejected {
+  color: #b91c1c;
+  background: #fee2e2;
+}
+
+.applications-type {
+  color: #334155;
+  background: #f8fafc;
+}
+
+.applications-card-title {
+  margin: 0 0 10px;
+  font-size: 1.45rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.applications-card-title a {
+  color: #0f172a;
+  text-decoration: none;
+}
+
+.applications-card-title a:hover {
+  color: #2563eb;
+}
+
+.applications-card-meta {
+  margin: 0 0 16px;
+  color: #64748b;
+  font-size: 0.95rem;
+}
+
+.applications-card-details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  color: #475569;
+  font-size: 0.9rem;
+}
+
+.applications-card-action {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.applications-view-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #2563eb;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.applications-view-link:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 900px) {
+  .applications-card {
+    flex-direction: column;
+  }
+
+  .applications-card-action {
+    justify-content: flex-start;
+  }
+}
