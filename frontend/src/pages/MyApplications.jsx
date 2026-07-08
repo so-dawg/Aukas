@@ -46,7 +46,6 @@ export default function MyApplications() {
         <div className="applications-inner">
           <header className="applications-header">
             <div>
-              <h1 className="applications-title">My Applications</h1>
               <p className="applications-subtitle">
                 {user?.full_name
                   ? `Hi ${user.full_name.split(" ")[0]}, here are the opportunities you have applied for.`

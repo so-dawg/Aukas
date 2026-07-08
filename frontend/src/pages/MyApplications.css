@@ -13,7 +13,7 @@
   display: flex;
   justify-content: space-between;
   gap: 24px;
-  align-items: flex-end;
+  align-items: flex-start;
   margin-bottom: 24px;
   flex-wrap: wrap;
 }
@@ -35,7 +35,7 @@
 }
 
 .applications-subtitle {
-  margin: 14px 0 0;
+  margin: 0;
   color: #475569;
   max-width: 680px;
   line-height: 1.75;
@@ -45,11 +45,12 @@
   background: #fff;
   border: 1px solid #e2e8f0;
   border-radius: 16px;
-  padding: 18px 24px;
+  padding: 14px 20px;
   color: #0f172a;
   font-weight: 700;
-  min-width: 180px;
+  min-width: 170px;
   text-align: center;
+  align-self: flex-start;
 }
 
 .applications-loading,

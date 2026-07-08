@@ -125,10 +125,6 @@ export default function ProfileJobSeeker() {
                 <FiEdit2 size={12} />
                 Edit profile
               </button>
-              <Link to="/my-applications" className="profile-action-btn secondary">
-                <FiBookOpen size={12} />
-                My applications
-              </Link>
             </div>
           </div>
 
