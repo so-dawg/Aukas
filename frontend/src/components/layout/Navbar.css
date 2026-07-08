@@ -171,6 +171,11 @@
   border-color: #475569;
 }
 
+.navbar-logout-button {
+  padding: 0.45rem 0.9rem;
+  font-size: 0.8rem;
+}
+
 .navbar-button.primary {
   background: #1e3a8a;
   color: #fff;
