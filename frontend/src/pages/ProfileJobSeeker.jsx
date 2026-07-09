@@ -1,9 +1,11 @@
 import { useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import {
   FiBookOpen,
   FiCalendar,
   FiCheck,
   FiEdit2,
+  FiLogOut,
   FiMail,
   FiUser,
   FiX,
@@ -24,7 +26,7 @@ const fullNameFrom = ({ firstName, lastName }) =>
   [firstName, lastName].filter(Boolean).join(" ").trim() || "Student";
 
 export default function ProfileJobSeeker() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const profile = user?.student_profile || user?.profile || {};
   const initialName = useMemo(
     () => splitName(user?.full_name),
@@ -123,6 +125,14 @@ export default function ProfileJobSeeker() {
               >
                 <FiEdit2 size={12} />
                 Edit profile
+              </button>
+              <button
+                type="button"
+                className="profile-action-btn secondary"
+                onClick={() => logout()}
+              >
+                <FiLogOut size={12} />
+                Log out
               </button>
             </div>
           </div>

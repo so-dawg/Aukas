@@ -13,7 +13,7 @@
 
 .opp-header {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: flex-start;
   margin-bottom: 28px;
 }
@@ -23,6 +23,8 @@
   font-weight: 600;
   color: #64748b;
   letter-spacing: 0.04em;
+  display: block;
+  text-align: left;
 }
 
 .opp-headline {
@@ -37,27 +39,9 @@
   font-size: 0.95rem;
   color: #64748b;
   margin: 0;
+  text-align: left;
 }
 
-.opp-alerts-btn {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: #2563eb;
-  color: #fff;
-  border: none;
-  border-radius: 999px;
-  padding: 10px 22px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  cursor: pointer;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-.opp-alerts-btn:hover {
-  background: #1d4ed8;
-}
 
 /* ── Search bar ── */
 

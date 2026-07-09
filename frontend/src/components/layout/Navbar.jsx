@@ -1,23 +1,35 @@
 import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
-import { FiBookmark, FiUser } from "react-icons/fi";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { FiBookmark, FiUser, FiSearch } from "react-icons/fi";
 import logo from "../../assets/AukasLogo.jpg";
 import { useAuth } from "../../context/AuthContext";
-
-const navLinks = [
-  { label: "Home", to: "/" },
-  { label: "Opportunities", to: "/opportunities" },
-  { label: "About Us", to: "/about" },
-  { label: "Contact Us", to: "/contact" },
-];
 
 const Navbar = () => {
   const { user, logout } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const isActive = (path) => location.pathname === path;
   const isJobSeeker = user?.role === "student";
+  const navLinks = [
+    { label: "Home", to: "/" },
+    { label: "Opportunities", to: "/opportunities" },
+    ...(isJobSeeker ? [{ label: "My Applications", to: "/my-applications" }] : []),
+    { label: "Contact Us", to: "/contact" },
+  ];
+
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    const query = searchTerm.trim();
+    if (query) {
+      navigate(`/opportunities?q=${encodeURIComponent(query)}`);
+    } else {
+      navigate("/opportunities");
+    }
+    setSearchTerm("");
+  };
 
   return (
     <nav className="navbar">
@@ -40,6 +52,17 @@ const Navbar = () => {
         </ul>
 
         <div className="navbar-actions">
+          <form className="navbar-search-form" onSubmit={handleSearchSubmit}>
+            <FiSearch size={18} className="navbar-search-icon" />
+            <input
+              className="navbar-search-input"
+              type="text"
+              placeholder="Search"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </form>
+
           {isJobSeeker && (
             <Link
               to="/whitelist"
@@ -52,14 +75,16 @@ const Navbar = () => {
           )}
 
           {user ? (
-            <Link
-              to="/profile"
-              className="profile-button"
-              aria-label={user.full_name ? `${user.full_name} account` : "Account"}
-              title={user.full_name || "Account"}
-            >
-              <FiUser size={18} />
-            </Link>
+            <>
+              <Link
+                to="/profile"
+                className="profile-button"
+                aria-label={user.full_name ? `${user.full_name} account` : "Account"}
+                title={user.full_name || "Account"}
+              >
+                <FiUser size={18} />
+              </Link>
+            </>
           ) : (
             <>
               <Link to="/login" className="navbar-button secondary">

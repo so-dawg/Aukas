@@ -6,8 +6,6 @@ const linkColumns = [
   {
     title: "Company",
     links: [
-      { label: "About", to: "/about" },
-      { label: "Team", to: "/about#team" },
       { label: "Contact", to: "/contact" },
       { label: "Press", to: "/press" },
     ],

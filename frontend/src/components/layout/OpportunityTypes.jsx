@@ -56,7 +56,7 @@ const OpportunityTypes = () => {
             <h2 className="opt__title">Whatever you're looking for next.</h2>
           </div>
           <Link className="opt__see-all" to="/opportunities">
-            See all open →
+            See all open
           </Link>
         </div>
 
@@ -69,7 +69,6 @@ const OpportunityTypes = () => {
                 <p className="opt__card-desc">{t.desc}</p>
                 <div className="opt__card-footer">
                   <span className="opt__count">{t.count} OPEN</span>
-                  <span className="opt__arrow">→</span>
                 </div>
               </div>
             </Link>
