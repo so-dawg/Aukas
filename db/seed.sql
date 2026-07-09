@@ -1,3 +1,4 @@
+-- Aukas — sample seed data
 -- Apply against a database that already has the schema:
 --   docker exec -i aukas-db psql -U opportunities -d opportunities_hub < db/seed.sql
 --
