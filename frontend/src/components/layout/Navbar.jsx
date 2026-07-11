@@ -18,6 +18,7 @@ const Navbar = () => {
     ? [
         { label: "Home", to: "/" },
         { label: "My Post", to: "/my-post" },
+        { label: "Applications", to: "/applications" },
         { label: "Contact Us", to: "/contact" },
       ]
     : [

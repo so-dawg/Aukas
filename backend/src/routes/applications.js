@@ -17,5 +17,11 @@ router.get(
   requireRole("student"),
   applicationController.listMy,
 );
+router.get(
+  "/applications/received",
+  authenticate,
+  requireRole("organization"),
+  applicationController.listReceived,
+);
 
 module.exports = router;

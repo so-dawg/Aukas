@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   FiBriefcase,
   FiCheck,
@@ -10,6 +11,7 @@ import {
   FiUsers,
   FiX,
   FiLinkedin,
+  FiLogOut,
 } from "react-icons/fi";
 import { useAuth } from "../context/AuthContext";
 import "./ProfileOrg.css";
@@ -24,7 +26,8 @@ const initials = (name = "") =>
     .toUpperCase() || "OR";
 
 export default function ProfileOrganisation() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
   const profile = user?.organisation_profile || user?.profile || {};
 
   const [isEditing, setIsEditing] = useState(false);
@@ -92,6 +95,17 @@ export default function ProfileOrganisation() {
               >
                 <FiEdit2 size={12} />
                 Edit profile
+              </button>
+              <button
+                type="button"
+                className="profile-action-btn secondary"
+                onClick={() => {
+                  logout();
+                  navigate("/login", { replace: true });
+                }}
+              >
+                <FiLogOut size={12} />
+                Log out
               </button>
             </div>
           </div>
@@ -187,10 +201,7 @@ export default function ProfileOrganisation() {
                 )}
               </div>
 
-              <p>
-                {profileData.description ||
-                  'No description yet. Click "Edit profile" to add information about your organisation.'}
-              </p>
+              {profileData.description ? <p>{profileData.description}</p> : null}
             </>
           )}
         </div>

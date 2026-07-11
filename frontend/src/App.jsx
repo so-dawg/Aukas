@@ -13,6 +13,7 @@ import Footer from "./components/layout/Footer";
 import Navbar from "./components/layout/Navbar";
 import MyApplications from "./pages/MyApplications";
 import MyPost from "./pages/MyPost";
+import ApplicationsOrg from "./pages/ApplicationsOrg";
 import "./components/layout/Navbar.css";
 
 function ProfileRoute() {
@@ -48,6 +49,32 @@ function OpportunitiesRoute() {
   );
 }
 
+function OrgApplicationsRoute() {
+  const { user, loading } = useAuth();
+
+  if (loading) return null;
+  if (!user) return <Navigate to="/login" replace />;
+  if (user.role !== "organization") return <Navigate to="/opportunities" replace />;
+
+  return <ApplicationsOrg />;
+}
+
+function StudentApplicationsRoute() {
+  const { user, loading } = useAuth();
+
+  if (loading) return null;
+  if (!user) return <Navigate to="/login" replace />;
+  if (user.role === "organization") return <Navigate to="/applications" replace />;
+  if (user.role !== "student") return <Navigate to="/opportunities" replace />;
+
+  return (
+    <>
+      <MyApplications />
+      <Footer />
+    </>
+  );
+}
+
 function App() {
   return (
     <>
@@ -76,15 +103,8 @@ function App() {
             />
             <Route path="/opportunities" element={<OpportunitiesRoute />} />
             {/* Opportunity detail route removed */}
-            <Route
-              path="/my-applications"
-              element={
-                <>
-                  <MyApplications />
-                  <Footer />
-                </>
-              }
-            />
+            <Route path="/my-applications" element={<StudentApplicationsRoute />} />
+            <Route path="/applications" element={<OrgApplicationsRoute />} />
             <Route path="/profile" element={<ProfileRoute />} />
             <Route path="/my-post" element={<MyPost />} />
           </Routes>

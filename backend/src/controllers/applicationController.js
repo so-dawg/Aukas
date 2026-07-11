@@ -1,5 +1,5 @@
-// Application controller — students apply to opportunities and view their sent applications.
-const { Application, Opportunity, Organization } = require("../models");
+// Application controller — students apply and organizations review incoming applications.
+const { Application, Opportunity, Organization, Student, User } = require("../models");
 const ApiError = require("../utils/ApiError");
 const PATTERNS = require("../utils/patterns");
 const { parsePagination, buildMeta } = require("../utils/pagination");
@@ -34,4 +34,40 @@ async function listMy(req, res) {
   res.json({ data: rows, meta: buildMeta(page, limit, count) });
 }
 
-module.exports = { create, listMy };
+async function listReceived(req, res) {
+  const { page, limit, offset } = parsePagination(req.query);
+  const where = {};
+  if (req.query.status) where.status = req.query.status;
+
+  const { rows, count } = await Application.findAndCountAll({
+    where,
+    include: [
+      {
+        model: Opportunity,
+        required: true,
+        where: {
+          organization_id: req.user.id,
+          deleted_at: null,
+        },
+        include: [{ model: Organization }],
+      },
+      {
+        model: Student,
+        include: [
+          {
+            model: User,
+            attributes: ["id", "full_name", "email"],
+          },
+        ],
+      },
+    ],
+    order: [["applied_at", "DESC"]],
+    limit,
+    offset,
+    distinct: true,
+  });
+
+  res.json({ data: rows, meta: buildMeta(page, limit, count) });
+}
+
+module.exports = { create, listMy, listReceived };

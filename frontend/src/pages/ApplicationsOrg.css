@@ -1,0 +1,275 @@
+.org-applications-page {
+  min-height: 100vh;
+  background: #f8fafc;
+  padding: 40px 24px 80px;
+}
+
+.org-applications-shell {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.org-app-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.org-applications-actions {
+  position: relative;
+}
+
+.org-filter-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  color: #334155;
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.org-filter-btn:hover {
+  border-color: #93c5fd;
+  color: #1d4ed8;
+}
+
+.org-filter-panel {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  min-width: 180px;
+  z-index: 5;
+  background: #ffffff;
+  border: 1px solid #dbeafe;
+  border-radius: 14px;
+  box-shadow: 0 16px 32px rgba(15, 23, 42, 0.1);
+  padding: 12px;
+}
+
+.org-filter-panel label {
+  display: block;
+  color: #475569;
+  font-size: 0.85rem;
+  margin-bottom: 8px;
+}
+
+.org-filter-panel select {
+  width: 100%;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  padding: 8px 10px;
+  color: #0f172a;
+  background: #ffffff;
+}
+
+.org-app-tabs {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  margin-bottom: 0;
+  flex: 1;
+}
+
+.org-app-tab {
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  color: #334155;
+  border-radius: 12px;
+  padding: 10px 16px;
+  white-space: nowrap;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.org-app-tab.is-active {
+  border-color: #93c5fd;
+  color: #1d4ed8;
+  background: #eff6ff;
+}
+
+.org-applications-state {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 34px;
+  color: #475569;
+  text-align: center;
+}
+
+.org-applications-error {
+  color: #b91c1c;
+}
+
+.org-applications-table-wrap {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.org-applications-head {
+  display: grid;
+  grid-template-columns: 2.2fr 2.3fr 1.4fr 1fr;
+  gap: 18px;
+  padding: 16px 20px;
+  color: #334155;
+  font-weight: 700;
+  border-bottom: 1px solid #e2e8f0;
+  background: #f8fafc;
+}
+
+.org-applications-list {
+  display: grid;
+}
+
+.org-applications-row {
+  display: grid;
+  grid-template-columns: 2.2fr 2.3fr 1.4fr 1fr;
+  gap: 18px;
+  padding: 18px 20px;
+  border-bottom: 1px solid #edf2f7;
+}
+
+.org-applications-row:last-child {
+  border-bottom: none;
+}
+
+.org-col {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.applicant-col {
+  gap: 12px;
+}
+
+.org-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.avatar-a {
+  background: #ede9fe;
+  color: #6d28d9;
+}
+
+.avatar-b {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.avatar-c {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.avatar-d {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.avatar-e {
+  background: #fee2e2;
+  color: #be123c;
+}
+
+.org-primary {
+  margin: 0;
+  color: #0f172a;
+  font-weight: 700;
+}
+
+.org-secondary {
+  margin: 2px 0 0;
+  color: #64748b;
+}
+
+.job-col {
+  flex-direction: column;
+}
+
+.org-meta-line {
+  margin: 4px 0 0;
+  color: #475569;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.date-col {
+  flex-direction: column;
+}
+
+.status-col {
+  align-items: center;
+}
+
+.org-status-badge {
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 0.84rem;
+  font-weight: 700;
+}
+
+.status-new {
+  background: #fff7ed;
+  color: #c2410c;
+}
+
+.status-shortlisted {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.status-interviewed {
+  background: #ede9fe;
+  color: #6d28d9;
+}
+
+.status-hired {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.status-rejected {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+@media (max-width: 860px) {
+  .org-app-toolbar {
+    align-items: stretch;
+  }
+
+  .org-applications-actions {
+    align-self: flex-end;
+  }
+
+  .org-applications-head {
+    display: none;
+  }
+
+  .org-applications-row {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .status-col {
+    align-items: flex-start;
+  }
+}

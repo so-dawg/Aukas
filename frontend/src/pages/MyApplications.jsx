@@ -1,5 +1,5 @@
 ﻿import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import client from "../api/client";
 import Navbar from "../components/layout/Navbar";
@@ -38,6 +38,10 @@ export default function MyApplications() {
   }, []);
 
   const appliedCount = applications.length;
+
+  if (!user) return <Navigate to="/login" replace />;
+  if (user.role === "organization") return <Navigate to="/applications" replace />;
+  if (user.role !== "student") return <Navigate to="/opportunities" replace />;
 
   return (
     <>
