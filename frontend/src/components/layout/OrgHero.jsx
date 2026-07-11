@@ -31,7 +31,7 @@ const OrgHero = () => {
               className="org-btn org-btn--primary"
               onClick={() => {
                 if (!user || user.role === "student") navigate("/signup");
-                else if (user.role === "organization") navigate("/dashboard");
+                else if (user.role === "organization") navigate("/my-post");
               }}
             >
               Post your first role

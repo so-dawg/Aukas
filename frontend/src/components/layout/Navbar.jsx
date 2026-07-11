@@ -13,12 +13,21 @@ const Navbar = () => {
 
   const isActive = (path) => location.pathname === path;
   const isJobSeeker = user?.role === "student";
-  const navLinks = [
-    { label: "Home", to: "/" },
-    { label: "Opportunities", to: "/opportunities" },
-    ...(isJobSeeker ? [{ label: "My Applications", to: "/my-applications" }] : []),
-    { label: "Contact Us", to: "/contact" },
-  ];
+  const isOrganization = user?.role === "organization";
+  const navLinks = isOrganization
+    ? [
+        { label: "Home", to: "/" },
+        { label: "My Post", to: "/my-post" },
+        { label: "Contact Us", to: "/contact" },
+      ]
+    : [
+        { label: "Home", to: "/" },
+        { label: "Opportunities", to: "/opportunities" },
+        ...(isJobSeeker
+          ? [{ label: "My Applications", to: "/my-applications" }]
+          : []),
+        { label: "Contact Us", to: "/contact" },
+      ];
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
@@ -52,16 +61,18 @@ const Navbar = () => {
         </ul>
 
         <div className="navbar-actions">
-          <form className="navbar-search-form" onSubmit={handleSearchSubmit}>
-            <FiSearch size={18} className="navbar-search-icon" />
-            <input
-              className="navbar-search-input"
-              type="text"
-              placeholder="Search"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </form>
+          {isJobSeeker && (
+            <form className="navbar-search-form" onSubmit={handleSearchSubmit}>
+              <FiSearch size={18} className="navbar-search-icon" />
+              <input
+                className="navbar-search-input"
+                type="text"
+                placeholder="Search"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </form>
+          )}
 
           {isJobSeeker && (
             <Link

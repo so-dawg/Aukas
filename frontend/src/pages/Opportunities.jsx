@@ -149,14 +149,18 @@ const Opportunities = () => {
     }
   };
 
-  const profileTags = [];
-  if (user?.student_profile?.year_of_study)
-    profileTags.push(`Year ${user.student_profile.year_of_study}`);
-  if (user?.student_profile?.major)
-    profileTags.push(user.student_profile.major);
-  if (user?.student_profile?.university)
-    profileTags.push(user.student_profile.university);
-  profileTags.push("open to internships");
+  const profileTags = user
+    ? [
+        ...(user.student_profile?.year_of_study
+          ? [`Year ${user.student_profile.year_of_study}`]
+          : []),
+        ...(user.student_profile?.major ? [user.student_profile.major] : []),
+        ...(user.student_profile?.university
+          ? [user.student_profile.university]
+          : []),
+        "open to internships",
+      ]
+    : ["Discover opportunities", "No account required"];
 
   return (
     <>
@@ -167,7 +171,7 @@ const Opportunities = () => {
           <div className="opp-header">
             <div>
               <span className="opp-greeting">
-                HI {user?.full_name?.toUpperCase() || "STUDENT"} · WELCOME BACK
+                HI {user?.full_name?.toUpperCase() || "GUEST"} · WELCOME
               </span>
               <h1 className="opp-headline">
                 {total.toLocaleString()} opportunities for you

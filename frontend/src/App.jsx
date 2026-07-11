@@ -12,6 +12,7 @@ import ProfileOrg from "./pages/ProfileOrg";
 import Footer from "./components/layout/Footer";
 import Navbar from "./components/layout/Navbar";
 import MyApplications from "./pages/MyApplications";
+import MyPost from "./pages/MyPost";
 import "./components/layout/Navbar.css";
 
 function ProfileRoute() {
@@ -28,6 +29,20 @@ function ProfileRoute() {
     <>
       <Navbar />
       {isStudent ? <ProfileJobSeeker /> : <ProfileOrg />}
+      <Footer />
+    </>
+  );
+}
+
+function OpportunitiesRoute() {
+  const { user, loading } = useAuth();
+
+  if (loading) return null;
+  if (user?.role === "organization") return <Navigate to="/profile" replace />;
+
+  return (
+    <>
+      <Opportunities />
       <Footer />
     </>
   );
@@ -59,15 +74,7 @@ function App() {
                 </>
               }
             />
-            <Route
-              path="/opportunities"
-              element={
-                <>
-                  <Opportunities />
-                  <Footer />
-                </>
-              }
-            />
+            <Route path="/opportunities" element={<OpportunitiesRoute />} />
             {/* Opportunity detail route removed */}
             <Route
               path="/my-applications"
@@ -78,10 +85,8 @@ function App() {
                 </>
               }
             />
-            <Route
-              path="/profile"
-              element={<ProfileRoute />}
-            />
+            <Route path="/profile" element={<ProfileRoute />} />
+            <Route path="/my-post" element={<MyPost />} />
           </Routes>
         </BrowserRouter>
       </AuthProvider>
