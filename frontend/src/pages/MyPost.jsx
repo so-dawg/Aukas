@@ -3,7 +3,14 @@ import { Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import client from "../api/client";
 import Navbar from "../components/layout/Navbar";
-import { FiCalendar, FiMapPin, FiSearch, FiTag, FiUsers } from "react-icons/fi";
+import {
+  FiCalendar,
+  FiMapPin,
+  FiSearch,
+  FiTag,
+  FiTrash2,
+  FiUsers,
+} from "react-icons/fi";
 import "./MyPost.css";
 
 const emptyForm = {
@@ -11,16 +18,25 @@ const emptyForm = {
   responsibilities: "",
   requirements: "",
   benefits: "",
+  salary: "",
+  job_type: "",
   pax: "",
   location: "",
   deadline: "",
   category_id: "",
 };
 
-function buildOpportunityDescription(form) {
+function buildOpportunityDescription(form, isJobCategory) {
   const pax = form.pax.toString().trim();
+  const jobMeta = isJobCategory
+    ? [
+        `Job Type: ${form.job_type.trim() || "-"}`,
+        `Salary: ${form.salary.trim() || "-"}`,
+      ]
+    : [];
 
   return `${`Pax: ${pax}\n\n`}${[
+    ...jobMeta,
     `Responsibilities:\n${form.responsibilities.trim()}`,
     `Requirements:\n${form.requirements.trim()}`,
     `Benefits:\n${form.benefits.trim()}`,
@@ -39,19 +55,38 @@ function parseOpportunityDescription(value) {
     text = text.slice(paxMatch[0].length);
   }
 
+  let jobType = "";
+  let salary = "";
+
+  const jobTypeMatch = text.match(/^Job Type:\s*(.+?)\n\n/);
+  if (jobTypeMatch) {
+    jobType = jobTypeMatch[1].trim();
+    text = text.slice(jobTypeMatch[0].length);
+  }
+
+  const salaryMatch = text.match(/^Salary:\s*(.+?)\n\n/);
+  if (salaryMatch) {
+    salary = salaryMatch[1].trim();
+    text = text.slice(salaryMatch[0].length);
+  }
+
   const match = text.match(
     /Responsibilities:\s*([\s\S]*?)\n\nRequirements:\s*([\s\S]*?)\n\nBenefits:\s*([\s\S]*)$/,
   );
 
   if (!match) return null;
 
+  const sections = [
+    ...(jobType ? [{ title: "Job Type", content: jobType }] : []),
+    ...(salary ? [{ title: "Salary", content: salary }] : []),
+    { title: "Responsibilities", content: match[1].trim() },
+    { title: "Requirements", content: match[2].trim() },
+    { title: "Benefits", content: match[3].trim() },
+  ];
+
   return {
     pax,
-    sections: [
-      { title: "Responsibilities", content: match[1].trim() },
-      { title: "Requirements", content: match[2].trim() },
-      { title: "Benefits", content: match[3].trim() },
-    ],
+    sections,
   };
 }
 
@@ -64,21 +99,6 @@ function formatDate(value) {
     month: "short",
     day: "numeric",
   });
-}
-
-function getStatusLabel(status) {
-  switch (status) {
-    case "approved":
-      return "Approved";
-    case "pending":
-      return "Pending review";
-    case "rejected":
-      return "Rejected";
-    case "expired":
-      return "Expired";
-    default:
-      return "Draft";
-  }
 }
 
 export default function MyPost() {
@@ -95,6 +115,12 @@ export default function MyPost() {
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [expandedPostId, setExpandedPostId] = useState(null);
+  const [confirmDeletePost, setConfirmDeletePost] = useState(null);
+  const [deletingPostId, setDeletingPostId] = useState(null);
+  const selectedCategory = categories.find((c) => c.id === form.category_id);
+  const isJobCategory =
+    selectedCategory?.slug === "job" ||
+    selectedCategory?.name?.toLowerCase() === "job";
 
   useEffect(() => {
     const loadData = async () => {
@@ -123,7 +149,20 @@ export default function MyPost() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
+    setForm((prev) => {
+      const next = { ...prev, [name]: value };
+      if (name === "category_id") {
+        const category = categories.find((c) => c.id === value);
+        const isJob =
+          category?.slug === "job" ||
+          category?.name?.toLowerCase() === "job";
+        if (!isJob) {
+          next.salary = "";
+          next.job_type = "";
+        }
+      }
+      return next;
+    });
   };
 
   const handleSubmit = async (e) => {
@@ -136,7 +175,7 @@ export default function MyPost() {
       const payload = {
         ...form,
         title: form.title.trim(),
-        description: buildOpportunityDescription(form),
+        description: buildOpportunityDescription(form, isJobCategory),
         location: form.location.trim() || null,
         deadline: form.deadline || null,
       };
@@ -153,10 +192,11 @@ export default function MyPost() {
     }
   };
 
-  const handleDelete = async (postId) => {
-    const shouldDelete = window.confirm("Delete this opportunity?");
-    if (!shouldDelete) return;
+  const handleDelete = async () => {
+    if (!confirmDeletePost?.id) return;
+    const postId = confirmDeletePost.id;
 
+    setDeletingPostId(postId);
     setError("");
     setSuccess("");
 
@@ -165,8 +205,11 @@ export default function MyPost() {
       setPosts((prev) => prev.filter((post) => post.id !== postId));
       setSuccess("Opportunity deleted.");
       if (expandedPostId === postId) setExpandedPostId(null);
+      setConfirmDeletePost(null);
     } catch (err) {
       setError(err.response?.data?.error?.message || "Unable to delete this opportunity.");
+    } finally {
+      setDeletingPostId(null);
     }
   };
 
@@ -207,8 +250,6 @@ export default function MyPost() {
           <section className="mypost-panel">
             <header className="mypost-header">
               <div className="mypost-heading">
-                <h1>My Opportunities</h1>
-                <p>Manage and track the opportunities you have posted.</p>
                 <button
                   className="mypost-primary-btn"
                   type="button"
@@ -260,6 +301,34 @@ export default function MyPost() {
                       </select>
                     </div>
                   </div>
+
+                  {isJobCategory && (
+                    <div className="grid2">
+                      <div className="field">
+                        <label className="label">Job type</label>
+                        <input
+                          className="input"
+                          name="job_type"
+                          value={form.job_type}
+                          onChange={handleChange}
+                          placeholder="e.g. Full-time"
+                          required
+                        />
+                      </div>
+
+                      <div className="field">
+                        <label className="label">Salary</label>
+                        <input
+                          className="input"
+                          name="salary"
+                          value={form.salary}
+                          onChange={handleChange}
+                          placeholder="e.g. $600/month"
+                          required
+                        />
+                      </div>
+                    </div>
+                  )}
 
                   <div className="field">
                     <label className="label">Responsibilities</label>
@@ -391,7 +460,6 @@ export default function MyPost() {
                       <option value="all">Filter</option>
                       <option value="draft">Draft</option>
                       <option value="pending">Pending</option>
-                      <option value="approved">Approved</option>
                       <option value="rejected">Rejected</option>
                       <option value="expired">Expired</option>
                     </select>
@@ -413,34 +481,29 @@ export default function MyPost() {
                       const isExpanded = expandedPostId === post.id;
                       const applicationsCount = post.applications_count ?? 0;
                       const parsedDescription = parseOpportunityDescription(post.description);
-                      const summaryText = parsedDescription
-                        ? parsedDescription.sections[0].content
-                        : post.description;
 
                       return (
                         <article key={post.id} className="mypost-item">
-                          <div className="mypost-item-thumb" aria-hidden="true">
-                            <span>{(post.category?.name || "OP").slice(0, 2).toUpperCase()}</span>
-                          </div>
-
                           <div className="mypost-item-main">
                             <div className="mypost-item-top">
                               <h3>{post.title}</h3>
-                              <span className={`mypost-status ${post.status}`}>{getStatusLabel(post.status)}</span>
                             </div>
 
-                            {isExpanded && parsedDescription ? (
-                              <div className="mypost-detail-sections">
+                            {parsedDescription ? (
+                              <div className={`mypost-detail-sections ${isExpanded ? "expanded" : "compact"}`}>
                                 {parsedDescription.sections.map((section) => (
-                                  <section key={section.title} className="mypost-detail-section">
-                                    <h4>{section.title}</h4>
-                                    <p>{section.content || "-"}</p>
-                                  </section>
+                                  <p
+                                    key={section.title}
+                                    className="mypost-detail-line"
+                                  >
+                                    <span className="mypost-detail-label">{section.title}:</span>
+                                    {(section.content || "-").replace(/\s+/g, " ").trim()}
+                                  </p>
                                 ))}
                               </div>
                             ) : (
                               <p className={`mypost-description ${isExpanded ? "expanded" : ""}`}>
-                                {summaryText}
+                                {post.description}
                               </p>
                             )}
 
@@ -468,8 +531,9 @@ export default function MyPost() {
                             <button
                               type="button"
                               className="mypost-danger-btn"
-                              onClick={() => handleDelete(post.id)}
+                              onClick={() => setConfirmDeletePost(post)}
                             >
+                              <FiTrash2 size={14} />
                               Delete
                             </button>
                           </div>
@@ -483,6 +547,37 @@ export default function MyPost() {
           </section>
         </div>
       </main>
+
+      {confirmDeletePost && (
+        <div className="mypost-modal-overlay" role="dialog" aria-modal="true" aria-label="Delete confirmation">
+          <div className="mypost-modal">
+            <p>
+              Are you sure you want to delete
+              {" "}
+              <strong>{confirmDeletePost.title}</strong>
+              ?
+            </p>
+            <div className="mypost-modal-actions">
+              <button
+                type="button"
+                className="mypost-modal-cancel"
+                onClick={() => setConfirmDeletePost(null)}
+                disabled={deletingPostId === confirmDeletePost.id}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="mypost-modal-delete"
+                onClick={handleDelete}
+                disabled={deletingPostId === confirmDeletePost.id}
+              >
+                {deletingPostId === confirmDeletePost.id ? "Deleting..." : "Delete"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

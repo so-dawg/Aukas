@@ -225,7 +225,7 @@
   border-radius: 14px;
   background: #ffffff;
   display: grid;
-  grid-template-columns: 140px minmax(260px, 1fr) 120px 130px;
+  grid-template-columns: minmax(260px, 1fr) 120px 130px;
   gap: 16px;
   padding: 14px;
   align-items: center;
@@ -318,25 +318,26 @@
   margin: 10px 0;
 }
 
-.mypost-detail-section {
-  border: 1px solid #e2e8f0;
-  background: #f8fafc;
-  border-radius: 10px;
-  padding: 10px 12px;
+.mypost-detail-sections.compact {
+  gap: 8px;
 }
 
-.mypost-detail-section h4 {
-  margin: 0 0 6px;
-  font-size: 0.88rem;
-  color: #1e3a8a;
-}
-
-.mypost-detail-section p {
+.mypost-detail-line {
   margin: 0;
   color: #334155;
   font-size: 0.9rem;
   line-height: 1.5;
-  white-space: pre-line;
+  display: block;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mypost-detail-label {
+  font-weight: 700;
+  color: #1e3a8a;
+  margin-right: 4px;
 }
 
 .mypost-meta-row {
@@ -400,9 +401,84 @@
 }
 
 .mypost-danger-btn {
-  border: 1px solid #fecaca;
+  border: none;
   color: #dc2626;
-  background: #fff1f2;
+  background: transparent;
+  padding-left: 0;
+  padding-right: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.mypost-danger-btn:hover {
+  opacity: 0.82;
+}
+
+.mypost-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 16px;
+}
+
+.mypost-modal {
+  width: min(460px, 100%);
+  background: #ffffff;
+  border-radius: 14px;
+  box-shadow: 0 24px 64px rgba(15, 23, 42, 0.24);
+  border: 1px solid #e2e8f0;
+  padding: 20px;
+}
+
+.mypost-modal h3 {
+  margin: 0;
+  color: #0f172a;
+  font-size: 1.2rem;
+}
+
+.mypost-modal p {
+  margin: 10px 0 0;
+  color: #475569;
+  line-height: 1.55;
+}
+
+.mypost-modal-actions {
+  margin-top: 16px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.mypost-modal-cancel,
+.mypost-modal-delete {
+  border-radius: 10px;
+  padding: 8px 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.mypost-modal-cancel {
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  color: #334155;
+}
+
+.mypost-modal-delete {
+  border: 1px solid #b91c1c;
+  background: #dc2626;
+  color: #ffffff;
+}
+
+.mypost-modal-cancel:disabled,
+.mypost-modal-delete:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
 }
 
 .mypost-empty,
@@ -432,7 +508,7 @@
 
 @media (max-width: 1100px) {
   .mypost-item {
-    grid-template-columns: 120px minmax(240px, 1fr) 100px 120px;
+    grid-template-columns: minmax(240px, 1fr) 100px 120px;
     gap: 12px;
   }
 }
