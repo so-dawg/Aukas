@@ -1,0 +1,219 @@
+.saved-page {
+  min-height: 100vh;
+  background: #f8fafc;
+  padding: 26px 16px 56px;
+}
+
+.saved-inner {
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+.saved-inner h1 {
+  margin: 0 0 16px;
+  color: #0f172a;
+  font-size: 1.4rem;
+  font-weight: 800;
+}
+
+.saved-empty {
+  border: 1px solid #e5eaf2;
+  background: #fff;
+  border-radius: 14px;
+  padding: 18px;
+}
+
+.saved-empty p {
+  margin: 0 0 10px;
+  color: #475569;
+}
+
+.saved-empty a {
+  color: #1d4ed8;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.saved-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.saved-card {
+  background: #fff;
+  border: 1px solid #e5eaf2;
+  border-radius: 14px;
+  padding: 14px;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 280px;
+  align-items: start;
+  gap: 16px;
+  text-align: left;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.saved-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.12);
+}
+
+.saved-title {
+  margin: 0;
+  font-size: 1.85rem;
+  font-weight: 800;
+  color: #0b1433;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+.saved-company-line {
+  margin: 8px 0 0;
+  width: 100%;
+  color: #667085;
+  font-size: 1.05rem;
+  font-weight: 600;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.saved-dot {
+  margin: 0 8px;
+}
+
+.saved-side {
+  border-left: 1px solid #e6eaf1;
+  padding-left: 18px;
+  text-align: left;
+  position: relative;
+  padding-top: 2px;
+}
+
+.saved-side-top {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.saved-unsave-btn {
+  width: 34px;
+  height: 34px;
+  border: 1px solid #bfdbfe;
+  border-radius: 9px;
+  background: #eff6ff;
+  color: #2563eb;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.saved-unsave-btn:hover {
+  background: #dbeafe;
+}
+
+.saved-deadline {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  text-align: left;
+  padding-top: 0;
+}
+
+.saved-deadline-label {
+  margin: 0 0 6px;
+  color: #64748b;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.saved-deadline-date {
+  margin: 0;
+  color: #dc2626;
+  font-size: 1.68rem;
+  font-weight: 800;
+}
+
+.saved-deadline-badge {
+  display: inline-flex;
+  margin-top: 12px;
+  border-radius: 999px;
+  padding: 3px 9px;
+  background: #fee2e2;
+  color: #dc2626;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.saved-actions {
+  display: flex;
+  width: auto;
+  gap: 8px;
+  margin-top: 10px;
+  justify-content: flex-start;
+}
+
+.saved-btn {
+  flex: 0 0 auto;
+  min-width: 94px;
+  border-radius: 7px;
+  padding: 6px 8px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-decoration: none;
+  text-align: center;
+  border: 1px solid transparent;
+}
+
+.saved-btn.secondary {
+  color: #64748b;
+  background: #fff;
+  border-color: #c4ccda;
+}
+
+.saved-btn.primary {
+  color: #fff;
+  background: #2563eb;
+}
+
+.saved-btn.primary:hover {
+  background: #1d4ed8;
+}
+
+.saved-btn.secondary:hover {
+  background: #f8fafc;
+}
+
+@media (max-width: 1024px) {
+  .saved-card {
+    grid-template-columns: minmax(0, 1fr) 250px;
+  }
+
+  .saved-title {
+    font-size: 1.45rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .saved-card {
+    grid-template-columns: 1fr;
+    padding: 12px;
+  }
+
+  .saved-side {
+    border-left: none;
+    border-top: 1px solid #e6eaf1;
+    padding-left: 0;
+    padding-top: 10px;
+  }
+
+  .saved-title {
+    font-size: 1rem;
+  }
+}

@@ -49,7 +49,7 @@ async function updateProfile(req, res) {
 
 async function listMyOpportunities(req, res) {
   const { page, limit, offset } = parsePagination(req.query);
-  const where = { organization_id: req.user.id };
+  const where = { organization_id: req.user.id, deleted_at: null };
   if (req.query.status) where.status = req.query.status;
 
   const { rows, count } = await Opportunity.findAndCountAll({

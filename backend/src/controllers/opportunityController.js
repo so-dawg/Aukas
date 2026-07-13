@@ -13,6 +13,8 @@ const OPPORTUNITY_TYPES = [
   "competition",
 ];
 
+const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+
 const SORT_MAP = {
   deadline_asc: [["deadline", "ASC"]],
   deadline_desc: [["deadline", "DESC"]],
@@ -141,20 +143,28 @@ function validateCreate(body) {
 async function create(req, res) {
   validateCreate(req.body);
 
-  // role is already 'organization' (requireRole); verified is data, so check it.
+  // role is already 'organization' (requireRole)
   const org = await Organization.findByPk(req.user.id);
-  if (!org || !org.verified)
-    throw ApiError.forbidden(
-      "Only verified organizations can post opportunities.",
-    );
+  if (!org)
+    throw ApiError.forbidden("Organization account is not set up.");
+
+  const category = await Category.findByPk(req.body.category_id);
+  if (!category || !OPPORTUNITY_TYPES.includes(category.slug)) {
+    throw ApiError.validation([
+      { field: "category_id", rule: "invalid_category" },
+    ]);
+  }
 
   const created = await Opportunity.create({
     organization_id: req.user.id, // from the token, never the body
     category_id: req.body.category_id,
+    type: category.slug,
     title: req.body.title.trim(),
     description: req.body.description,
     location: req.body.location ?? null,
     deadline: req.body.deadline ?? null,
+    // Temporary behavior: publish immediately after create.
+    status: "approved",
   });
 
   // Re-fetch with includes to return the full object
@@ -259,14 +269,10 @@ async function remove(req, res) {
 
   const existing = await Opportunity.findOne({
     where: { id, deleted_at: null },
-    include: [Organization],
   });
   if (!existing) throw ApiError.notFound("Opportunity not found.");
 
-  if (
-    req.user.role === "organization" &&
-    existing.organization.user_id !== req.user.id
-  )
+  if (req.user.role === "organization" && existing.organization_id !== req.user.id)
     throw ApiError.forbidden("You do not own this opportunity.");
 
   await Opportunity.update(

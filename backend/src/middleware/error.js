@@ -18,6 +18,11 @@ const PG_ERRORS = {
     status: 400,
     message: "Check constraint violation.",
   },
+  23502: {
+    code: "BAD_REQUEST",
+    status: 400,
+    message: "Required field is missing.",
+  },
 };
 
 function errorHandler(err, req, res, _next) {

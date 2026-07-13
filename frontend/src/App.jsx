@@ -7,6 +7,7 @@ import Signup from "./pages/Signup";
 import Login from "./pages/Login";
 import Contact from "./pages/Contact";
 import Opportunities from "./pages/Opportunities";
+import OpportunityDetail from "./pages/OpportunityDetail";
 import ProfileJobSeeker from "./pages/ProfileJobSeeker";
 import ProfileOrg from "./pages/ProfileOrg";
 import Footer from "./components/layout/Footer";
@@ -14,6 +15,7 @@ import Navbar from "./components/layout/Navbar";
 import MyApplications from "./pages/MyApplications";
 import MyPost from "./pages/MyPost";
 import ApplicationsOrg from "./pages/ApplicationsOrg";
+import Saved from "./pages/Saved";
 import "./components/layout/Navbar.css";
 
 function ProfileRoute() {
@@ -49,6 +51,19 @@ function OpportunitiesRoute() {
   );
 }
 
+function OpportunityDetailRoute() {
+  const { loading } = useAuth();
+
+  if (loading) return null;
+
+  return (
+    <>
+      <OpportunityDetail />
+      <Footer />
+    </>
+  );
+}
+
 function OrgApplicationsRoute() {
   const { user, loading } = useAuth();
 
@@ -70,6 +85,22 @@ function StudentApplicationsRoute() {
   return (
     <>
       <MyApplications />
+      <Footer />
+    </>
+  );
+}
+
+function StudentSavedRoute() {
+  const { user, loading } = useAuth();
+
+  if (loading) return null;
+  if (!user) return <Navigate to="/login" replace />;
+  if (user.role === "organization") return <Navigate to="/applications" replace />;
+  if (user.role !== "student") return <Navigate to="/opportunities" replace />;
+
+  return (
+    <>
+      <Saved />
       <Footer />
     </>
   );
@@ -102,8 +133,9 @@ function App() {
               }
             />
             <Route path="/opportunities" element={<OpportunitiesRoute />} />
-            {/* Opportunity detail route removed */}
+            <Route path="/opportunities/:id" element={<OpportunityDetailRoute />} />
             <Route path="/my-applications" element={<StudentApplicationsRoute />} />
+            <Route path="/saved" element={<StudentSavedRoute />} />
             <Route path="/applications" element={<OrgApplicationsRoute />} />
             <Route path="/profile" element={<ProfileRoute />} />
             <Route path="/my-post" element={<MyPost />} />
