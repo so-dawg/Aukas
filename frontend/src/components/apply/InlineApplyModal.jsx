@@ -1,15 +1,14 @@
 import { useEffect, useMemo, useState } from "react";
 import { FiAlertCircle, FiCheckCircle, FiFileText, FiUpload, FiX } from "react-icons/fi";
 import client from "../../api/client";
+import { useAuth } from "../../context/AuthContext";
 import "./InlineApplyModal.css";
 
 const MAX_UPLOAD_SIZE = 10 * 1024 * 1024;
 const ACCEPTED_CV_TYPES = new Set([
   "application/pdf",
-  "application/msword",
-  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
 ]);
-const ACCEPTED_CV_EXTENSIONS = [".pdf", ".doc", ".docx"];
+const ACCEPTED_CV_EXTENSIONS = [".pdf"];
 
 function getFileExtension(fileName = "") {
   const idx = fileName.lastIndexOf(".");
@@ -57,10 +56,12 @@ function getCategoryName(opportunity) {
 }
 
 export default function InlineApplyModal({ open, opportunity, onClose }) {
+  const { user } = useAuth();
   const [selectedCv, setSelectedCv] = useState(null);
   const [applyError, setApplyError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [applySubmitted, setApplySubmitted] = useState(false);
+  const [submittedCvUrl, setSubmittedCvUrl] = useState("");
   const [loadingOpportunity, setLoadingOpportunity] = useState(false);
   const [resolvedOpportunity, setResolvedOpportunity] = useState(null);
 
@@ -76,6 +77,7 @@ export default function InlineApplyModal({ open, opportunity, onClose }) {
     setSelectedCv(null);
     setApplyError("");
     setApplySubmitted(false);
+    setSubmittedCvUrl("");
   }, [open]);
 
   useEffect(() => {
@@ -139,7 +141,7 @@ export default function InlineApplyModal({ open, opportunity, onClose }) {
     const hasAcceptedExtension = ACCEPTED_CV_EXTENSIONS.includes(getFileExtension(file.name));
 
     if (!hasAcceptedMimeType && !hasAcceptedExtension) {
-      setApplyError("Please upload a PDF, DOC, or DOCX file.");
+      setApplyError("Please upload a PDF file.");
       setSelectedCv(null);
       return;
     }
@@ -155,7 +157,7 @@ export default function InlineApplyModal({ open, opportunity, onClose }) {
   };
 
   const submitApplication = async () => {
-    if (!currentOpportunity?.id) return;
+    if (!currentOpportunity?.id || !user?.id) return;
 
     if (!selectedCv) {
       setApplyError("CV is required.");
@@ -166,10 +168,24 @@ export default function InlineApplyModal({ open, opportunity, onClose }) {
     setApplyError("");
 
     try {
-      await client.post("/applications", { opportunity_id: currentOpportunity.id });
+      const formData = new FormData();
+      formData.append("student_id", user.id);
+      formData.append("opportunity_id", currentOpportunity.id);
+      formData.append("cv", selectedCv);
+
+      const response = await client.post("/applications", formData, {
+        timeout: 60000,
+      });
+      setSubmittedCvUrl(response.data?.data?.cv_url || "");
       setApplySubmitted(true);
     } catch (err) {
-      setApplyError(err.response?.data?.error?.message || "Unable to submit application.");
+      let message = "Unable to submit application.";
+      if (!err.response) {
+        message = "Upload timed out or network issue. Please try again.";
+      } else {
+        message = err.response?.data?.error?.message || "Unable to submit application.";
+      }
+      setApplyError(message);
     } finally {
       setIsSubmitting(false);
     }
@@ -236,8 +252,8 @@ export default function InlineApplyModal({ open, opportunity, onClose }) {
             <section className="inline-apply-materials">
               <h3>Required materials</h3>
               <p>
-                Upload each file below to complete your application. Accepted formats: PDF,
-                DOC, DOCX (max 10MB).
+                Upload each file below to complete your application. Accepted format: PDF
+                (max 10MB).
               </p>
 
               <div className="inline-apply-file-row">
@@ -250,7 +266,7 @@ export default function InlineApplyModal({ open, opportunity, onClose }) {
                   <input
                     id="inline-apply-cv-input"
                     type="file"
-                    accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                    accept=".pdf,application/pdf"
                     onChange={handleCvChange}
                     disabled={isSubmitting}
                   />
@@ -300,17 +316,25 @@ export default function InlineApplyModal({ open, opportunity, onClose }) {
             <div className="inline-apply-success-icon">
               <FiCheckCircle size={28} />
             </div>
-            <h3>Application submitted</h3>
+            <h3>Application submitted successfully</h3>
             <p>
-              Your application was sent successfully. You can continue browsing opportunities
-              on this page.
+              Your CV and application were uploaded successfully.
             </p>
+            {submittedCvUrl && (
+              <p>
+                CV uploaded:
+                {" "}
+                <a href={submittedCvUrl} target="_blank" rel="noreferrer">
+                  Open file
+                </a>
+              </p>
+            )}
             <button
               type="button"
               className="inline-apply-submit inline-apply-success-btn"
               onClick={onClose}
             >
-              Done
+              Success, Done
             </button>
           </div>
         )}

@@ -2,6 +2,7 @@
 const { Router } = require("express");
 const { authenticate, requireRole } = require("../middleware/auth");
 const applicationController = require("../controllers/applicationController");
+const upload = require("../config/multer");
 
 const router = Router();
 
@@ -9,6 +10,7 @@ router.post(
   "/applications",
   authenticate,
   requireRole("student"),
+  upload.single("cv"),
   applicationController.create,
 );
 router.get(

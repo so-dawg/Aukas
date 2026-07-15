@@ -103,12 +103,14 @@
   border-radius: 10px;
   padding: 13px 14px;
   background: #fff;
+  text-align: left;
 }
 
 .opp-detail-section h2 {
   margin: 0 0 10px;
   font-size: 1.02rem;
   color: #0f172a;
+  text-align: left;
 }
 
 .opp-detail-section p {
@@ -122,6 +124,7 @@
 .opp-detail-section ul {
   margin: 0;
   padding-left: 18px;
+  text-align: left;
 }
 
 .opp-detail-section li {

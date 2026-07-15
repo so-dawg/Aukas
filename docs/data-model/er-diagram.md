@@ -7,6 +7,88 @@
 
 ---
 
+## 0. Visual ER Diagram (Mermaid)
+
+The following ER diagram is generated from the implemented schema in `db/schema.sql`.
+
+```mermaid
+erDiagram
+	USERS {
+		uuid id PK
+		varchar email
+		varchar password_hash
+		varchar full_name
+		enum role
+		timestamptz created_at
+		timestamptz deleted_at
+	}
+
+	STUDENTS {
+		uuid user_id PK, FK
+		varchar university
+		varchar major
+		smallint year_of_study
+		varchar resume_url
+	}
+
+	ORGANIZATIONS {
+		uuid user_id PK, FK
+		varchar org_name
+		varchar website
+		text description
+		boolean verified
+	}
+
+	CATEGORIES {
+		uuid id PK
+		varchar name
+		varchar slug
+	}
+
+	OPPORTUNITIES {
+		uuid id PK
+		uuid organization_id FK
+		uuid category_id FK
+		uuid approved_by FK
+		varchar title
+		text description
+		enum type
+		varchar location
+		date deadline
+		enum status
+		timestamptz created_at
+		timestamptz updated_at
+		timestamptz deleted_at
+	}
+
+	APPLICATIONS {
+		uuid id PK
+		uuid student_id FK
+		uuid opportunity_id FK
+		enum status
+		timestamptz applied_at
+	}
+
+	BOOKMARKS {
+		uuid id PK
+		uuid student_id FK
+		uuid opportunity_id FK
+		timestamptz saved_at
+	}
+
+	USERS ||--o| STUDENTS : has_profile
+	USERS ||--o| ORGANIZATIONS : has_profile
+	ORGANIZATIONS ||--o{ OPPORTUNITIES : posts
+	CATEGORIES ||--o{ OPPORTUNITIES : classifies
+	USERS ||--o{ OPPORTUNITIES : approves
+	STUDENTS ||--o{ APPLICATIONS : applies
+	OPPORTUNITIES ||--o{ APPLICATIONS : receives
+	STUDENTS ||--o{ BOOKMARKS : bookmarks
+	OPPORTUNITIES ||--o{ BOOKMARKS : bookmarked_in
+```
+
+---
+
 ## 1. Purpose
 
 This document is the textual companion to the ER diagram PNG. The PNG is the visual reference; this file is the searchable, diff-able specification used during implementation (Week 3+) and the project report.

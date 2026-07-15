@@ -18,6 +18,10 @@ const Application = sequelize.define(
       type: DataTypes.UUID,
       allowNull: false,
     },
+    cv_url: {
+      type: DataTypes.STRING(500),
+      allowNull: false,
+    },
     status: {
       type: DataTypes.ENUM("clicked", "in_review", "accepted", "rejected"),
       allowNull: false,

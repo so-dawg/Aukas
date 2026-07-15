@@ -230,11 +230,11 @@ const Opportunities = () => {
           {/* ── Card grid ── */}
           <div className="opp-grid">
             {visibleOpportunities.map((opp) => (
-              <article
-                key={opp.id}
-                className="opp-card"
-                onClick={() => navigate(`/opportunities/${opp.id}`)}
-              >
+                <article
+                  key={opp.id}
+                  className="opp-card"
+                  onClick={() => navigate(`/opportunities/${opp.id}`)}
+                >
                 <div className="opp-card-top">
                   <h3 className="opp-card-title">{opp.title}</h3>
                   <button

@@ -11,11 +11,17 @@
 
 .applications-header {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   gap: 24px;
   align-items: flex-start;
   margin-bottom: 24px;
   flex-wrap: wrap;
+}
+
+.applications-header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .applications-eyebrow {
@@ -49,7 +55,8 @@
   color: #0f172a;
   font-weight: 700;
   min-width: 170px;
-  text-align: center;
+  width: fit-content;
+  text-align: left;
   align-self: flex-start;
 }
 
@@ -114,6 +121,7 @@
 
 .applications-card-main {
   flex: 1;
+  text-align: left;
 }
 
 .applications-card-top {
@@ -164,6 +172,7 @@
   font-size: 1.45rem;
   font-weight: 800;
   line-height: 1.2;
+  text-align: left;
 }
 
 .applications-card-title a {
@@ -179,6 +188,7 @@
   margin: 0 0 16px;
   color: #64748b;
   font-size: 0.95rem;
+  text-align: left;
 }
 
 .applications-card-details {
@@ -192,20 +202,74 @@
 .applications-card-action {
   display: flex;
   align-items: center;
+  gap: 10px;
   flex-shrink: 0;
+}
+
+.applications-stage-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  padding: 8px 12px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+
+.applications-stage-badge.stage-new {
+  color: #1d4ed8;
+  background: #dbeafe;
+  border-color: #bfdbfe;
+}
+
+.applications-stage-badge.stage-shortlisted {
+  color: #7c3aed;
+  background: #f3e8ff;
+  border-color: #e9d5ff;
+}
+
+.applications-stage-badge.stage-interviewed {
+  color: #6d28d9;
+  background: #ede9fe;
+  border-color: #ddd6fe;
+}
+
+.applications-stage-badge.stage-hired {
+  color: #166534;
+  background: #dcfce7;
+  border-color: #bbf7d0;
+}
+
+.applications-stage-badge.stage-rejected {
+  color: #b91c1c;
+  background: #fee2e2;
+  border-color: #fecaca;
 }
 
 .applications-view-link {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
   color: #2563eb;
+  background: #fff;
+  border: 1px solid #bfdbfe;
+  border-radius: 999px;
+  padding: 10px 18px;
   font-weight: 700;
   text-decoration: none;
+  cursor: pointer;
 }
 
 .applications-view-link:hover {
-  text-decoration: underline;
+  background: #eff6ff;
+}
+
+.applications-view-link:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
 }
 
 @media (max-width: 900px) {

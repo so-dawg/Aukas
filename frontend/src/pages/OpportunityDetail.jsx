@@ -10,10 +10,8 @@ import "./OpportunityDetail.css";
 const MAX_UPLOAD_SIZE = 10 * 1024 * 1024;
 const ACCEPTED_CV_TYPES = new Set([
   "application/pdf",
-  "application/msword",
-  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
 ]);
-const ACCEPTED_CV_EXTENSIONS = [".pdf", ".doc", ".docx"];
+const ACCEPTED_CV_EXTENSIONS = [".pdf"];
 
 function getFileExtension(fileName = "") {
   const idx = fileName.lastIndexOf(".");
@@ -116,6 +114,7 @@ export default function OpportunityDetail() {
   const [applyError, setApplyError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [applySubmitted, setApplySubmitted] = useState(false);
+  const [submittedCvUrl, setSubmittedCvUrl] = useState("");
 
   useEffect(() => {
     if (!id) return;
@@ -159,6 +158,7 @@ export default function OpportunityDetail() {
   );
 
   const isStudent = user?.role === "student";
+  const fromMyApplications = Boolean(location.state?.fromMyApplications);
 
   const openApplyModal = () => {
     if (!user) {
@@ -170,6 +170,7 @@ export default function OpportunityDetail() {
     setApplyError("");
     setSelectedCv(null);
     setApplySubmitted(false);
+    setSubmittedCvUrl("");
     setShowApplyModal(true);
   };
 
@@ -179,6 +180,7 @@ export default function OpportunityDetail() {
     setApplyError("");
     setSelectedCv(null);
     setApplySubmitted(false);
+    setSubmittedCvUrl("");
   };
 
   const handleCvChange = (event) => {
@@ -194,7 +196,7 @@ export default function OpportunityDetail() {
     const hasAcceptedExtension = ACCEPTED_CV_EXTENSIONS.includes(getFileExtension(file.name));
 
     if (!hasAcceptedMimeType && !hasAcceptedExtension) {
-      setApplyError("Please upload a PDF, DOC, or DOCX file.");
+      setApplyError("Please upload a PDF file.");
       setSelectedCv(null);
       return;
     }
@@ -210,7 +212,7 @@ export default function OpportunityDetail() {
   };
 
   const submitApplication = async () => {
-    if (!id || !isStudent) return;
+    if (!id || !isStudent || !user?.id) return;
 
     if (!selectedCv) {
       setApplyError("CV is required.");
@@ -221,11 +223,24 @@ export default function OpportunityDetail() {
     setApplyError("");
 
     try {
-      // Backend currently stores the application record; document upload endpoint can be connected later.
-      await client.post("/applications", { opportunity_id: id });
+      const formData = new FormData();
+      formData.append("student_id", user.id);
+      formData.append("opportunity_id", id);
+      formData.append("cv", selectedCv);
+
+      const response = await client.post("/applications", formData, {
+        timeout: 60000,
+      });
+      setSubmittedCvUrl(response.data?.data?.cv_url || "");
       setApplySubmitted(true);
     } catch (err) {
-      setApplyError(err.response?.data?.error?.message || "Unable to submit application.");
+      let message = "Unable to submit application.";
+      if (!err.response) {
+        message = "Upload timed out or network issue. Please try again.";
+      } else {
+        message = err.response?.data?.error?.message || "Unable to submit application.";
+      }
+      setApplyError(message);
     } finally {
       setIsSubmitting(false);
     }
@@ -310,7 +325,7 @@ export default function OpportunityDetail() {
                   Back
                 </button>
 
-                {!authLoading && isStudent ? (
+                {!authLoading && isStudent && !fromMyApplications ? (
                   <button
                     type="button"
                     className="opp-detail-bottom-apply"
@@ -318,7 +333,7 @@ export default function OpportunityDetail() {
                   >
                     Apply Now
                   </button>
-                ) : !authLoading && !user ? (
+                ) : !authLoading && !user && !fromMyApplications ? (
                   <button
                     type="button"
                     className="opp-detail-bottom-apply"
@@ -394,8 +409,8 @@ export default function OpportunityDetail() {
                 <section className="apply-modal-materials">
                   <h3>Required materials</h3>
                   <p>
-                    Upload each file below to complete your application. Accepted formats: PDF,
-                    DOC, DOCX (max 10MB).
+                    Upload each file below to complete your application. Accepted format: PDF
+                    (max 10MB).
                   </p>
 
                   <div className="apply-file-row">
@@ -408,7 +423,7 @@ export default function OpportunityDetail() {
                       <input
                         id="apply-cv-input"
                         type="file"
-                        accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                        accept=".pdf,application/pdf"
                         onChange={handleCvChange}
                         disabled={isSubmitting}
                       />
@@ -458,7 +473,7 @@ export default function OpportunityDetail() {
                 <div className="apply-modal-success-icon">
                   <FiCheckCircle size={32} />
                 </div>
-                <h3>Application submitted</h3>
+                <h3>Application submitted successfully</h3>
                 <p>
                   Your application to
                   {" "}
@@ -470,6 +485,15 @@ export default function OpportunityDetail() {
                   {" "}
                   was sent successfully.
                 </p>
+                {submittedCvUrl && (
+                  <p>
+                    CV uploaded:
+                    {" "}
+                    <a href={submittedCvUrl} target="_blank" rel="noreferrer">
+                      Open file
+                    </a>
+                  </p>
+                )}
                 <button
                   type="button"
                   className="apply-submit-btn apply-success-cta"
