@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import client from "../api/client";
 import Navbar from "../components/layout/Navbar";
@@ -102,6 +102,7 @@ function formatDate(value) {
 }
 
 export default function MyPost() {
+  const navigate = useNavigate();
   const { user, loading } = useAuth();
   const [form, setForm] = useState(emptyForm);
   const [categories, setCategories] = useState([]);
@@ -114,7 +115,6 @@ export default function MyPost() {
   const [activeTab, setActiveTab] = useState("all");
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
-  const [expandedPostId, setExpandedPostId] = useState(null);
   const [confirmDeletePost, setConfirmDeletePost] = useState(null);
   const [deletingPostId, setDeletingPostId] = useState(null);
   const selectedCategory = categories.find((c) => c.id === form.category_id);
@@ -204,7 +204,6 @@ export default function MyPost() {
       await client.delete(`/opportunities/${postId}`);
       setPosts((prev) => prev.filter((post) => post.id !== postId));
       setSuccess("Opportunity deleted.");
-      if (expandedPostId === postId) setExpandedPostId(null);
       setConfirmDeletePost(null);
     } catch (err) {
       setError(err.response?.data?.error?.message || "Unable to delete this opportunity.");
@@ -478,7 +477,6 @@ export default function MyPost() {
                 ) : (
                   <div className="mypost-list">
                     {filteredPosts.map((post) => {
-                      const isExpanded = expandedPostId === post.id;
                       const applicationsCount = post.applications_count ?? 0;
                       const parsedDescription = parseOpportunityDescription(post.description);
 
@@ -490,7 +488,7 @@ export default function MyPost() {
                             </div>
 
                             {parsedDescription ? (
-                              <div className={`mypost-detail-sections ${isExpanded ? "expanded" : "compact"}`}>
+                              <div className="mypost-detail-sections compact">
                                 {parsedDescription.sections.map((section) => (
                                   <p
                                     key={section.title}
@@ -502,7 +500,7 @@ export default function MyPost() {
                                 ))}
                               </div>
                             ) : (
-                              <p className={`mypost-description ${isExpanded ? "expanded" : ""}`}>
+                              <p className="mypost-description">
                                 {post.description}
                               </p>
                             )}
@@ -524,9 +522,9 @@ export default function MyPost() {
                             <button
                               type="button"
                               className="mypost-secondary-btn"
-                              onClick={() => setExpandedPostId((prev) => (prev === post.id ? null : post.id))}
+                              onClick={() => navigate(`/opportunities/${post.id}`)}
                             >
-                              {isExpanded ? "Hide Details" : "View Details"}
+                              Details
                             </button>
                             <button
                               type="button"

@@ -3,10 +3,10 @@ import { Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import client from "../api/client";
 import Navbar from "../components/layout/Navbar";
-import { FiBriefcase, FiFilter, FiGrid } from "react-icons/fi";
+import { FiBriefcase, FiCalendar, FiClock, FiFilter, FiGrid, FiPhone } from "react-icons/fi";
 import "./ApplicationsOrg.css";
 
-const STATUS_TABS = ["all", "new", "shortlisted", "interviewed", "hired", "rejected"];
+const STATUS_TABS = ["all", "new", "interviewed", "hired", "rejected"];
 const OPPORTUNITY_TYPES = [
   { value: "all", label: "All types" },
   { value: "internship", label: "Internship" },
@@ -19,7 +19,6 @@ const OPPORTUNITY_TYPES = [
 const tabLabel = {
   all: "All",
   new: "New",
-  shortlisted: "Shortlisted",
   interviewed: "Interviewed",
   hired: "Hired",
   rejected: "Rejected",
@@ -29,15 +28,15 @@ function normalizeStatus(status) {
   const value = String(status || "").toLowerCase();
 
   if (value === "clicked" || value === "new") return "new";
-  if (value === "shortlisted") return "shortlisted";
   if (value === "in_review" || value === "interviewed") return "interviewed";
+  if (value === "shortlisted") return "interviewed";
   if (value === "accepted" || value === "hired") return "hired";
   if (value === "rejected") return "rejected";
   return "new";
 }
 
 function getInitials(name) {
-  if (!name) return "NA";
+  if (!name) return "";
   return name
     .trim()
     .split(/\s+/)
@@ -55,6 +54,7 @@ export default function ApplicationsOrg() {
   const { user, loading } = useAuth();
   const [applications, setApplications] = useState([]);
   const [pageLoading, setPageLoading] = useState(true);
+  const [updatingStatusId, setUpdatingStatusId] = useState(null);
   const [error, setError] = useState("");
   const [activeTab, setActiveTab] = useState("all");
   const [typeFilter, setTypeFilter] = useState("all");
@@ -113,6 +113,33 @@ export default function ApplicationsOrg() {
       return false;
     return true;
   });
+
+  const handleStatusChange = async (applicationId, uiStatus) => {
+    setUpdatingStatusId(applicationId);
+    setError("");
+
+    try {
+      const { data } = await client.patch(`/applications/${applicationId}/status`, {
+        status: uiStatus,
+      });
+
+      const nextStatus = data?.data?.status || uiStatus;
+      setApplications((prev) =>
+        prev.map((application) =>
+          application.id === applicationId
+            ? {
+                ...application,
+                status: nextStatus,
+              }
+            : application,
+        ),
+      );
+    } catch (err) {
+      setError(err.response?.data?.error?.message || "Unable to update application status.");
+    } finally {
+      setUpdatingStatusId(null);
+    }
+  };
 
   return (
     <>
@@ -207,11 +234,18 @@ export default function ApplicationsOrg() {
                         {getInitials(applicant.full_name)}
                       </span>
                       <div>
-                        <p className="org-primary">{applicant.full_name || "Unknown name"}</p>
-                        <p className="org-secondary">{applicant.email || "No email"}</p>
-                        <p className="org-secondary">
-                          {studentProfile.phone_number || studentProfile.university || "No phone listed"}
-                        </p>
+                        {applicant.full_name && (
+                          <p className="org-primary">{applicant.full_name}</p>
+                        )}
+                        {applicant.email && (
+                          <p className="org-secondary">{applicant.email}</p>
+                        )}
+                        {studentProfile.phone_number && (
+                          <p className="org-secondary org-secondary-icon">
+                            <FiPhone size={13} />
+                            {studentProfile.phone_number}
+                          </p>
+                        )}
                       </div>
                     </div>
 
@@ -221,21 +255,40 @@ export default function ApplicationsOrg() {
                         <FiBriefcase size={13} />
                         {(opportunity.type || "opportunity").replace("_", " ")}
                       </p>
-                      <p className="org-meta-line">
-                        <FiGrid size={13} />
-                        {opportunity.category?.name || "Uncategorized"}
-                      </p>
+                      {opportunity.category?.name && (
+                        <p className="org-meta-line">
+                          <FiGrid size={13} />
+                          {opportunity.category.name}
+                        </p>
+                      )}
                     </div>
 
                     <div className="org-col date-col">
-                      <p className="org-primary">{dateLine}</p>
-                      <p className="org-secondary">{timeLine}</p>
+                      <p className="org-primary org-primary-icon">
+                        <FiCalendar size={14} />
+                        {dateLine}
+                      </p>
+                      <p className="org-secondary org-secondary-icon">
+                        <FiClock size={14} />
+                        {timeLine}
+                      </p>
                     </div>
 
                     <div className="org-col status-col">
-                      <span className={`org-status-badge status-${application.uiStatus}`}>
-                        {application.uiStatusLabel}
-                      </span>
+                      <div className={`org-status-control status-${application.uiStatus}`}>
+                        <select
+                          className="org-status-select"
+                          value={application.uiStatus}
+                          onChange={(e) => handleStatusChange(application.id, e.target.value)}
+                          disabled={updatingStatusId === application.id}
+                          aria-label="Application status"
+                        >
+                          <option value="new">New</option>
+                          <option value="interviewed">Interviewed</option>
+                          <option value="hired">Hired</option>
+                          <option value="rejected">Rejected</option>
+                        </select>
+                      </div>
                     </div>
                   </article>
                 );

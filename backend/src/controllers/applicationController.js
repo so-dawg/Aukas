@@ -131,4 +131,49 @@ async function listReceived(req, res) {
   res.json({ data: rows, meta: buildMeta(page, limit, count) });
 }
 
-module.exports = { create, listMy, listReceived };
+function mapOrganizationStatus(input) {
+  const value = String(input || "").toLowerCase();
+
+  if (value === "new" || value === "clicked") return "clicked";
+  if (value === "shortlisted" || value === "interviewed" || value === "in_review") return "in_review";
+  if (value === "hired" || value === "accepted") return "accepted";
+  if (value === "rejected") return "rejected";
+  return null;
+}
+
+async function updateReceivedStatus(req, res) {
+  const { id } = req.params;
+  if (!id || !PATTERNS.uuid.test(id)) {
+    throw ApiError.validation([{ field: "id", rule: "format" }]);
+  }
+
+  const nextStatus = mapOrganizationStatus(req.body?.status);
+  if (!nextStatus) {
+    throw ApiError.validation([{ field: "status", rule: "enum" }], "Invalid status value.");
+  }
+
+  const application = await Application.findOne({
+    where: { id },
+    include: [
+      {
+        model: Opportunity,
+        required: true,
+        where: {
+          organization_id: req.user.id,
+          deleted_at: null,
+        },
+      },
+    ],
+  });
+
+  if (!application) {
+    throw ApiError.notFound("Application not found.");
+  }
+
+  application.status = nextStatus;
+  await application.save();
+
+  res.json({ data: application });
+}
+
+module.exports = { create, listMy, listReceived, updateReceivedStatus };

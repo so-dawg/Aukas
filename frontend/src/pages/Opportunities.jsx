@@ -132,6 +132,13 @@ const Opportunities = () => {
       navigate("/login");
       return;
     }
+    if (user.role === "organization") {
+      const isOwnOpportunity = String(opp?.organization_id || "") === String(user?.id || "");
+      if (isOwnOpportunity) {
+        navigate("/my-post");
+      }
+      return;
+    }
     if (user.role !== "student") return;
     setApplyingOpportunity(opp);
   };
@@ -230,6 +237,12 @@ const Opportunities = () => {
           {/* ── Card grid ── */}
           <div className="opp-grid">
             {visibleOpportunities.map((opp) => (
+              (() => {
+                const isOrgOwnerViewingOwnPost =
+                  user?.role === "organization" &&
+                  String(opp?.organization_id || "") === String(user?.id || "");
+
+                return (
                 <article
                   key={opp.id}
                   className="opp-card"
@@ -304,10 +317,12 @@ const Opportunities = () => {
                       openApplyModal(opp);
                     }}
                   >
-                    Apply Now
+                    {isOrgOwnerViewingOwnPost ? "View Applications" : "Apply Now"}
                   </button>
                 </div>
               </article>
+                );
+              })()
             ))}
           </div>
 

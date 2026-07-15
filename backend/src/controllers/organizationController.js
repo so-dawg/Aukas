@@ -1,6 +1,6 @@
 // Organization controller — update org profile and list own opportunities.
 const PATTERNS = require("../utils/patterns");
-const { Organization, Opportunity, Category } = require("../models");
+const { Organization, Opportunity, Category, Application } = require("../models");
 const ApiError = require("../utils/ApiError");
 const { parsePagination, buildMeta } = require("../utils/pagination");
 
@@ -60,7 +60,33 @@ async function listMyOpportunities(req, res) {
     offset,
     distinct: true,
   });
-  res.json({ data: rows, meta: buildMeta(page, limit, count) });
+
+  const opportunityIds = rows.map((row) => row.id);
+  const applicationCounts = opportunityIds.length
+    ? await Application.findAll({
+        attributes: [
+          "opportunity_id",
+          [Opportunity.sequelize.fn("COUNT", Opportunity.sequelize.col("id")), "applications_count"],
+        ],
+        where: { opportunity_id: opportunityIds },
+        group: ["opportunity_id"],
+        raw: true,
+      })
+    : [];
+
+  const countsByOpportunityId = new Map(
+    applicationCounts.map((item) => [
+      item.opportunity_id,
+      Number(item.applications_count) || 0,
+    ]),
+  );
+
+  const data = rows.map((row) => ({
+    ...row.toJSON(),
+    applications_count: countsByOpportunityId.get(row.id) || 0,
+  }));
+
+  res.json({ data, meta: buildMeta(page, limit, count) });
 }
 
 module.exports = { updateProfile, listMyOpportunities };

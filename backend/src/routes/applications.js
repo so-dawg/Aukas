@@ -25,5 +25,11 @@ router.get(
   requireRole("organization"),
   applicationController.listReceived,
 );
+router.patch(
+  "/applications/:id/status",
+  authenticate,
+  requireRole("organization"),
+  applicationController.updateReceivedStatus,
+);
 
 module.exports = router;
