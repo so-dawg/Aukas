@@ -36,8 +36,7 @@ const Footer = () => (
           <img src={logo} alt="Aukas logo" className="footer-logo-image" />
         </div>
         <p className="footer-tagline">
-          Opportunities Hub — a Cambodia-first platform
-          built by IDT Group 3, CS Gen 11.
+            Aukas is a platform that connects students and organizations with opportunities for growth, learning, and collaboration.
         </p>
       </div>
 

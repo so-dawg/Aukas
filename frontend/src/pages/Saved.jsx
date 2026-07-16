@@ -66,6 +66,7 @@ export default function Saved() {
   const [bookmarks, setBookmarks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [submittedSearch, setSubmittedSearch] = useState("");
   const [activeFilter, setActiveFilter] = useState("All");
   const [applyingOpportunity, setApplyingOpportunity] = useState(null);
 
@@ -101,13 +102,21 @@ export default function Saved() {
     return `${days} days left`;
   };
 
+  const handleSearch = () => {
+    setSubmittedSearch(search.trim());
+  };
+
+  const handleFilter = (filter) => {
+    setActiveFilter(filter);
+  };
+
   const filteredBookmarks = bookmarks.filter((b) => {
     const opportunity = getOpportunity(b);
     const type = (opportunity?.type || "").toLowerCase();
     const matchesType =
       activeFilter === "All" || type === activeFilter.toLowerCase();
 
-    const normalized = search.trim().toLowerCase();
+    const normalized = submittedSearch.toLowerCase();
     const matchesSearch =
       !normalized ||
       opportunity?.title?.toLowerCase().includes(normalized) ||
@@ -164,9 +173,10 @@ export default function Saved() {
                   </svg>
                   <input
                     className="opp-search-input"
-                    placeholder="Search marketing internships, ASEAN scholarships"
+                    placeholder="Search"
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                   />
                 </div>
                 <span className="opp-search-divider" />
@@ -194,7 +204,7 @@ export default function Saved() {
                     <polyline points="6 9 12 15 18 9" />
                   </svg>
                 </div>
-                <button className="opp-search-btn" type="button">
+                <button className="opp-search-btn" type="button" onClick={handleSearch}>
                   <svg
                     width="16"
                     height="16"
@@ -215,7 +225,7 @@ export default function Saved() {
                   <button
                     key={cat}
                     className={`opp-filter-pill ${activeFilter === cat ? "active" : ""}`}
-                    onClick={() => setActiveFilter(cat)}
+                    onClick={() => handleFilter(cat)}
                   >
                     {cat}
                   </button>
@@ -242,9 +252,10 @@ export default function Saved() {
                   </svg>
                   <input
                     className="opp-search-input"
-                    placeholder="Search marketing internships, ASEAN scholarships"
+                    placeholder="Search"
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                   />
                 </div>
                 <span className="opp-search-divider" />
@@ -272,7 +283,7 @@ export default function Saved() {
                     <polyline points="6 9 12 15 18 9" />
                   </svg>
                 </div>
-                <button className="opp-search-btn" type="button">
+                <button className="opp-search-btn" type="button" onClick={handleSearch}>
                   <svg
                     width="16"
                     height="16"
@@ -293,7 +304,7 @@ export default function Saved() {
                   <button
                     key={cat}
                     className={`opp-filter-pill ${activeFilter === cat ? "active" : ""}`}
-                    onClick={() => setActiveFilter(cat)}
+                    onClick={() => handleFilter(cat)}
                   >
                     {cat}
                   </button>

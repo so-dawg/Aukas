@@ -4,17 +4,17 @@ const steps = [
   {
     step: "STEP 01",
     title: "Build your profile once",
-    desc: "Year, major, skills, languages. Reuse it for every application — no re-typing.",
+    desc: "Year, major, skills, interests. Reuse it for every application, no re-typing.",
   },
   {
     step: "STEP 02",
-    title: "Browse & apply in one click",
+    title: "Apply in one click",
     desc: "Filter by deadline, stipend, type. Save what catches your eye, apply when you're ready.",
   },
   {
     step: "STEP 03",
     title: "Track everything in one place",
-    desc: "See submitted, interview, offer status on a single timeline. We remind you before deadlines.",
+    desc: "See submitted, interview, offer status on a single timeline.",
   },
 ];
 

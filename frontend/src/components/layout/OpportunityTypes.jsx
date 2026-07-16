@@ -14,35 +14,30 @@ const types = [
     title: "Internship",
     slug: "internship",
     desc: "Paid + unpaid, hybrid + onsite",
-    count: "428",
   },
   {
     icon: <GraduationCap size={20} />,
     title: "Scholarship",
     slug: "scholarship",
     desc: "Undergrad, postgrad, exchange",
-    count: "312",
   },
   {
     icon: <ClipboardList size={20} />,
     title: "Job",
     slug: "job",
     desc: "Entry & graduate roles",
-    count: "286",
   },
   {
     icon: <Heart size={20} />,
     title: "Volunteer",
     slug: "volunteer",
     desc: "NGOs and community work",
-    count: "142",
   },
   {
     icon: <Trophy size={20} />,
     title: "Competition",
     slug: "competition",
     desc: "Hackathons, business, arts",
-    count: "80",
   },
 ];
 
@@ -52,12 +47,8 @@ const OpportunityTypes = () => {
       <div className="opt__inner">
         <div className="opt__header">
           <div>
-            <p className="opt__eyebrow">FIVE TYPES · ONE PLATFORM</p>
             <h2 className="opt__title">Whatever you're looking for next.</h2>
           </div>
-          <Link className="opt__see-all" to="/opportunities">
-            See all open
-          </Link>
         </div>
 
         <div className="opt__grid">

@@ -36,26 +36,13 @@ const Contact = () => {
         <section className="contact-hero">
           <h1 className="contact-hero-title">Contact Us</h1>
           <p className="contact-hero-desc">
-            Have a question, feedback, or want to partner with us? Reach out —
-            we'd love to hear from you.
+            Have a question, feedback, or want to partner with our platform?
+            
+            Reach out and we'd love to hear from you.
           </p>
         </section>
 
         <section className="contact-grid">
-          <div className="contact-info">
-            <div className="contact-info-card">
-              <h3>Email</h3>
-              <p>hello@aukas.app</p>
-            </div>
-            <div className="contact-info-card">
-              <h3>Location</h3>
-              <p>Phnom Penh, Cambodia</p>
-            </div>
-            <div className="contact-info-card">
-              <h3>Follow Us</h3>
-              <p>Facebook &bull; Telegram &bull; LinkedIn</p>
-            </div>
-          </div>
 
           <form className="contact-form" onSubmit={handleSubmit}>
             <div className="contact-form-row">
@@ -65,6 +52,7 @@ const Contact = () => {
                 className="contact-input"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
+                required
               />
               <input
                 type="email"
@@ -72,6 +60,7 @@ const Contact = () => {
                 className="contact-input"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                required
               />
             </div>
             <input
@@ -80,6 +69,7 @@ const Contact = () => {
               className="contact-input"
               value={subject}
               onChange={(e) => setSubject(e.target.value)}
+              required
             />
             <textarea
               placeholder="Message"
@@ -87,7 +77,9 @@ const Contact = () => {
               rows={5}
               value={message}
               onChange={(e) => setMessage(e.target.value)}
+              required
             />
+            {error && <p className="contact-error">{error}</p>}
             <button type="submit" className="contact-btn">
               Send Message
             </button>

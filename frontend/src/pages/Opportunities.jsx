@@ -14,6 +14,10 @@ const getOrganizationName = (opp) => {
   );
 };
 
+const getCategoryName = (opp) => {
+  return opp?.Category?.name || opp?.category?.name || "";
+};
+
 const parseOpportunityMeta = (description) => {
   if (typeof description !== "string") {
     return { salary: "", jobType: "", pax: "" };
@@ -43,14 +47,14 @@ const Opportunities = () => {
   const navigate = useNavigate();
   const [opportunities, setOpportunities] = useState([]);
   const [search, setSearch] = useState("");
+  const [submittedSearch, setSubmittedSearch] = useState("");
   const [activeFilter, setActiveFilter] = useState("All");
   const [bookmarks, setBookmarks] = useState(new Set());
   const [visibleCount, setVisibleCount] = useState(INITIAL_VISIBLE);
   const [applyingOpportunity, setApplyingOpportunity] = useState(null);
 
-  const fetchList = async (filters = {}) => {
-    const params = { limit: 100, sort: "newest", ...filters };
-    if (!params.type) delete params.type;
+  const fetchList = async () => {
+    const params = { limit: 100, sort: "newest" };
     const { data } = await client.get("/opportunities", { params });
     setOpportunities(data.data);
     setVisibleCount(INITIAL_VISIBLE);
@@ -73,14 +77,15 @@ const Opportunities = () => {
 
   const handleFilter = (filter) => {
     setActiveFilter(filter);
-    const type = filter === "All" ? "" : filter.toLowerCase();
-    fetchList({ type, q: search || undefined });
   };
 
   const handleSearch = () => {
-    const type = activeFilter === "All" ? "" : activeFilter.toLowerCase();
-    fetchList({ q: search || undefined, type: type || undefined });
+    setSubmittedSearch(search.trim());
   };
+
+  useEffect(() => {
+    setVisibleCount(INITIAL_VISIBLE);
+  }, [activeFilter, submittedSearch]);
 
   const toggleBookmark = async (oppId) => {
     if (!user) return;
@@ -101,20 +106,23 @@ const Opportunities = () => {
     }
   };
 
-  const profileTags = user
-    ? [
-        ...(user.profile?.year_of_study
-          ? [`Year ${user.profile.year_of_study}`]
-          : []),
-        ...(user.profile?.major ? [user.profile.major] : []),
-        ...(user.profile?.university
-          ? [user.profile.university]
-          : []),
-      ]
-    : [];
+  const filteredOpportunities = opportunities.filter((opp) => {
+    const type = (opp?.type || "").toLowerCase();
+    const matchesType = activeFilter === "All" || type === activeFilter.toLowerCase();
 
-  const visibleOpportunities = opportunities.slice(0, visibleCount);
-  const hasMore = visibleCount < opportunities.length;
+    const normalized = submittedSearch.toLowerCase();
+    const matchesSearch =
+      !normalized ||
+      opp?.title?.toLowerCase().includes(normalized) ||
+      getOrganizationName(opp).toLowerCase().includes(normalized) ||
+      opp?.location?.toLowerCase().includes(normalized) ||
+      getCategoryName(opp).toLowerCase().includes(normalized);
+
+    return matchesType && matchesSearch;
+  });
+
+  const visibleOpportunities = filteredOpportunities.slice(0, visibleCount);
+  const hasMore = visibleCount < filteredOpportunities.length;
 
   const openApplyModal = (opp) => {
     if (!user) {
@@ -137,15 +145,6 @@ const Opportunities = () => {
       <Navbar />
       <main className="opp-page">
         <div className="opp-inner">
-          {/* ── Header ── */}
-          <div className="opp-header">
-            <div>
-              {profileTags.length > 0 && (
-                <p className="opp-context">{profileTags.join(" · ")}</p>
-              )}
-            </div>
-          </div>
-
           {/* ── Search bar ── */}
           <div className="opp-search-bar">
             <div className="opp-search-input-wrap">
@@ -163,7 +162,7 @@ const Opportunities = () => {
               </svg>
               <input
                 className="opp-search-input"
-                placeholder="Search marketing internships, ASEAN scholarships"
+                placeholder="Search"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleSearch()}

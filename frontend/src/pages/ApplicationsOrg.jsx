@@ -35,21 +35,6 @@ function normalizeStatus(status) {
   return "new";
 }
 
-function getInitials(name) {
-  if (!name) return "";
-  return name
-    .trim()
-    .split(/\s+/)
-    .slice(0, 2)
-    .map((part) => part[0]?.toUpperCase() || "")
-    .join("");
-}
-
-function getAvatarClass(index) {
-  const themes = ["avatar-a", "avatar-b", "avatar-c", "avatar-d", "avatar-e"];
-  return themes[index % themes.length];
-}
-
 export default function ApplicationsOrg() {
   const { user, loading } = useAuth();
   const [applications, setApplications] = useState([]);
@@ -211,7 +196,7 @@ export default function ApplicationsOrg() {
               </div>
 
               <div className="org-applications-list">
-                {filteredRows.map((application, index) => {
+                {filteredRows.map((application) => {
                 const applicant = application.Student?.User || {};
                 const studentProfile = application.Student || {};
                 const opportunity = application.Opportunity || {};
@@ -230,9 +215,6 @@ export default function ApplicationsOrg() {
                 return (
                   <article key={application.id} className="org-applications-row">
                     <div className="org-col applicant-col">
-                      <span className={`org-avatar ${getAvatarClass(index)}`}>
-                        {getInitials(applicant.full_name)}
-                      </span>
                       <div>
                         {applicant.full_name && (
                           <p className="org-primary">{applicant.full_name}</p>

@@ -149,44 +149,7 @@
 }
 
 .applicant-col {
-  gap: 14px;
-}
-
-.org-avatar {
-  width: 76px;
-  height: 76px;
-  font-size: 1.95rem;
-  border-radius: 999px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 800;
-  flex-shrink: 0;
-}
-
-.avatar-a {
-  background: #ede9fe;
-  color: #6d28d9;
-}
-
-.avatar-b {
-  background: #dbeafe;
-  color: #1d4ed8;
-}
-
-.avatar-c {
-  background: #dcfce7;
-  color: #15803d;
-}
-
-.avatar-d {
-  background: #fef3c7;
-  color: #b45309;
-}
-
-.avatar-e {
-  background: #fee2e2;
-  color: #be123c;
+  gap: 0;
 }
 
 .org-primary {
@@ -298,12 +261,6 @@
 
   .status-col {
     align-items: flex-start;
-  }
-
-  .org-avatar {
-    width: 52px;
-    height: 52px;
-    font-size: 1.1rem;
   }
 
   .org-primary {

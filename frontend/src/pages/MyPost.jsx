@@ -445,7 +445,7 @@ export default function MyPost() {
                       <FiSearch size={16} />
                       <input
                         type="text"
-                        placeholder="Search opportunities..."
+                        placeholder="Search"
                         value={query}
                         onChange={(e) => setQuery(e.target.value)}
                       />

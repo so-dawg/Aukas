@@ -319,14 +319,16 @@ export default function AukasSignup() {
 
         <div className="toggle">
           <button
+            type="button"
             className={role === "student" ? "active" : ""}
             onClick={() => setRole("student")}
           >
             Student
           </button>
           <button
-            className={role === "org" ? "active" : ""}
-            onClick={() => setRole("org")}
+            type="button"
+            className={role === "organization" ? "active" : ""}
+            onClick={() => setRole("organization")}
           >
             Organisation
           </button>
