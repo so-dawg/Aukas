@@ -1,4 +1,3 @@
-const { Op } = require("sequelize");
 const sequelize = require("../db");
 const {
   Opportunity,

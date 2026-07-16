@@ -230,7 +230,7 @@ export default function MyPost() {
       post.title?.toLowerCase().includes(normalized) ||
       post.description?.toLowerCase().includes(normalized) ||
       post.location?.toLowerCase().includes(normalized) ||
-      post.category?.name?.toLowerCase().includes(normalized)
+      post.Category?.name?.toLowerCase().includes(normalized)
     );
   };
 
@@ -506,7 +506,7 @@ export default function MyPost() {
                             )}
 
                             <div className="mypost-meta-row">
-                              <span><FiTag size={14} /> {post.category?.name || "Uncategorized"}</span>
+                              <span><FiTag size={14} /> {post.Category?.name || "Uncategorized"}</span>
                               <span><FiMapPin size={14} /> {post.location || "Remote / flexible"}</span>
                               {parsedDescription?.pax && <span><FiUsers size={14} /> Pax: {parsedDescription.pax}</span>}
                               <span><FiCalendar size={14} /> Deadline: {formatDate(post.deadline)}</span>

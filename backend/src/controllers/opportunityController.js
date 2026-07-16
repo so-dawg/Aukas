@@ -50,8 +50,12 @@ function buildWhere(filters) {
   if (!filters.allStatuses) where.status = "approved";
 
   if (filters.q) {
-    where[Op.and] = sequelize.literal(
-      `to_tsvector('simple', "Opportunity"."title" || ' ' || "Opportunity"."description") @@ plainto_tsquery('simple', ${sequelize.escape(filters.q)})`,
+    where[Op.and] = sequelize.where(
+      sequelize.fn("to_tsvector", "simple",
+        sequelize.literal(`"Opportunity"."title" || ' ' || "Opportunity"."description"`)
+      ),
+      "@@",
+      sequelize.fn("plainto_tsquery", "simple", filters.q)
     );
   }
   if (filters.type) where.type = filters.type;
@@ -163,8 +167,6 @@ async function create(req, res) {
     description: req.body.description,
     location: req.body.location ?? null,
     deadline: req.body.deadline ?? null,
-    // Temporary behavior: publish immediately after create.
-    status: "approved",
   });
 
   // Re-fetch with includes to return the full object

@@ -9,6 +9,7 @@ const Contact = () => {
   const [email, setEmail] = useState("");
   const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -16,12 +17,16 @@ const Contact = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await client.post("/contact", { name, email, subject, message });
-    alert("Message sent!");
-    setName("");
-    setEmail("");
-    setSubject("");
-    setMessage("");
+    try {
+      await client.post("/contact", { name, email, subject, message });
+      alert("Message sent!");
+      setName("");
+      setEmail("");
+      setSubject("");
+      setMessage("");
+    }catch (err) {
+      setError(err.response?.data?.error?.message || "Failed to send message");
+    }
   };
 
   return (

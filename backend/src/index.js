@@ -1,4 +1,3 @@
-const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
 
@@ -34,6 +33,7 @@ const swaggerDocument = yamljs.load(
 
 setInterval(
   async () => {
+    try {
     await Opportunity.update(
       { status: "expired" },
       {
@@ -43,7 +43,9 @@ setInterval(
           deleted_at: null,
         },
       },
-    );
+    );} catch (err) {
+      console.error("Expiry job failed:", err);
+    }
   },
   60 * 60 * 1000,
 );

@@ -2,7 +2,7 @@ const bcrypt = require("bcryptjs");
 
 // Cost factor — higher = slower = harder to brute-force.
 // 10 is the standard minimum (takes ~50-100ms per hash).
-const ROUNDS = 10;
+const ROUNDS = parseInt(process.env.BCRYPT_ROUNDS, 10) || 10;
 
 // Hash a plain-text password before storing it.
 // Returns a 60-character string: $2b$10$<salt><hash>.

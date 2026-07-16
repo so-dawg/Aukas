@@ -3,7 +3,7 @@ const jwt = require("jsonwebtoken");
 // Read from .env — never hardcode secrets in code
 const SECRET = process.env.JWT_SECRET;
 // Token expires in 14 days — user has to log in again after that
-const EXPIRE_IN = "14d";
+const EXPIRE_IN = process.env.JWT_EXPIRES_IN || "14d";
 
 // Create a signed JWT for the given user.
 // The token carries user.id (as "sub") and user.role — but NOT the password_hash.

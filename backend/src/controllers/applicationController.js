@@ -37,7 +37,7 @@ async function create(req, res) {
   }
 
   const opp = await Opportunity.findOne({
-    where: { id: opportunity_id, deleted_at: null },
+    where: { id: opportunity_id, deleted_at: null, status: "approved" },
   });
   if (!opp) throw ApiError.notFound("Opportunity not found.");
 
@@ -110,7 +110,7 @@ async function listReceived(req, res) {
           organization_id: req.user.id,
           deleted_at: null,
         },
-        include: [{ model: Organization }],
+        include: [{ model: Organization }, { model: Category }],
       },
       {
         model: Student,

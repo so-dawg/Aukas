@@ -1,5 +1,4 @@
 import { useMemo, useState } from "react";
-import { Link } from "react-router-dom";
 import {
   FiBookOpen,
   FiCalendar,
@@ -43,7 +42,6 @@ export default function ProfileJobSeeker() {
     university: profile.university || "",
     major: profile.major || "",
     email: user?.email || "",
-    bio: user?.bio || "",
   });
   const [draft, setDraft] = useState(profileData);
 
@@ -86,8 +84,10 @@ export default function ProfileJobSeeker() {
         studentPayload.university = draft.university;
       if (draft.major !== profile.major) studentPayload.major = draft.major;
       if (draft.yearOfStudy !== (profile.year_of_study?.toString() || ""))
-        studentPayload.year_of_study = parseInt(draft.yearOfStudy, 10);
+        if (draft.yearOfStudy === "") delete studentPayload.year_of_study;
+          else studentPayload.year_of_study = parseInt(draft.yearOfStudy, 10);
       if (Object.keys(studentPayload).length > 0)
+
         await client.patch("/students/me", studentPayload);
 
       setProfileData(draft);
