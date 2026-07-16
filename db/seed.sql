@@ -21,6 +21,7 @@ INSERT INTO users (email, password_hash, full_name, role) VALUES
   ('sopheak@student.test', '$2b$10$placeholderhashplaceholderhashplaceholderhashplacehol', 'Sopheak Chan',        'student'),
   ('dara@student.test',    '$2b$10$placeholderhashplaceholderhashplaceholderhashplacehol', 'Dara Ouk',            'student'),
   ('mealea@student.test',  '$2b$10$placeholderhashplaceholderhashplaceholderhashplacehol', 'Mealea Sam',          'student');
+  
 
 -- Organization profiles (2 verified, 1 unverified)
 INSERT INTO organizations (user_id, org_name, website, description, verified)

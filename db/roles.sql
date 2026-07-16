@@ -1,57 +1,36 @@
--- ===========================================
--- AUKAS Opportunity Hub
--- PostgreSQL User Roles & Privileges
--- ===========================================
 
--- Create Roles
-CREATE ROLE aukas_admin LOGIN PASSWORD 'Admin@123';
-CREATE ROLE aukas_organization LOGIN PASSWORD 'Org@123';
-CREATE ROLE aukas_student LOGIN PASSWORD 'Student@123';
+CREATE USER kanha
+WITH PASSWORD 'Kanha@123';
 
-------------------------------------------------------------
--- Database Connection
-------------------------------------------------------------
-GRANT CONNECT ON DATABASE opportunities_hub TO aukas_admin;
-GRANT CONNECT ON DATABASE opportunities_hub TO aukas_organization;
-GRANT CONNECT ON DATABASE opportunities_hub TO aukas_student;
+CREATE USER pheaktra
+WITH PASSWORD 'Pheaktra@123';
 
-------------------------------------------------------------
--- Allow schema access
-------------------------------------------------------------
-GRANT USAGE ON SCHEMA public
-TO aukas_admin,
-   aukas_organization,
-   aukas_student;
 
-------------------------------------------------------------
--- Admin Permissions
-------------------------------------------------------------
+CREATE ROLE database_admin;
+CREATE ROLE backend_developer;
+
+
+GRANT CONNECT ON DATABASE opportunities_hub TO database_admin;
+GRANT USAGE ON SCHEMA public TO database_admin;
+
 GRANT ALL PRIVILEGES
 ON ALL TABLES IN SCHEMA public
-TO aukas_admin;
+TO database_admin;
 
 GRANT ALL PRIVILEGES
 ON ALL SEQUENCES IN SCHEMA public
-TO aukas_admin;
+TO database_admin;
 
-------------------------------------------------------------
--- Organization Permissions
-------------------------------------------------------------
-GRANT SELECT, INSERT, UPDATE
+GRANT CONNECT ON DATABASE opportunities_hub TO backend_developer;
+GRANT USAGE ON SCHEMA public TO backend_developer;
+
+GRANT SELECT, INSERT, UPDATE, DELETE
 ON ALL TABLES IN SCHEMA public
-TO aukas_organization;
+TO backend_developer;
 
-------------------------------------------------------------
--- Student Permissions
-------------------------------------------------------------
-GRANT SELECT
-ON ALL TABLES IN SCHEMA public
-TO aukas_student;
+GRANT USAGE, SELECT
+ON ALL SEQUENCES IN SCHEMA public
+TO backend_developer;
 
-GRANT INSERT
-ON TABLE applications
-TO aukas_student;
-
-GRANT INSERT
-ON TABLE bookmarks
-TO aukas_student;
+GRANT database_admin TO kanha;
+GRANT backend_developer TO pheaktra;

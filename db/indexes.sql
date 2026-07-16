@@ -12,13 +12,6 @@ ON users(email);
 CREATE INDEX idx_users_role
 ON users(role);
 
-------------------------------------------------------------
--- Organizations
-------------------------------------------------------------
-CREATE INDEX idx_org_verified
-ON organizations(verified);
-
-------------------------------------------------------------
 -- Opportunities
 ------------------------------------------------------------
 CREATE INDEX idx_opportunity_status
@@ -54,5 +47,5 @@ ON applications(status);
 CREATE INDEX idx_bookmark_student
 ON bookmarks(student_id);
 
-CREATE INDEX idx_bookmark_opportunity
+CREATE INDEX IF NOT EXISTS idx_bookmark_opportunity
 ON bookmarks(opportunity_id);
