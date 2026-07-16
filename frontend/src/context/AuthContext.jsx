@@ -20,15 +20,17 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     const { data } = await client.post("/auth/login", { email, password });
     localStorage.setItem("token", data.token);
-    setUser(data.user);
-    return data.user;
+    const { data: meData } = await client.get("/auth/me");
+    setUser(meData.user);
+    return meData.user;
   };
 
   const register = async (payload) => {
     const { data } = await client.post("/auth/register", payload);
     localStorage.setItem("token", data.token);
-    setUser(data.user);
-    return data.user;
+    const { data: meData } = await client.get("/auth/me");
+    setUser(meData.user);
+    return meData.user;
   };
 
   const logout = () => {

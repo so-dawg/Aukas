@@ -40,7 +40,7 @@ function formatDate(value) {
 }
 
 function formatPositions(paxValue) {
-  if (!paxValue) return "-";
+  if (paxValue === null || paxValue === undefined || paxValue === "") return "-";
   const normalized = String(paxValue).trim();
   if (!normalized) return "-";
   if (/\bpax\b/i.test(normalized)) return normalized;

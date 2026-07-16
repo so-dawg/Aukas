@@ -8,23 +8,9 @@ import InlineApplyModal from "../components/apply/InlineApplyModal";
 import "../components/layout/Navbar.css";
 import "./Opportunities.css";
 
-const formatCompensation = (type) => {
-  const map = {
-    internship: "$400/mo",
-    scholarship: "$24,000/yr",
-    job: "$650/mo",
-    volunteer: "Transport covered",
-    competition: "$5,000 prize pool",
-  };
-  return map[type] || "";
-};
-
 const getOrganizationName = (opp) => {
   return (
-    opp?.organization?.org_name ||
-    opp?.Organization?.org_name ||
-    opp?.org_name ||
-    "Organization"
+     opp?.Organization?.org_name || opp?.org_name || opp?.organization?.org_name || "Organization"
   );
 };
 
@@ -98,28 +84,31 @@ const Opportunities = () => {
 
   const toggleBookmark = async (oppId) => {
     if (!user) return;
-    if (bookmarks.has(oppId)) {
-      await client.delete(`/bookmarks/${oppId}`);
-      setBookmarks((prev) => {
-        const next = new Set(prev);
-        next.delete(oppId);
-        return next;
-      });
-      return;
+    try {
+      if (bookmarks.has(oppId)) {
+        await client.delete(`/bookmarks/${oppId}`);
+        setBookmarks((prev) => {
+          const next = new Set(prev);
+          next.delete(oppId);
+          return next;
+        });
+      } else {
+        await client.post("/bookmarks", { opportunity_id: oppId });
+        setBookmarks((prev) => new Set(prev).add(oppId));
+      }
+    } catch (err) {
+      console.error("Bookmark failed:", err);
     }
-
-    await client.post("/bookmarks", { opportunity_id: oppId });
-    setBookmarks((prev) => new Set(prev).add(oppId));
   };
 
   const profileTags = user
     ? [
-        ...(user.student_profile?.year_of_study
-          ? [`Year ${user.student_profile.year_of_study}`]
+        ...(user.profile?.year_of_study
+          ? [`Year ${user.profile.year_of_study}`]
           : []),
-        ...(user.student_profile?.major ? [user.student_profile.major] : []),
-        ...(user.student_profile?.university
-          ? [user.student_profile.university]
+        ...(user.profile?.major ? [user.profile.major] : []),
+        ...(user.profile?.university
+          ? [user.profile.university]
           : []),
       ]
     : [];
@@ -277,7 +266,7 @@ const Opportunities = () => {
                     <div className="opp-card-details-grid">
                       <p className="opp-card-detail-label">Salary</p>
                       <p className="opp-card-detail-value">
-                        {meta.salary || formatCompensation(opp.type) || "Negotiable"}
+                        {meta.salary || "Negotiable"}
                       </p>
 
                       <p className="opp-card-detail-label">Job Type</p>
@@ -287,7 +276,7 @@ const Opportunities = () => {
 
                       <p className="opp-card-detail-label">Industry</p>
                       <p className="opp-card-detail-value">
-                        {opp.category?.name || "General"}
+                        {opp.Category?.name || "General"}
                       </p>
 
                       <p className="opp-card-detail-label">Available Positions</p>

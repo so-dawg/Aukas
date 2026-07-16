@@ -16,11 +16,11 @@ import {
 } from "react-icons/fi";
 import "./Signup.css";
 
- 
+
 function Label({ children }) {
   return <label className="label">{children}</label>;
 }
- 
+
 function Input({ id, type = "text", placeholder, value, onChange, icon }) {
   return (
     <div className="inputWrapper">
@@ -36,10 +36,10 @@ function Input({ id, type = "text", placeholder, value, onChange, icon }) {
     </div>
   );
 }
- 
+
 function PasswordField({ id, label, value, onChange }) {
   const [show, setShow] = useState(false);
- 
+
   return (
     <div className="field">
       <Label>{label}</Label>
@@ -62,15 +62,15 @@ function PasswordField({ id, label, value, onChange }) {
     </div>
   );
 }
- 
+
 /* Student Form */
- 
+
 function StudentForm({ data, onChange }) {
   const f = (key) => ({
     value: data[key],
     onChange: (e) => onChange(key, e.target.value),
   });
- 
+
   return (
     <div>
       <div className="grid2">
@@ -83,7 +83,7 @@ function StudentForm({ data, onChange }) {
           <Input id="s-last" placeholder="Sokun" icon={<FiUser size={15} />} {...f("lastName")} />
         </div>
       </div>
- 
+
       <div className="field">
         <Label>Date of birth</Label>
         <div className="inputWrapper">
@@ -97,7 +97,7 @@ function StudentForm({ data, onChange }) {
           />
         </div>
       </div>
- 
+
       <div className="field">
         <Label>University</Label>
         <div className="selectWrapper">
@@ -125,17 +125,17 @@ function StudentForm({ data, onChange }) {
           />
         )}
       </div>
- 
+
       <div className="field">
         <Label>Major</Label>
         <Input id="s-major" placeholder="e.g. Computer Science, Business…" icon={<FiBookOpen size={15} />} {...f("major")} />
       </div>
- 
+
       <div className="field">
         <Label>Email address</Label>
         <Input id="s-email" type="email" placeholder="kanha@gmail.com" icon={<FiMail size={15} />} {...f("email")} />
       </div>
- 
+
       <PasswordField
         id="s-pw"
         label="Password"
@@ -145,22 +145,22 @@ function StudentForm({ data, onChange }) {
     </div>
   );
 }
- 
+
 /* Org Form */
- 
+
 function OrgForm({ data, onChange }) {
   const f = (key) => ({
     value: data[key],
     onChange: (e) => onChange(key, e.target.value),
   });
- 
+
   return (
     <div>
       <div className="field">
         <Label>Organisation name</Label>
         <Input id="o-name" placeholder="e.g. Tech Innovations Ltd." icon={<FiBriefcase size={15} />} {...f("orgName")} />
       </div>
- 
+
       <div className="field">
         <Label>Industry</Label>
         <div className="selectWrapper">
@@ -190,7 +190,7 @@ function OrgForm({ data, onChange }) {
           />
         )}
       </div>
- 
+
       <div className="field">
         <Label>Company size</Label>
         <div className="selectWrapper">
@@ -209,22 +209,22 @@ function OrgForm({ data, onChange }) {
           </select>
         </div>
       </div>
- 
+
       <div className="field">
         <Label>Website <span className="optional">(optional)</span></Label>
         <Input id="o-website" placeholder="https://yourcompany.com" icon={<FiGlobe size={15} />} {...f("website")} />
       </div>
- 
+
       <div className="field">
         <Label>Contact number <span className="optional">(optional)</span></Label>
         <Input id="o-phone" type="tel" placeholder="+855 12 345 678" icon={<FiPhone size={15} />} {...f("phone")} />
       </div>
- 
+
       <div className="field">
         <Label>Work email</Label>
         <Input id="o-email" type="email" placeholder="company@gmail.com" icon={<FiMail size={15} />} {...f("email")} />
       </div>
- 
+
       <PasswordField
         id="o-pw"
         label="Password"
@@ -234,13 +234,13 @@ function OrgForm({ data, onChange }) {
     </div>
   );
 }
- 
+
 export default function AukasSignup() {
   const { register } = useAuth();
   const navigate = useNavigate();
   const [error, setError] = useState("");
   const [role, setRole] = useState("student");
- 
+
   const [studentData, setStudentData] = useState({
     firstName: "",
     lastName: "",
@@ -250,8 +250,8 @@ export default function AukasSignup() {
     major: "",
     email: "",
     password: "",
-  }); 
- 
+  });
+
   const [orgData, setOrgData] = useState({
     orgName: "",
     industry: "",
@@ -262,7 +262,7 @@ export default function AukasSignup() {
     email: "",
     password: "",
   });
- 
+
   const isStudent = role === "student";
   const updateStudent = (k, v) => setStudentData((p) => ({ ...p, [k]: v }));
   const updateOrg = (k, v) => setOrgData((p) => ({ ...p, [k]: v }));
@@ -279,7 +279,6 @@ export default function AukasSignup() {
           password: studentData.password,
           role: "student",
           profile: {
-            dob: studentData.dob,
             university:
               studentData.university === "Other"
                 ? studentData.universityOther
@@ -311,13 +310,13 @@ export default function AukasSignup() {
         <h1 className="title">
           Create account on <span>Aukas</span>
         </h1>
- 
+
         <p className="subtitle">
           {isStudent
             ? "Join as a student to get more opportunities."
             : "Post opportunities as an organisation."}
         </p>
- 
+
         <div className="toggle">
           <button
             className={role === "student" ? "active" : ""}
@@ -332,13 +331,13 @@ export default function AukasSignup() {
             Organisation
           </button>
         </div>
- 
+
         {isStudent ? (
           <StudentForm data={studentData} onChange={updateStudent} />
         ) : (
           <OrgForm data={orgData} onChange={updateOrg} />
         )}
- 
+
         {error && <p className="errorMsg">{error}</p>}
 
         <button type="submit" className="submitBtn">

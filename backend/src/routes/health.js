@@ -13,6 +13,5 @@ router.get("/health", async (_req, res) => {
   }
 });
 
-router.get;
 
 module.exports = router;

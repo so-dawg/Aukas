@@ -14,6 +14,7 @@ import {
   FiLogOut,
 } from "react-icons/fi";
 import { useAuth } from "../context/AuthContext";
+import client from "../api/client";
 import "./ProfileOrg.css";
 
 const initials = (name = "") =>
@@ -29,17 +30,14 @@ export default function ProfileOrganisation() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const profile = user?.organisation_profile || user?.profile || {};
-
+  const initialOrg = useMemo(() => ({ orgName: profile.org_name || "", website: profile.website || "", description: profile.description || "" }), []);
   const [isEditing, setIsEditing] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState(null);
   const [profileData, setProfileData] = useState({
-    orgName:     profile.org_name     || profile.orgName     || "",
-    email:       user?.email          || profile.email       || "",
-    industry:    profile.industry     || "",
-    companySize: profile.company_size || profile.companySize || "",
+    orgName:     profile.org_name     || "",
+    email:       user?.email          || "",
     website:     profile.website      || "",
-    phone:       profile.phone        || "",
-    city:        profile.city         || "",
-    linkedin:    profile.linkedin     || "",
     description: profile.description  || "",
   });
   const [draft, setDraft] = useState(profileData);
@@ -47,9 +45,23 @@ export default function ProfileOrganisation() {
   const updateDraft = (key, value) =>
     setDraft((prev) => ({ ...prev, [key]: value }));
 
-  const saveProfile = () => {
-    setProfileData(draft);
-    setIsEditing(false);
+  const saveProfile = async () => {
+    setSaving(true);
+    setError(null);
+    try {
+      const payload = {};
+      if (draft.orgName !== profile.org_name) payload.org_name = draft.orgName;
+      if (draft.website !== profile.website) payload.website = draft.website;
+      if (draft.description !== profile.description) payload.description = draft.description;
+      if (Object.keys(payload).length > 0)
+        await client.patch("/organization/me", payload);
+      setProfileData(draft);
+      setIsEditing(false);
+    } catch (err) {
+      setError(err.response?.data?.error?.message || "Failed to save");
+    } finally {
+      setSaving(false);
+    }
   };
 
   const cancelEdit = () => {
@@ -60,20 +72,11 @@ export default function ProfileOrganisation() {
   const avatarText = initials(profileData.orgName);
 
   const metaItems = [
-    profileData.industry    && { icon: <FiBriefcase size={12} />, label: profileData.industry },
-    profileData.companySize && { icon: <FiUsers size={12} />,     label: `${profileData.companySize} employees` },
-    profileData.city        && { icon: <FiMapPin size={12} />,    label: profileData.city },
-    profileData.email       && { icon: <FiMail size={12} />,      label: profileData.email },
-    profileData.phone       && { icon: <FiPhone size={12} />,     label: profileData.phone },
-    profileData.website     && {
+    profileData.email   && { icon: <FiMail size={12} />,      label: profileData.email },
+    profileData.website && {
       icon: <FiGlobe size={12} />,
       label: profileData.website,
       href: profileData.website,
-    },
-    profileData.linkedin    && {
-      icon: <FiLinkedin size={12} />,
-      label: profileData.linkedin,
-      href: profileData.linkedin,
     },
   ].filter(Boolean);
 
@@ -122,45 +125,8 @@ export default function ProfileOrganisation() {
                   <input type="email" value={draft.email} onChange={(e) => updateDraft("email", e.target.value)} />
                 </label>
                 <label>
-                  Industry
-                  <select value={draft.industry} onChange={(e) => updateDraft("industry", e.target.value)}>
-                    <option value="">Select industry</option>
-                    <option>Technology</option>
-                    <option>Finance & Banking</option>
-                    <option>Education</option>
-                    <option>Healthcare</option>
-                    <option>NGO / Non-profit</option>
-                    <option>Retail & E-commerce</option>
-                    <option>Media & Communications</option>
-                    <option>Other</option>
-                  </select>
-                </label>
-                <label>
-                  Company size
-                  <select value={draft.companySize} onChange={(e) => updateDraft("companySize", e.target.value)}>
-                    <option value="">Number of employees</option>
-                    <option>1 – 10</option>
-                    <option>11 – 50</option>
-                    <option>51 – 200</option>
-                    <option>201 – 500</option>
-                    <option>500+</option>
-                  </select>
-                </label>
-                <label>
-                  City
-                  <input value={draft.city} placeholder="e.g. Phnom Penh" onChange={(e) => updateDraft("city", e.target.value)} />
-                </label>
-                <label>
-                  Phone <span className="optional">(optional)</span>
-                  <input type="tel" value={draft.phone} placeholder="+855 12 345 678" onChange={(e) => updateDraft("phone", e.target.value)} />
-                </label>
-                <label>
                   Website <span className="optional">(optional)</span>
                   <input value={draft.website} placeholder="https://yourcompany.com" onChange={(e) => updateDraft("website", e.target.value)} />
-                </label>
-                <label>
-                  LinkedIn <span className="optional">(optional)</span>
-                  <input value={draft.linkedin} placeholder="linkedin.com/company/you" onChange={(e) => updateDraft("linkedin", e.target.value)} />
                 </label>
               </div>
 
@@ -173,12 +139,14 @@ export default function ProfileOrganisation() {
                 />
               </label>
 
+              {error && <p className="profile-error">{error}</p>}
+
               <div className="profile-form-actions">
-                <button type="button" className="profile-action-btn" onClick={cancelEdit}>
+                <button type="button" className="profile-action-btn" onClick={cancelEdit} disabled={saving}>
                   <FiX size={12} /> Cancel
                 </button>
-                <button type="button" className="profile-action-btn primary" onClick={saveProfile}>
-                  <FiCheck size={12} /> Save
+                <button type="button" className="profile-action-btn primary" onClick={saveProfile} disabled={saving}>
+                  <FiCheck size={12} /> {saving ? "Saving..." : "Save"}
                 </button>
               </div>
             </div>
