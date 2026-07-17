@@ -33,9 +33,12 @@ async function listOpportunities(req, res) {
 
 async function listUsers(req, res) {
   const { page, limit, offset } = parsePagination(req.query);
-  const where = { deleted_at: null };
 
+  // Admin sees ALL users including banned ones
+  const where = {};
   if (req.query.role) where.role = req.query.role;
+  if (req.query.banned === "true") where.deleted_at = { [require("sequelize").Op.ne]: null };
+  else if (req.query.banned !== "all") where.deleted_at = null;
 
   const { rows, count } = await User.findAndCountAll({
     where,
@@ -58,6 +61,29 @@ async function listUsers(req, res) {
   res.json({ data, meta: buildMeta(page, limit, count) });
 }
 
+async function banUser(req, res) {
+  const { id } = req.params;
+  const { banned } = req.body;
+
+  if (!PATTERNS.uuid.test(id))
+    throw ApiError.validation([{ field: "id", rule: "format" }]);
+  if (typeof banned !== "boolean")
+    throw ApiError.validation([{ field: "banned", rule: "required" }]);
+
+  const user = await User.findByPk(id);
+  if (!user) throw ApiError.notFound("User not found.");
+  if (user.role === "admin")
+    throw ApiError.forbidden("Cannot ban another admin.");
+
+  await User.update(
+    { deleted_at: banned ? new Date() : null },
+    { where: { id } },
+  );
+
+  const updated = await User.findByPk(id);
+  res.json({ data: { ...updated.toJSON(), banned: !!updated.deleted_at } });
+}
+
 async function verifyOrganization(req, res) {
   const { user_id } = req.params;
   const { verified } = req.body;
@@ -75,4 +101,4 @@ async function verifyOrganization(req, res) {
   res.json({ data: updated });
 }
 
-module.exports = { listOpportunities, listUsers, verifyOrganization };
+module.exports = { listOpportunities, listUsers, verifyOrganization, banUser };

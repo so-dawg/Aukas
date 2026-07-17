@@ -14,13 +14,13 @@ TRUNCATE TABLE applications, bookmarks, opportunities, students, organizations, 
 -- Users  (1 admin, 3 organizations, 3 students)
 -- =============================================================================
 INSERT INTO users (email, password_hash, full_name, role) VALUES
-  ('admin@aukas.test',     '$2b$10$placeholderhashplaceholderhashplaceholderhashplacehol', 'Aukas Admin',         'admin'),
-  ('hr@mekongtech.test',   '$2b$10$placeholderhashplaceholderhashplaceholderhashplacehol', 'Mekong Tech HR',      'organization'),
-  ('jobs@angkormob.test',  '$2b$10$placeholderhashplaceholderhashplaceholderhashplacehol', 'Angkor Mobility',     'organization'),
-  ('hello@tonlesap.test',  '$2b$10$placeholderhashplaceholderhashplaceholderhashplacehol', 'Tonle Sap NGO',       'organization'),
-  ('sopheak@student.test', '$2b$10$placeholderhashplaceholderhashplaceholderhashplacehol', 'Sopheak Chan',        'student'),
-  ('dara@student.test',    '$2b$10$placeholderhashplaceholderhashplaceholderhashplacehol', 'Dara Ouk',            'student'),
-  ('mealea@student.test',  '$2b$10$placeholderhashplaceholderhashplaceholderhashplacehol', 'Mealea Sam',          'student');
+  ('admin@aukas.edu.kh',   '$2a$10$9fi/G2yEm7Uu.ndDuho3k.TFv3oaZcgkW0n.O8dCrdCZUTe590uqy', 'Aukas Admin',         'admin'),
+  ('hr@mekongtech.test',   '$2a$10$9fi/G2yEm7Uu.ndDuho3k.TFv3oaZcgkW0n.O8dCrdCZUTe590uqy', 'Mekong Tech HR',      'organization'),
+  ('jobs@angkormob.test',  '$2a$10$9fi/G2yEm7Uu.ndDuho3k.TFv3oaZcgkW0n.O8dCrdCZUTe590uqy', 'Angkor Mobility',     'organization'),
+  ('hello@tonlesap.test',  '$2a$10$9fi/G2yEm7Uu.ndDuho3k.TFv3oaZcgkW0n.O8dCrdCZUTe590uqy', 'Tonle Sap NGO',       'organization'),
+  ('sopheak@student.test', '$2a$10$9fi/G2yEm7Uu.ndDuho3k.TFv3oaZcgkW0n.O8dCrdCZUTe590uqy', 'Sopheak Chan',        'student'),
+  ('dara@student.test',    '$2a$10$9fi/G2yEm7Uu.ndDuho3k.TFv3oaZcgkW0n.O8dCrdCZUTe590uqy', 'Dara Ouk',            'student'),
+  ('mealea@student.test',  '$2a$10$9fi/G2yEm7Uu.ndDuho3k.TFv3oaZcgkW0n.O8dCrdCZUTe590uqy', 'Mealea Sam',          'student');
   
 
 -- Organization profiles (2 verified, 1 unverified)
@@ -52,62 +52,62 @@ SELECT id, 'American University of Phnom Penh',   'Business Administration', 2
 INSERT INTO opportunities (organization_id, category_id, approved_by, title, description, location, deadline, status) VALUES
   ( (SELECT user_id FROM organizations WHERE org_name = 'Mekong Tech Co.'),
     (SELECT id      FROM categories    WHERE slug = 'internship'),
-    (SELECT id      FROM users         WHERE email = 'admin@aukas.test'),
+    (SELECT id      FROM users         WHERE email = 'admin@aukas.edu.kh'),
     'Backend Engineering Intern',
     'Three-month paid internship building Node.js and PostgreSQL APIs. Open to 3rd and 4th year IT students.',
     'Phnom Penh', '2026-06-30', 'approved' ),
   ( (SELECT user_id FROM organizations WHERE org_name = 'Mekong Tech Co.'),
     (SELECT id      FROM categories    WHERE slug = 'job'),
-    (SELECT id      FROM users         WHERE email = 'admin@aukas.test'),
+    (SELECT id      FROM users         WHERE email = 'admin@aukas.edu.kh'),
     'Junior DevOps Engineer',
     'Maintain CI/CD pipelines and container deployments. Linux + Docker required.',
     'Phnom Penh', '2026-07-15', 'approved' ),
 
   ( (SELECT user_id FROM organizations WHERE org_name = 'Mekong Tech Co.'),
     (SELECT id      FROM categories    WHERE slug = 'scholarship'),
-    (SELECT id      FROM users         WHERE email = 'admin@aukas.test'),
+    (SELECT id      FROM users         WHERE email = 'admin@aukas.edu.kh'),
     'Mekong Tech Scholarship 2026',
     'Full-tuition scholarship for one final-year IT student. Includes 6-month mentorship.',
     'Phnom Penh', '2026-07-31', 'approved' ),
 
   ( (SELECT user_id FROM organizations WHERE org_name = 'Angkor Mobility'),
     (SELECT id      FROM categories    WHERE slug = 'internship'),
-    (SELECT id      FROM users         WHERE email = 'admin@aukas.test'),
+    (SELECT id      FROM users         WHERE email = 'admin@aukas.edu.kh'),
     'Frontend Intern (React Native)',
     'Help ship features for the driver and rider mobile apps. Stipend + lunch provided.',
     'Phnom Penh', '2026-06-10', 'approved' ),
 
   ( (SELECT user_id FROM organizations WHERE org_name = 'Angkor Mobility'),
     (SELECT id      FROM categories    WHERE slug = 'job'),
-    (SELECT id      FROM users         WHERE email = 'admin@aukas.test'),
+    (SELECT id      FROM users         WHERE email = 'admin@aukas.edu.kh'),
     'Data Analyst',
     'SQL-heavy analytics role. Build dashboards for the operations and growth teams.',
     'Phnom Penh', '2026-08-01', 'approved' ),
 
   ( (SELECT user_id FROM organizations WHERE org_name = 'Angkor Mobility'),
     (SELECT id      FROM categories    WHERE slug = 'competition'),
-    (SELECT id      FROM users         WHERE email = 'admin@aukas.test'),
+    (SELECT id      FROM users         WHERE email = 'admin@aukas.edu.kh'),
     'Angkor Hack 2026',
     '48-hour hackathon for university students. Build a transportation feature. Prize pool $5,000.',
     'Phnom Penh', '2026-07-05', 'approved' ),
 
   ( (SELECT user_id FROM organizations WHERE org_name = 'Angkor Mobility'),
     (SELECT id      FROM categories    WHERE slug = 'scholarship'),
-    (SELECT id      FROM users         WHERE email = 'admin@aukas.test'),
+    (SELECT id      FROM users         WHERE email = 'admin@aukas.edu.kh'),
     'Women in Tech Scholarship',
     '$2,000 scholarship for women pursuing computer science degrees in Cambodia.',
     'Remote',      '2026-08-15', 'approved' ),
 
   ( (SELECT user_id FROM organizations WHERE org_name = 'Tonle Sap Conservation'),
     (SELECT id      FROM categories    WHERE slug = 'volunteer'),
-    (SELECT id      FROM users         WHERE email = 'admin@aukas.test'),
+    (SELECT id      FROM users         WHERE email = 'admin@aukas.edu.kh'),
     'Freshwater Survey Volunteer',
     'Two-week field program monitoring fish populations on the Tonle Sap. Training provided.',
     'Siem Reap',   '2026-06-20', 'approved' ),
 
   ( (SELECT user_id FROM organizations WHERE org_name = 'Tonle Sap Conservation'),
     (SELECT id      FROM categories    WHERE slug = 'volunteer'),
-    (SELECT id      FROM users         WHERE email = 'admin@aukas.test'),
+    (SELECT id      FROM users         WHERE email = 'admin@aukas.edu.kh'),
     'Community Outreach Coordinator',
     'Weekend volunteer role running environmental education workshops in lakeside villages.',
     'Siem Reap',   '2026-09-30', 'approved' ),
@@ -128,7 +128,7 @@ INSERT INTO opportunities (organization_id, category_id, approved_by, title, des
     'Phnom Penh', '2026-09-01', 'draft' ),
   ( (SELECT user_id FROM organizations WHERE org_name = 'Tonle Sap Conservation'),
     (SELECT id      FROM categories    WHERE slug = 'competition'),
-    (SELECT id      FROM users         WHERE email = 'admin@aukas.test'),
+    (SELECT id      FROM users         WHERE email = 'admin@aukas.edu.kh'),
     'Eco Innovation Challenge',
     'Rejected by moderation: missing judging criteria and prize details.',
     'Siem Reap',  '2026-07-10', 'rejected' );
@@ -136,36 +136,41 @@ INSERT INTO opportunities (organization_id, category_id, approved_by, title, des
 -- =============================================================================
 -- Bookmarks  (so saved-items pages have content)
 -- =============================================================================
-INSERT INTO bookmarks (student_id, opportunity_id)
-SELECT (SELECT id FROM users WHERE email = 'sopheak@student.test'),
-       o.id
+INSERT INTO bookmarks (id, student_id, opportunity_id, saved_at)
+SELECT gen_random_uuid(),
+       (SELECT id FROM users WHERE email = 'sopheak@student.test'),
+       o.id, now()
 FROM opportunities o
 WHERE o.title IN ('Backend Engineering Intern',
                   'Mekong Tech Scholarship 2026',
                   'Angkor Hack 2026');
 
-INSERT INTO bookmarks (student_id, opportunity_id)
-SELECT (SELECT id FROM users WHERE email = 'dara@student.test'),
-       o.id
+INSERT INTO bookmarks (id, student_id, opportunity_id, saved_at)
+SELECT gen_random_uuid(),
+       (SELECT id FROM users WHERE email = 'dara@student.test'),
+       o.id, now()
 FROM opportunities o
 WHERE o.title IN ('Junior DevOps Engineer', 'Data Analyst');
 
 -- =============================================================================
 -- Applications  (click-apply records, with a few advanced statuses)
 -- =============================================================================
-INSERT INTO applications (student_id, opportunity_id, status)
-SELECT (SELECT id FROM users WHERE email = 'sopheak@student.test'),
-       o.id, 'clicked'
+INSERT INTO applications (id, student_id, opportunity_id, status, cv_url, applied_at)
+SELECT gen_random_uuid(),
+       (SELECT id FROM users WHERE email = 'sopheak@student.test'),
+       o.id, 'clicked', 'https://example.com/cv/sopheak.pdf', now()
 FROM opportunities o WHERE o.title = 'Backend Engineering Intern';
 
-INSERT INTO applications (student_id, opportunity_id, status)
-SELECT (SELECT id FROM users WHERE email = 'dara@student.test'),
-       o.id, 'in_review'
+INSERT INTO applications (id, student_id, opportunity_id, status, cv_url, applied_at)
+SELECT gen_random_uuid(),
+       (SELECT id FROM users WHERE email = 'dara@student.test'),
+       o.id, 'in_review', 'https://example.com/cv/dara.pdf', now()
 FROM opportunities o WHERE o.title = 'Junior DevOps Engineer';
 
-INSERT INTO applications (student_id, opportunity_id, status)
-SELECT (SELECT id FROM users WHERE email = 'mealea@student.test'),
-       o.id, 'accepted'
+INSERT INTO applications (id, student_id, opportunity_id, status, cv_url, applied_at)
+SELECT gen_random_uuid(),
+       (SELECT id FROM users WHERE email = 'mealea@student.test'),
+       o.id, 'accepted', 'https://example.com/cv/mealea.pdf', now()
 FROM opportunities o WHERE o.title = 'Women in Tech Scholarship';
 
 COMMIT;

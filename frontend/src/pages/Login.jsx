@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import { FiMail, FiLock, FiEye, FiEyeOff } from "react-icons/fi";
 import { useAuth } from "../context/AuthContext";
 import "./Login.css";
@@ -33,18 +33,28 @@ function PasswordField({ id, label, value, onChange }) {
 }
 
 export default function Login() {
-  const { login } = useAuth();
+  const { user, login } = useAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
+  if (user) {
+    const target = user.role === "organization" ? "/profile" : user.role === "admin" ? "/admin" : "/profile";
+    return <Navigate to={target} replace />;
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     try {
-      const user = await login(email, password);
-      navigate(user?.role === "organization" ? "/profile" : "/opportunities");
+      const loggedInUser = await login(email, password);
+      navigate(
+        loggedInUser?.role === "organization" ? "/profile" :
+        loggedInUser?.role === "admin" ? "/admin" :
+        "/profile",
+        { replace: true },
+      );
     } catch (err) {
       setError(err.response?.data?.error?.message || "Login failed. Please try again.");
     }

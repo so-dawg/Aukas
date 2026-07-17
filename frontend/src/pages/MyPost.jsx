@@ -3,6 +3,7 @@ import { Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import client from "../api/client";
 import Navbar from "../components/layout/Navbar";
+import Footer from "../components/layout/Footer";
 import {
   FiCalendar,
   FiMapPin,
@@ -545,6 +546,7 @@ export default function MyPost() {
           </section>
         </div>
       </main>
+      <Footer />
 
       {confirmDeletePost && (
         <div className="mypost-modal-overlay" role="dialog" aria-modal="true" aria-label="Delete confirmation">

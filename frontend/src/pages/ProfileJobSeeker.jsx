@@ -58,11 +58,14 @@ export default function ProfileJobSeeker() {
       icon: <FiUser size={12} />,
       label: `Year ${profileData.yearOfStudy}`,
     },
-    profileData.email && {
-      icon: <FiMail size={12} />,
-      label: profileData.email,
-    },
   ].filter(Boolean);
+
+  const detailFields = [
+    { label: "Email", value: profileData.email },
+    { label: "University", value: profileData.university || "Not set" },
+    { label: "Major", value: profileData.major || "Not set" },
+    { label: "Year of Study", value: profileData.yearOfStudy ? `Year ${profileData.yearOfStudy}` : "Not set" },
+  ];
 
   const updateDraft = (key, value) => {
     setDraft((current) => ({ ...current, [key]: value }));
@@ -234,6 +237,14 @@ export default function ProfileJobSeeker() {
                     {item.icon}
                     {item.label}
                   </span>
+                ))}
+              </div>
+              <div className="jobseeker-profile-details">
+                {detailFields.map((field) => (
+                  <div key={field.label} className="profile-detail-row">
+                    <span className="profile-detail-label">{field.label}</span>
+                    <span className="profile-detail-value">{field.value}</span>
+                  </div>
                 ))}
               </div>
             </>

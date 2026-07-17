@@ -3,6 +3,7 @@ const PATTERNS = require("../utils/patterns");
 const ApiError = require("../utils/ApiError");
 const password = require("../utils/password");
 const { User, Student, Organization } = require("../models");
+const upload = require("../config/multer");
 
 function publicUser(u) {
   return {
@@ -115,4 +116,12 @@ async function updateStudentProfile(req, res) {
   res.json({ data: updated });
 }
 
-module.exports = { updateMe, deleteMe, getUser, updateStudentProfile };
+async function uploadResume(req, res) {
+  if (!req.file) throw ApiError.validation([], "No file provided.");
+
+  const url = req.file.path;
+  await Student.update({ resume_url: url }, { where: { user_id: req.user.id } });
+  res.json({ data: { resume_url: url } });
+}
+
+module.exports = { updateMe, deleteMe, getUser, updateStudentProfile, uploadResume };

@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import {
@@ -236,9 +236,15 @@ function OrgForm({ data, onChange }) {
 }
 
 export default function AukasSignup() {
-  const { register } = useAuth();
+  const { user, register } = useAuth();
   const navigate = useNavigate();
   const [error, setError] = useState("");
+
+  if (user) {
+    const target = user.role === "organization" ? "/profile" : user.role === "admin" ? "/admin" : "/profile";
+    return <Navigate to={target} replace />;
+  }
+
   const [role, setRole] = useState("student");
 
   const [studentData, setStudentData] = useState({
@@ -287,6 +293,12 @@ export default function AukasSignup() {
           },
         });
       } else {
+        const site = orgData.website?.trim();
+        const website = site
+          ? /^https?:\/\//i.test(site)
+            ? site
+            : "https://" + site
+          : undefined;
         user = await register({
           full_name: orgData.orgName,
           email: orgData.email,
@@ -294,13 +306,23 @@ export default function AukasSignup() {
           role: "organization",
           profile: {
             org_name: orgData.orgName,
-            website: orgData.website || undefined,
+            website,
           },
         });
       }
-      navigate(user?.role === "organization" ? "/profile" : "/opportunities");
-    } catch (err) {
-      setError(err.response?.data?.error?.message || "Registration failed. Please try again.");
+      navigate(
+        user?.role === "organization" ? "/profile" :
+        user?.role === "admin" ? "/admin" :
+        "/profile",
+        { replace: true },
+      );
+      } catch (err) {
+      const data = err.response?.data?.error;
+      let msg = data?.message || "Registration failed. Please try again.";
+      if (data?.details?.length) {
+        msg += " " + data.details.map((d) => d.field.replace("profile.", "") + ": " + d.rule).join(", ");
+      }
+      setError(msg);
     }
   };
 

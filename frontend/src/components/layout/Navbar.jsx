@@ -14,19 +14,29 @@ const Navbar = () => {
   const isOrganization = user?.role === "organization";
   const navLinks = isOrganization
     ? [
-        { label: "Home", to: "/" },
+        ...(!user ? [{ label: "Home", to: "/" }] : []),
+        { label: "Profile", to: "/profile" },
         { label: "My Post", to: "/my-post" },
-        { label: "Applications", to: "/applications" },
-        { label: "Contact Us", to: "/contact" },
+        { label: "Applicants", to: "/applications" },
       ]
     : [
-        { label: "Home", to: "/" },
+        ...(!user ? [{ label: "Home", to: "/" }] : []),
         { label: "Opportunities", to: "/opportunities" },
         ...(isJobSeeker
           ? [{ label: "My Applications", to: "/my-applications" }]
           : []),
-        { label: "Contact Us", to: "/contact" },
+        ...(isJobSeeker
+          ? [{ label: "Saved", to: "/saved" }]
+          : [{ label: "Contact Us", to: "/contact" }]),
+        ...(isJobSeeker || user?.role === "admin"
+          ? [{ label: "Profile", to: "/profile" }]
+          : []),
       ];
+
+const adminLink =user?.role === "admin"
+  ? { label: "Admin", to: "/admin" }
+  : null;
+
 
   return (
     <nav className="navbar">
@@ -46,6 +56,16 @@ const Navbar = () => {
               </Link>
             </li>
           ))}
+          {adminLink && (
+            <li>
+              <Link
+                to={adminLink.to}
+                className={`navbar-link ${isActive(adminLink.to) ? "active" : ""}`}
+              >
+                {adminLink.label}
+              </Link>
+            </li>
+          )}
         </ul>
 
         <div className="navbar-actions">
@@ -108,14 +128,14 @@ const Navbar = () => {
             </li>
           ))}
 
-          {isJobSeeker && (
+          {adminLink && (
             <li>
               <Link
-                to="/saved"
+                to="/admin"
                 onClick={() => setMenuOpen(false)}
                 className="navbar-mobile-link"
               >
-                Saved
+                Admin
               </Link>
             </li>
           )}

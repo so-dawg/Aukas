@@ -3,6 +3,7 @@ import { Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import client from "../api/client";
 import Navbar from "../components/layout/Navbar";
+import Footer from "../components/layout/Footer";
 import { FiBriefcase, FiCalendar, FiClock, FiFilter, FiGrid, FiPhone } from "react-icons/fi";
 import "./ApplicationsOrg.css";
 
@@ -280,6 +281,7 @@ export default function ApplicationsOrg() {
           )}
         </div>
       </main>
+      <Footer />
     </>
   );
 }

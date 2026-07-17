@@ -20,9 +20,14 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     const { data } = await client.post("/auth/login", { email, password });
     localStorage.setItem("token", data.token);
-    const { data: meData } = await client.get("/auth/me");
-    setUser(meData.user);
-    return meData.user;
+    try {
+      const { data: meData } = await client.get("/auth/me");
+      setUser(meData.user);
+      return meData.user;
+    } catch {
+      localStorage.removeItem("token");
+      throw new Error("Failed to load profile.");
+    }
   };
 
   const register = async (payload) => {

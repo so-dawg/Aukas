@@ -13,5 +13,6 @@ router.patch(
   "/organizations/:user_id/verify",
   adminController.verifyOrganization,
 );
+router.patch("/users/:id/ban", adminController.banUser);
 
 module.exports = router;

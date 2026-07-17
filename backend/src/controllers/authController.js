@@ -33,7 +33,7 @@ function validateRegister(body) {
   if (b.role === "organization") {
     if (typeof p.org_name !== "string" || p.org_name.trim().length < 1)
       details.push({ field: "profile.org_name", rule: "required" });
-    if (p.website != null && !PATTERNS.url.test(p.website))
+    if (p.website && !PATTERNS.url.test(p.website))
       details.push({ field: "profile.website", rule: "format" });
   }
   if (b.role === "student") {
@@ -46,7 +46,7 @@ function validateRegister(body) {
       )
     )
       details.push({ field: "profile.year_of_study", rule: "range" });
-    if (p.resume_url != null && !PATTERNS.url.test(p.resume_url))
+    if (p.resume_url && !PATTERNS.url.test(p.resume_url))
       details.push({ field: "profile.resume_url", rule: "format" });
   }
 

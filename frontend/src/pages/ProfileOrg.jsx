@@ -1,16 +1,15 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   FiBriefcase,
+  FiCalendar,
   FiCheck,
+  FiClock,
   FiEdit2,
   FiGlobe,
   FiMail,
-  FiMapPin,
   FiPhone,
-  FiUsers,
   FiX,
-  FiLinkedin,
   FiLogOut,
 } from "react-icons/fi";
 import { useAuth } from "../context/AuthContext";
@@ -42,6 +41,33 @@ export default function ProfileOrganisation() {
   });
   const [draft, setDraft] = useState(profileData);
 
+  const [applications, setApplications] = useState([]);
+  const [appsLoading, setAppsLoading] = useState(true);
+  const [updatingId, setUpdatingId] = useState(null);
+  const [appsError, setAppsError] = useState("");
+  const [activeTab, setActiveTab] = useState("all");
+
+  const STATUS_TABS = ["all", "new", "interviewed", "hired", "rejected"];
+  const tabLabel = { all: "All", new: "New", interviewed: "Interviewed", hired: "Hired", rejected: "Rejected" };
+
+  function normalizeStatus(s) {
+    const v = String(s || "").toLowerCase();
+    if (v === "clicked" || v === "new") return "new";
+    if (v === "in_review" || v === "interviewed" || v === "shortlisted") return "interviewed";
+    if (v === "accepted" || v === "hired") return "hired";
+    if (v === "rejected") return "rejected";
+    return "new";
+  }
+
+  useEffect(() => {
+    if (user?.role !== "organization") return;
+    setAppsLoading(true);
+    client.get("/applications/received")
+      .then((res) => setApplications(res.data?.data || []))
+      .catch((err) => setAppsError(err.response?.data?.error?.message || "Failed to load applications"))
+      .finally(() => setAppsLoading(false));
+  }, [user]);
+
   const updateDraft = (key, value) =>
     setDraft((prev) => ({ ...prev, [key]: value }));
 
@@ -67,6 +93,21 @@ export default function ProfileOrganisation() {
   const cancelEdit = () => {
     setDraft(profileData);
     setIsEditing(false);
+  };
+
+  const handleStatusChange = async (applicationId, status) => {
+    setUpdatingId(applicationId);
+    setAppsError("");
+    try {
+      await client.patch(`/applications/${applicationId}/status`, { status });
+      setApplications((prev) =>
+        prev.map((a) => (a.id === applicationId ? { ...a, status } : a)),
+      );
+    } catch (err) {
+      setAppsError(err.response?.data?.error?.message || "Failed to update status");
+    } finally {
+      setUpdatingId(null);
+    }
   };
 
   const avatarText = initials(profileData.orgName);
@@ -173,6 +214,90 @@ export default function ProfileOrganisation() {
             </>
           )}
         </div>
+      </section>
+
+      <section className="org-applicants-section">
+        <h2 className="org-applicants-heading">Applicants</h2>
+
+        <nav className="org-app-status-tabs" aria-label="Status tabs">
+          {STATUS_TABS.map((tab) => {
+            const count = tab === "all"
+              ? applications.length
+              : applications.filter((a) => normalizeStatus(a.status) === tab).length;
+            return (
+              <button
+                key={tab}
+                type="button"
+                className={`org-app-tab ${activeTab === tab ? "is-active" : ""}`}
+                onClick={() => setActiveTab(tab)}
+              >
+                {tabLabel[tab]} ({count})
+              </button>
+            );
+          })}
+        </nav>
+
+        {appsLoading ? (
+          <p className="org-app-state">Loading applications...</p>
+        ) : appsError ? (
+          <p className="org-app-state org-app-error">{appsError}</p>
+        ) : applications.length === 0 ? (
+          <p className="org-app-state">No applications received yet.</p>
+        ) : (
+          <div className="org-app-table">
+            <div className="org-app-head">
+              <span>Applicant</span>
+              <span>Job</span>
+              <span>Date</span>
+              <span>Status</span>
+            </div>
+            {applications
+              .filter((a) => activeTab === "all" || normalizeStatus(a.status) === activeTab)
+              .map((application) => {
+                const applicant = application.Student?.User || {};
+                const opportunity = application.Opportunity || {};
+                const appliedAt = new Date(application.applied_at);
+                const dateStr = Number.isNaN(appliedAt.getTime())
+                  ? "-"
+                  : appliedAt.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
+                const timeStr = Number.isNaN(appliedAt.getTime())
+                  ? ""
+                  : appliedAt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+                const uiStatus = normalizeStatus(application.status);
+
+                return (
+                  <div key={application.id} className="org-app-row">
+                    <div className="org-app-cell">
+                      <p className="org-primary">{applicant.full_name || "Unknown"}</p>
+                      <p className="org-secondary">{applicant.email || ""}</p>
+                    </div>
+                    <div className="org-app-cell">
+                      <p className="org-primary">{opportunity.title || "Untitled"}</p>
+                    </div>
+                    <div className="org-app-cell">
+                      <p className="org-primary"><FiCalendar size={13} /> {dateStr}</p>
+                      {timeStr && <p className="org-secondary"><FiClock size={13} /> {timeStr}</p>}
+                    </div>
+                    <div className="org-app-cell">
+                      <div className={`org-status-control status-${uiStatus}`}>
+                        <select
+                          className="org-status-select"
+                          value={uiStatus}
+                          onChange={(e) => handleStatusChange(application.id, e.target.value)}
+                          disabled={updatingId === application.id}
+                        >
+                          <option value="new">New</option>
+                          <option value="interviewed">Interviewed</option>
+                          <option value="hired">Hired</option>
+                          <option value="rejected">Rejected</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+          </div>
+        )}
       </section>
     </main>
   );

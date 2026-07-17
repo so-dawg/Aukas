@@ -2,6 +2,7 @@
 const { Router } = require("express");
 const { authenticate, requireRole } = require("../middleware/auth");
 const userController = require("../controllers/userController");
+const upload = require("../config/multer");
 
 const router = Router();
 
@@ -18,6 +19,13 @@ router.patch(
   authenticate,
   requireRole("student"),
   userController.updateStudentProfile,
+);
+router.post(
+  "/students/me/resume",
+  authenticate,
+  requireRole("student"),
+  upload.single("resume"),
+  userController.uploadResume,
 );
 
 module.exports = router;

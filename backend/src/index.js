@@ -16,6 +16,7 @@ const rateLimit = require("express-rate-limit");
 const swaggerUi = require("swagger-ui-express");
 const yamljs = require("yamljs");
 
+const sequelize = require("./db");
 const healthRouter = require("./routes/health");
 const contactRouter = require("./routes/contact");
 const authRouter = require("./routes/auth");
@@ -91,6 +92,18 @@ app.use("/api", contactRouter);
 
 app.use(errorHandler);
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+if (!process.env.VERCEL) {
+  sequelize
+    .sync()
+    .then(() => {
+      app.listen(PORT, () => {
+        console.log(`Server running on port ${PORT}`);
+      });
+    })
+    .catch((err) => {
+      console.error("Database sync failed:", err);
+      process.exit(1);
+    });
+}
+
+module.exports = app;

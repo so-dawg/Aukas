@@ -16,7 +16,18 @@ import MyApplications from "./pages/MyApplications";
 import MyPost from "./pages/MyPost";
 import ApplicationsOrg from "./pages/ApplicationsOrg";
 import Saved from "./pages/Saved";
+import Admin from "./pages/Admin";
 import "./components/layout/Navbar.css";
+
+function AdminRoute() {
+  const { user, loading } = useAuth();
+
+  if (loading) return null;
+  if (!user) return <Navigate to="/login" replace />;
+  if (user.role !== "admin") return <Navigate to="/opportunities" replace />;
+
+  return <Admin />;
+}
 
 function ProfileRoute() {
   const { user, loading } = useAuth();
@@ -26,14 +37,38 @@ function ProfileRoute() {
 
   const isStudent = user.role === "student";
   const isOrganization = user.role === "organization";
-  if (!isStudent && !isOrganization) return <Navigate to="/opportunities" replace />;
+  const isAdmin = user.role === "admin";
 
   return (
-    <>
+    <div className="route-page">
       <Navbar />
-      {isStudent ? <ProfileJobSeeker /> : <ProfileOrg />}
+      <div className="route-content">
+        {isAdmin ? (
+          <main className="org-profile-page" style={{ flex: 1 }}>
+            <section className="org-profile-card">
+              <div className="org-profile-banner" />
+              <div className="org-profile-body">
+                <div className="org-profile-top">
+                  <div className="org-profile-avatar">
+                    {(user.full_name || "A").split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase()}
+                  </div>
+                </div>
+                <h1>{user.full_name || "Admin"}</h1>
+                <div className="org-profile-meta">
+                  <span>{user.email}</span>
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, background: '#dbeafe', color: '#1d4ed8', padding: '2px 8px', borderRadius: 4, fontSize: 11, fontWeight: 700 }}>ADMIN</span>
+                </div>
+              </div>
+            </section>
+          </main>
+        ) : isStudent ? (
+          <ProfileJobSeeker />
+        ) : (
+          <ProfileOrg />
+        )}
+      </div>
       <Footer />
-    </>
+    </div>
   );
 }
 
@@ -139,6 +174,7 @@ function App() {
             <Route path="/applications" element={<OrgApplicationsRoute />} />
             <Route path="/profile" element={<ProfileRoute />} />
             <Route path="/my-post" element={<MyPost />} />
+            <Route path="/admin" element={<AdminRoute />} />
           </Routes>
         </BrowserRouter>
       </AuthProvider>
