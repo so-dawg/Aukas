@@ -1,8 +1,8 @@
-# Aukas — Opportunities Hub
+# Aukas — All Opportunities In One
 
 A web platform where students discover **internships, jobs, scholarships, volunteer work, and competitions** in one place.
 
-> Capstone project — IDT · 
+> Capstone project — IDT 
 
 ---
 
