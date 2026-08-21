@@ -1,8 +1,8 @@
 # Aukas — Opportunities Hub
 
-A Cambodia-first web platform where students discover **internships, jobs, scholarships, volunteer work, and competitions** in one place.
+A web platform where students discover **internships, jobs, scholarships, volunteer work, and competitions** in one place.
 
-> Capstone project — IDT · Computer Science Gen 11 · Year 2 Term 3 · Group 3 · 7-week build
+> Capstone project — IDT · 
 
 ---
 
